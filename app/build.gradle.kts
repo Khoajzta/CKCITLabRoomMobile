@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation("androidx.navigation:navigation-compose:2.8.3")
+    implementation("androidx.compose.animation:animation:1.9.0-alpha03")
     implementation("androidx.compose.material:material-icons-extended-android:1.7.5")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     // Fuel library
@@ -73,6 +74,7 @@ dependencies {
     implementation("androidx.datastore:datastore:1.1.1")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.play.services.maps)
+    implementation(libs.common)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.09.00")
     implementation(composeBom)

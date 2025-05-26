@@ -31,7 +31,7 @@ fun CardLichHoc(
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier.width(400.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 15.dp),
         shape = RoundedCornerShape(30.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {

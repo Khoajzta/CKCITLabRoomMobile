@@ -3,6 +3,11 @@ package com.example.ckcitlabroom
 import AnimatedNavigationBar
 import ButtonData
 import CardLichHoc
+import DotLoadingIndicator
+import DotLoadingOverlay
+import HomeScreen
+import NavRoute
+import NavgationGraph
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,9 +39,11 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +52,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,7 +66,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,48 +86,44 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
+    val navController = rememberNavController()
+    var isLoading by remember { mutableStateOf(false) }
 
     val buttons = listOf(
-        ButtonData("Home", Icons.Default.Home,{}),
-        ButtonData("Quản Lý", Icons.Default.Apps,{}),
-        ButtonData("Quét Mã", Icons.Default.QrCodeScanner,{}),
-        ButtonData("Thông Báo", Icons.Default.Notifications,{}),
-        ButtonData("Thông Tin", Icons.Default.AccountCircle,{}),
+        ButtonData("Home", Icons.Default.Home,
+            click = {
+                isLoading = true
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(500)
+                    isLoading = false
+                    navController.navigate(NavRoute.HOME.route)
+                }
+            }
+        ),
+        ButtonData(
+            "Quản Lý",
+            Icons.Default.Apps,
+            click = {
+                isLoading = true
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(500)  // giả lập loading
+                    isLoading = false
+                    navController.navigate(NavRoute.QUANLY.route)
+                }
+            }
+        ),
+        ButtonData("Quét Mã", Icons.Default.QrCodeScanner, {}),
+        ButtonData("Thông Báo", Icons.Default.Notifications, {}),
+        ButtonData("Thông Tin", Icons.Default.AccountCircle, { navController.navigate(NavRoute.ACCOUNT.route) }),
     )
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0XFF1B8DDE)),
-                title = { Text("") },
-                navigationIcon = {
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { /* TODO */ }) {
-                            Icon(Icons.Default.Menu,
-                                contentDescription = "Menu",
-                                modifier = Modifier.size(40.dp),
-                                Color.White
-                            )
-                        }
-                        Image(
-                            painter = painterResource(id = R.drawable.logo),
-                            contentDescription = "Logo",
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                        )
-                        Spacer(modifier = Modifier.width(7.dp))
-                        Text("IT LabRoom", fontWeight = FontWeight.ExtraBold, fontSize = 25.sp, color = Color.White)
-                    }
-                },
-            )
-        },
+        topBar = { /* TopAppBar như cũ */ },
         bottomBar = {
             AnimatedNavigationBar(
                 buttons = buttons,
@@ -121,26 +134,32 @@ fun MainScreen() {
             )
         },
         containerColor = Color(0xff1B8DDE)
+    ) { paddingValues ->
 
-    ) {
-        Column (
+        Box(
             modifier = Modifier
-                .padding(it)
                 .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text("Lịch Dạy", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                .padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                NavgationGraph(navController)
             }
-            //danh sách lịch dạy
-            CardLichHoc(gv = "Lê Viết Hoàng Nguyên", ca = "1", phong = "F7.1", thu = "4", lop = "CĐ TH22 D", tuan = "34", mon = "CSDL", ngay = "25/05/2025")
 
-
+            // Loading overlay
+//            if (isLoading) {
+//                DotLoadingOverlay()
+//            }
         }
     }
 }
+
+
 
 @Preview(showBackground = true)
 @Composable

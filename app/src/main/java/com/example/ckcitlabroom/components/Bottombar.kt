@@ -67,7 +67,7 @@ import androidx.compose.ui.zIndex
 data class ButtonData(
     val text: String,
     val icon: ImageVector,
-    val onClick: () -> Unit = {}
+    val click:  () -> Unit = {}
 )
 
 
@@ -149,7 +149,10 @@ fun AnimatedNavigationBar(
                 val isSelected = index == selectedItem
                 NavigationBarItem(
                     selected = isSelected,
-                    onClick = { selectedItem = index },
+                    onClick = {
+                        button.click()
+                        selectedItem = index
+                    },
                     icon = {
                         val iconAlpha by animateFloatAsState(
                             targetValue = if (isSelected) 0f else 1f,
