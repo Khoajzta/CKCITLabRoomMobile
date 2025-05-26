@@ -34,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -78,10 +79,25 @@ fun AnimatedNavigationBar(
     circleColor: Color,
     selectedColor: Color,
     unselectedColor: Color,
+    currentRoute: String?
 ) {
     val circleRadius = 26.dp
 
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
+
+    LaunchedEffect(currentRoute) {
+        currentRoute?.let { route ->
+            val index = when (route) {
+                NavRoute.HOME.route -> 0
+                NavRoute.QUANLY.route -> 1
+                NavRoute.ACCOUNT.route -> 4
+                // thêm các route khác nếu cần
+                else -> selectedItem
+            }
+            selectedItem = index
+        }
+    }
+
     var barSize by remember { mutableStateOf(IntSize(0, 0)) }
     // first item's center offset for Arrangement.SpaceAround
     val offsetStep = remember(barSize) {

@@ -30,13 +30,13 @@ fun NavgationGraph(
         composable(NavRoute.HOME.route,
             enterTransition = {
                 slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    AnimatedContentTransitionScope.SlideDirection.End,
                     animationSpec = tween(300)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    AnimatedContentTransitionScope.SlideDirection.Start,
                     animationSpec = tween(300)
                 )
             }) {
@@ -44,38 +44,40 @@ fun NavgationGraph(
         }
 
         composable(
-            route = NavRoute.ACCOUNT.route,enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(300)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(300)
-                )
-            }
-        ) {
-            AccountScreen()
-        }
-        composable(
             route = NavRoute.QUANLY.route,
             enterTransition = {
                 slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    AnimatedContentTransitionScope.SlideDirection.Start,
                     animationSpec = tween(300)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    AnimatedContentTransitionScope.SlideDirection.End,
                     animationSpec = tween(300)
                 )
             }
         ) {
             QuanLyScreen(navController)
         }
+
+        composable(
+            route = NavRoute.ACCOUNT.route,enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            AccountScreen()
+        }
+
 
         composable(
             route = NavRoute.QUANLYCAUHINH.route,

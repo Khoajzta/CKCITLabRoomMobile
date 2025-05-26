@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.DesktopWindows
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.DesktopWindows
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Card
@@ -32,17 +33,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 
 
-
-
 @Composable
-fun QuanLyScreen(navController: NavHostController){
+fun QuanLyScreen(navController: NavHostController) {
 
 
     val dsChucNang = listOf(
         ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = {}),
-        ChucNang("Quản Lý Cấu Hình", iconComputer ,{navController.navigate(NavRoute.QUANLYCAUHINH.route)}),
-        ChucNang("Quản Lý Giảng Viên", Icons.Outlined.Person,{}),
-        ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person,{})
+        ChucNang("Quản Lý Cấu Hình", iconComputer, {
+            navController.navigate(NavRoute.QUANLYCAUHINH.route)
+        }),
+        ChucNang("Quản Lý Giảng Viên", Icons.Outlined.Person, {}),
+        ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, {}),
+        ChucNang("Quản Lý Lịch", Icons.Outlined.CalendarMonth, {})
     )
 
 
