@@ -18,6 +18,9 @@ sealed class NavRoute(val route: String) {
     object LOGIN : NavRoute("login_screen")
     object QUANLY : NavRoute("quanly_screen")
     object QUANLYCAUHINH : NavRoute("quanlycauhinh_screen")
+    object QUANLYMAYTINH : NavRoute("quanlymaytinh_screen")
+    object ADDCAUHINH : NavRoute("addcauhinh_screen")
+    object EDITCAUHINH : NavRoute("editcauhinh_screen")
 }
 
 @Composable
@@ -31,13 +34,13 @@ fun NavgationGraph(
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(300)
+                    animationSpec = tween(200)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(300)
+                    animationSpec = tween(200)
                 )
             }) {
             HomeScreen()
@@ -48,13 +51,13 @@ fun NavgationGraph(
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(300)
+                    animationSpec = tween(200)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(300)
+                    animationSpec = tween(200)
                 )
             }
         ) {
@@ -62,27 +65,69 @@ fun NavgationGraph(
         }
 
         composable(
-            route = NavRoute.ACCOUNT.route,enterTransition = {
+            route = NavRoute.ACCOUNT.route,
+            enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(300)
+                    animationSpec = tween(200)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(300)
+                    animationSpec = tween(200)
                 )
             }
         ) {
             AccountScreen()
         }
 
-
         composable(
             route = NavRoute.QUANLYCAUHINH.route,
         ) {
-            QuanLyCauHinh()
+            QuanLyCauHinh(navController)
+        }
+
+        composable(
+            route = NavRoute.QUANLYMAYTINH.route,
+        ) {
+            QuanLyMayTinh(navController)
+        }
+
+        composable(
+            route = NavRoute.ADDCAUHINH.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
+            CreateCauHinhScreen()
+        }
+
+        composable(
+            route = NavRoute.EDITCAUHINH.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
+//            EditCauHinhScreen()
         }
     }
 }

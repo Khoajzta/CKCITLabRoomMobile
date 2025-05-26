@@ -28,34 +28,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuanLyCauHinh(navController: NavHostController) {
-    val danhSachCauHinh = listOf(
-        CauHinh(
-            MaCauHinh = "CH001",
-            Main = "Asus B660",
-            CPU = "Intel i5-12400F",
-            RAM = "16GB DDR4",
-            VGA = "GTX 1660",
-            ManHinh = "27 inch",
-            BanPhim = "Logitech K120",
-            Chuot = "Logitech M90",
-            HDD = "Samsung x70 evo 500gb",
-            NgayNhap = "2025-05-20",
+fun QuanLyMayTinh(navController: NavHostController) {
+    val danhSachMayTinh = listOf(
+        MayTinh(
+            MaMay = "MAY01",
+            TenMay = "MÁY 01",
+            MaCauHinh = "CH01",
+            MaPhong = "F7.1",
             TrangThai = 1
         ),
-        CauHinh(
-            MaCauHinh = "CH002",
-            Main = "MSI B550",
-            CPU = "Ryzen 5 5600X",
-            RAM = "16GB DDR4",
-            VGA = "RTX 3060",
-            ManHinh = "24 inch",
-            BanPhim = "Razer Cynosa",
-            Chuot = "Razer DeathAdder",
-            HDD = "Samsung x70 evo 500gb",
-            NgayNhap = "2025-05-18",
+        MayTinh(
+            MaMay = "MAY02",
+            TenMay = "MÁY 02",
+            MaCauHinh = "CH02",
+            MaPhong = "F7.2",
             TrangThai = 0
         )
     )
@@ -72,7 +59,7 @@ fun QuanLyCauHinh(navController: NavHostController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Cấu Hình",
+                "Quản Lý Máy Tính",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 color = Color.White
@@ -94,8 +81,8 @@ fun QuanLyCauHinh(navController: NavHostController) {
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            items(danhSachCauHinh) { cauHinh ->
-                CardCauHinh(cauHinh)
+            items(danhSachMayTinh) { maytinh ->
+                CardMayTinh(maytinh)
             }
         }
     }

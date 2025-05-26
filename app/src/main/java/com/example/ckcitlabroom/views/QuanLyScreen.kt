@@ -38,10 +38,8 @@ fun QuanLyScreen(navController: NavHostController) {
 
 
     val dsChucNang = listOf(
-        ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = {}),
-        ChucNang("Quản Lý Cấu Hình", iconComputer, {
-            navController.navigate(NavRoute.QUANLYCAUHINH.route)
-        }),
+        ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = {navController.navigate(NavRoute.QUANLYMAYTINH.route)}),
+        ChucNang("Quản Lý Cấu Hình", iconComputer, Click = { navController.navigate(NavRoute.QUANLYCAUHINH.route) }),
         ChucNang("Quản Lý Giảng Viên", Icons.Outlined.Person, {}),
         ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, {}),
         ChucNang("Quản Lý Lịch", Icons.Outlined.CalendarMonth, {})

@@ -7,6 +7,7 @@ data class CauHinh(
     var ManHinh:String,
     var BanPhim:String,
     var Chuot:String,
+    var HDD:String,
     var NgayNhap:String,
     var TrangThai:Int,
 )
