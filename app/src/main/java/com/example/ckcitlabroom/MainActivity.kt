@@ -97,6 +97,7 @@ fun MainScreen() {
     val buttons = listOf(
         ButtonData("Home", Icons.Default.Home,
             click = {
+                navController.popBackStack()
                 isLoading = true
                 CoroutineScope(Dispatchers.Main).launch {
                     delay(500)
@@ -109,6 +110,7 @@ fun MainScreen() {
             "Quản Lý",
             Icons.Default.Apps,
             click = {
+                navController.popBackStack()
                 isLoading = true
                 CoroutineScope(Dispatchers.Main).launch {
                     delay(500)  // giả lập loading
@@ -119,11 +121,34 @@ fun MainScreen() {
         ),
         ButtonData("Quét Mã", Icons.Default.QrCodeScanner, {}),
         ButtonData("Thông Báo", Icons.Default.Notifications, {}),
-        ButtonData("Thông Tin", Icons.Default.AccountCircle, { navController.navigate(NavRoute.ACCOUNT.route) }),
+        ButtonData("Thông Tin", Icons.Default.AccountCircle, {
+            navController.popBackStack()
+            navController.navigate(NavRoute.ACCOUNT.route)
+        }),
     )
 
     Scaffold(
-        topBar = { /* TopAppBar như cũ */ },
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0XFF1B8DDE)),
+                title = {
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo),
+                            contentDescription = "Logo",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                        )
+                        Spacer(modifier = Modifier.width(7.dp))
+                        Text("IT LabRoom", fontWeight = FontWeight.ExtraBold, fontSize = 25.sp, color = Color.White)
+                    }
+                },
+            )
+        },
         bottomBar = {
             AnimatedNavigationBar(
                 buttons = buttons,
@@ -136,7 +161,7 @@ fun MainScreen() {
         containerColor = Color(0xff1B8DDE)
     ) { paddingValues ->
 
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
@@ -151,7 +176,6 @@ fun MainScreen() {
                 NavgationGraph(navController)
             }
 
-            // Loading overlay
 //            if (isLoading) {
 //                DotLoadingOverlay()
 //            }
@@ -159,12 +183,3 @@ fun MainScreen() {
     }
 }
 
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CKCITLabRoomTheme {
-        MainScreen()
-    }
-}

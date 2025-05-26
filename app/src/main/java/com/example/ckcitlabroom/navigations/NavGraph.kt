@@ -17,6 +17,7 @@ sealed class NavRoute(val route: String) {
     object ACCOUNT : NavRoute("account_screen")
     object LOGIN : NavRoute("login_screen")
     object QUANLY : NavRoute("quanly_screen")
+    object QUANLYCAUHINH : NavRoute("quanlycauhinh_screen")
 }
 
 @Composable
@@ -29,7 +30,7 @@ fun NavgationGraph(
         composable(NavRoute.HOME.route,
             enterTransition = {
                 slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    AnimatedContentTransitionScope.SlideDirection.Right,
                     animationSpec = tween(300)
                 )
             },
@@ -73,8 +74,13 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLyScreen()
+            QuanLyScreen(navController)
         }
 
+        composable(
+            route = NavRoute.QUANLYCAUHINH.route,
+        ) {
+            QuanLyCauHinh()
+        }
     }
 }
