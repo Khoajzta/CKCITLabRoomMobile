@@ -9,6 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.lapstore.viewmodels.LichHocViewModel
 import com.google.ai.client.generativeai.common.server.Segment
 
 
@@ -26,6 +27,7 @@ sealed class NavRoute(val route: String) {
 @Composable
 fun NavgationGraph(
     navController: NavHostController,
+    lichHocViewModel: LichHocViewModel
 ) {
     NavHost(navController = navController, startDestination = NavRoute.HOME.route,
 
@@ -43,7 +45,7 @@ fun NavgationGraph(
                     animationSpec = tween(300)
                 )
             }) {
-            HomeScreen()
+            HomeScreen(lichHocViewModel)
         }
 
         composable(

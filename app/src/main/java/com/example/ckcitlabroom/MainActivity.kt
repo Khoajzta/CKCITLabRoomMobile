@@ -2,6 +2,7 @@ package com.example.ckcitlabroom
 
 import AnimatedNavigationBar
 import ButtonData
+import DotLoadingOverlay
 import LoginScreen
 import NavRoute
 import NavgationGraph
@@ -46,9 +47,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
+import com.example.lapstore.viewmodels.LichHocViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -70,13 +73,11 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
-    // Khởi tạo NavController để điều hướng giữa các màn hình
     val navController = rememberNavController()
+    val lichHocViewModel: LichHocViewModel = viewModel()
 
-    // Biến quản lý trạng thái loading
     var isLoading by remember { mutableStateOf(false) }
 
-    // Lấy route hiện tại để xác định màn hình nào đang hiển thị
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
     // Danh sách các button cho Bottom Navigation Bar
@@ -101,9 +102,13 @@ fun MainScreen() {
                 }
             }
         }),
-        ButtonData("Quét Mã", Icons.Default.QrCodeScanner, {}),
-        ButtonData("Thông Báo", Icons.Default.Notifications, {}),
-        ButtonData("Thông Tin", Icons.Default.AccountCircle, {
+        ButtonData("Quét Mã", Icons.Default.QrCodeScanner,click = {
+
+        }),
+        ButtonData("Thông Báo", Icons.Default.Notifications,click = {
+
+        }),
+        ButtonData("Thông Tin", Icons.Default.AccountCircle,click = {
             navController.navigate(NavRoute.ACCOUNT.route){
                 popUpTo(0) { inclusive = true }
             }
@@ -122,7 +127,6 @@ fun MainScreen() {
                 }
             })
     }, {
-        // TopAppBar với logo và tiêu đề (cho màn hình Home)
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0XFF1B8DDE)),
             title = {
@@ -149,27 +153,22 @@ fun MainScreen() {
         )
     })
 
-    // Scaffold chứa TopAppBar, BottomBar và nội dung màn hình
     Scaffold(topBar = {
-        // Chọn TopAppBar tuỳ theo route hiện tại
         when (currentRoute) {
-            NavRoute.HOME.route, NavRoute.QUANLY.route, NavRoute.ACCOUNT.route -> topAppBars[1]()  // Nếu là Home thì dùng TopAppBar số 2
-            else -> topAppBars[0]()                 // Ngược lại dùng TopAppBar số 1
+            NavRoute.HOME.route, NavRoute.QUANLY.route, NavRoute.ACCOUNT.route -> topAppBars[1]()
+            else -> topAppBars[0]()
         }
     }, bottomBar = {
-        // Custom Bottom Navigation Bar luôn cố định tại MainScreen
         AnimatedNavigationBar(
             buttons = buttons,
             barColor = Color.White,
             circleColor = Color.White,
             selectedColor = Color(0xff1B8DDE),
             unselectedColor = Color.Gray,
-            currentRoute = currentRoute  // truyền vào đây
+            currentRoute = currentRoute
         )
     }, containerColor = Color(0xff1B8DDE)
     ) { paddingValues ->
-
-        // Nội dung chính của màn hình
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -182,14 +181,13 @@ fun MainScreen() {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Điều hướng màn hình bằng NavHost
-                NavgationGraph(navController)
+                NavgationGraph(navController,lichHocViewModel)
             }
 
             // Hiển thị overlay loading khi isLoading = true
-            // if (isLoading) {
-            //     DotLoadingOverlay()
-            // }
+//             if (isLoading) {
+//                 DotLoadingOverlay()
+//             }
         }
     }
 }

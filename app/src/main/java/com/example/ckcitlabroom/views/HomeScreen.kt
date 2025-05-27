@@ -1,3 +1,5 @@
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,33 +14,42 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.lapstore.viewmodels.LichHocViewModel
+
 
 @Composable
-fun HomeScreen() {
-    val danhSachLichHoc = listOf(
-        LichHoc(1,"GV001","F7.1","25/05/2025","CĐTH22DDD",1,"TKW","4","41",""),
-        LichHoc(2,"GV002","F7.1","25/05/2025","CĐTH22DDD",2,"CSDL","4","41","")
-    )
+fun HomeScreen(viewmodel: LichHocViewModel) {
+    val danhSachLichHoc = viewmodel.danhSachLichHoc
+
+    LaunchedEffect(Unit) {
+        viewmodel.getAllLichHoc()
+    }
+
+    Log.d("DanhSachLichHoc", danhSachLichHoc.toString())
+
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                "Lịch Dạy",
+                text = "Lịch Dạy",
                 color = Color.White,
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                modifier = Modifier.padding(16.dp)
             )
         }
+
         Spacer(modifier = Modifier.height(12.dp))
 
         LazyRow(
@@ -46,9 +57,13 @@ fun HomeScreen() {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 8.dp)
         ) {
-            items(danhSachLichHoc) { lichHoc ->
-                CardLichHoc(lichHoc)
+            items(danhSachLichHoc) { lichhoc ->
+                CardLichHoc(lichhoc)
             }
         }
     }
 }
+
+
+
+
