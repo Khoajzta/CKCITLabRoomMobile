@@ -19,24 +19,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-data class LichHoc(
-    val gv: String,       // Giáo viên
-    val ca: String,       // Ca học
-    val phong: String,    // Phòng học
-    val thu: String,      // Thứ (1,2,3,... hoặc thứ 2, thứ 3)
-    val lop: String,      // Lớp học
-    val tuan: String,     // Tuần học
-    val mon: String,      // Môn học
-    val ngay: String      // Ngày học (vd: 25/05/2025)
-)
-
-
 @Composable
 fun HomeScreen() {
     val danhSachLichHoc = listOf(
-        LichHoc("Lê Viết Hoàng Nguyên", "1", "F7.1", "4", "CĐ TH22 D", "34", "CSDL", "25/05/2025"),
-        LichHoc("Nguyễn Văn A", "2", "F7.2", "5", "CĐ TH22 E", "35", "Toán", "26/05/2025"),
-        // Thêm các lịch học khác...
+        LichHoc(1,"GV001","F7.1","25/05/2025","CĐTH22DDD",1,"TKW","4","41",""),
+        LichHoc(2,"GV002","F7.1","25/05/2025","CĐTH22DDD",2,"CSDL","4","41","")
     )
     Column(
         modifier = Modifier
@@ -60,17 +47,7 @@ fun HomeScreen() {
             contentPadding = PaddingValues(horizontal = 8.dp)
         ) {
             items(danhSachLichHoc) { lichHoc ->
-                // Giả sử bạn muốn show nhiều trường, ở đây tạm dùng dữ liệu mẫu:
-                CardLichHoc(
-                    gv = lichHoc.gv,
-                    ca = lichHoc.ca,
-                    phong = lichHoc.phong,
-                    thu = lichHoc.thu,
-                    lop = lichHoc.lop,
-                    tuan = lichHoc.tuan,
-                    mon = lichHoc.mon,
-                    ngay = lichHoc.ngay
-                )
+                CardLichHoc(lichHoc)
             }
         }
     }
