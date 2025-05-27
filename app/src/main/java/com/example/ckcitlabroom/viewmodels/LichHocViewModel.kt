@@ -9,7 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lapstore.api.LichHocRetrofitClient
+import com.example.lapstore.api.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,7 +26,7 @@ class LichHocViewModel : ViewModel() {
     fun getAllLichHoc() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = LichHocRetrofitClient.lichhocAPIService.getAllLichHoc()
+                val response = ITLabRoomRetrofitClient.lichhocAPIService.getAllLichHoc()
                 danhSachLichHoc = response.lichhoc
             } catch (e: Exception) {
                 errorMessage = e.message
