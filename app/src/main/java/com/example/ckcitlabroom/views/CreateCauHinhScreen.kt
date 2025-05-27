@@ -44,6 +44,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import java.util.Calendar
 
 
@@ -77,9 +78,8 @@ fun CreateCauHinhScreen() {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
-            .padding(8.dp)
             .fillMaxWidth()
-            .height(600.dp),
+            .height(640.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(
@@ -91,7 +91,7 @@ fun CreateCauHinhScreen() {
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text("Thêm Cấu hình", fontWeight = FontWeight.ExtraBold)
+                Text("Thêm Cấu hình", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             }
 
             LazyColumn(

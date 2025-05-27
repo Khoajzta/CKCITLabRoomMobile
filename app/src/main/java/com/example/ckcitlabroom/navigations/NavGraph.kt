@@ -34,13 +34,13 @@ fun NavgationGraph(
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             }) {
             HomeScreen()
@@ -51,13 +51,13 @@ fun NavgationGraph(
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             }
         ) {
@@ -69,13 +69,13 @@ fun NavgationGraph(
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             }
         ) {
@@ -84,12 +84,36 @@ fun NavgationGraph(
 
         composable(
             route = NavRoute.QUANLYCAUHINH.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
         ) {
             QuanLyCauHinh(navController)
         }
 
         composable(
             route = NavRoute.QUANLYMAYTINH.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
         ) {
             QuanLyMayTinh(navController)
         }
@@ -99,13 +123,13 @@ fun NavgationGraph(
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             }
         ) {
@@ -117,13 +141,13 @@ fun NavgationGraph(
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(200)
+                    animationSpec = tween(300)
                 )
             }
         ) {

@@ -106,7 +106,6 @@ fun MainScreen() {
     // Danh sách các button cho Bottom Navigation Bar
     val buttons = listOf(
         ButtonData("Home", Icons.Default.Home, click = {
-            navController.popBackStack()
             isLoading = true
             CoroutineScope(Dispatchers.Main).launch {
                 delay(500)
@@ -117,7 +116,6 @@ fun MainScreen() {
             }
         }),
         ButtonData("Quản Lý", Icons.Default.Apps, click = {
-//            navController.popBackStack()
             isLoading = true
             CoroutineScope(Dispatchers.Main).launch {
                 delay(500)
@@ -130,7 +128,6 @@ fun MainScreen() {
         ButtonData("Quét Mã", Icons.Default.QrCodeScanner, {}),
         ButtonData("Thông Báo", Icons.Default.Notifications, {}),
         ButtonData("Thông Tin", Icons.Default.AccountCircle, {
-//            navController.popBackStack()
             navController.navigate(NavRoute.ACCOUNT.route){
                 popUpTo(0) { inclusive = true }
             }
@@ -139,13 +136,12 @@ fun MainScreen() {
     )
 
     val topAppBars = listOf<@Composable () -> Unit>({
-        // TopAppBar có nút quay lại (cho các màn hình khác Home)
         TopAppBar(colors = TopAppBarDefaults.topAppBarColors(Color(0XFF1B8DDE)),
-            title = { Text("Trở lại", fontWeight = FontWeight.Bold) },
+            title = { Text("Trở lại", fontWeight = FontWeight.Bold, color = Color.White) },
             navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBackIosNew, contentDescription = ""
+                        imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "", tint = Color.White
                     )
                 }
             })
