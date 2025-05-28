@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.DesktopWindows
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.SupervisorAccount
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +41,7 @@ fun QuanLyScreen(navController: NavHostController) {
     val dsChucNang = listOf(
         ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = {navController.navigate(NavRoute.QUANLYMAYTINH.route)}),
         ChucNang("Quản Lý Cấu Hình", iconComputer, Click = { navController.navigate(NavRoute.QUANLYCAUHINH.route) }),
-        ChucNang("Quản Lý Giảng Viên", Icons.Outlined.Person, {}),
+        ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = {navController.navigate(NavRoute.QUANLYGIANGVIEN.route)}),
         ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, {}),
         ChucNang("Quản Lý Lịch", Icons.Outlined.CalendarMonth, {})
     )

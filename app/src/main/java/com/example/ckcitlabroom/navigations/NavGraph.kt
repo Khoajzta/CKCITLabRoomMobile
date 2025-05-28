@@ -133,6 +133,12 @@ fun NavgationGraph(
         }
 
         composable(
+            route = NavRoute.QUANLYGIANGVIEN.route,
+        ) {
+            QuanLyGiangVien(navController)
+        }
+
+        composable(
             route = NavRoute.ADDCAUHINH.route,
             enterTransition = {
                 slideIntoContainer(
@@ -219,6 +225,42 @@ fun NavgationGraph(
             route = NavRoute.QUANLYGIANGVIEN.route,
         ) {
             QuanLyGiangVien(navController)
+        }
+
+        composable(
+            route = NavRoute.ADDGIANGVIEN.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
+            CreateGiangVienScreen()
+        }
+
+        composable(
+            route = NavRoute.EDITGIANGVIEN.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
+//            EditGiangVienScreen()
         }
 
         composable(
