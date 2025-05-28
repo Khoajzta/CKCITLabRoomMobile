@@ -68,7 +68,7 @@ fun CardGiangVien(giangVien: GiangVien) {
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = giangVien.MaGiangVien,
+                text = giangVien.MaGV,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -165,7 +165,7 @@ fun CardGiangVien(giangVien: GiangVien) {
                 ) {
                     Text(
                         text =
-                        if (giangVien.TrangThai == 1) {
+                        if (giangVien.TrangThai == "1") {
                             "Đang Giảng Dạy"
                         } else {
                             "Ngừng Dạy"

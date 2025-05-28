@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.lapstore.viewmodels.LichHocViewModel
 import com.google.ai.client.generativeai.common.server.Segment
@@ -16,7 +17,8 @@ import com.google.ai.client.generativeai.common.server.Segment
 sealed class NavRoute(val route: String) {
     object HOME : NavRoute("home_screen")
     object ACCOUNT : NavRoute("account_screen")
-    object LOGIN : NavRoute("login_screen")
+    object LOGINGIANGVIEN : NavRoute("logingv_screen")
+    object LOGINSINHVIEN : NavRoute("loginsv_screen")
     object QUANLY : NavRoute("quanly_screen")
     object QUANLYCAUHINH : NavRoute("quanlycauhinh_screen")
     object QUANLYMAYTINH : NavRoute("quanlymaytinh_screen")
@@ -27,12 +29,16 @@ sealed class NavRoute(val route: String) {
 @Composable
 fun NavgationGraph(
     navController: NavHostController,
-    lichHocViewModel: LichHocViewModel
+    lichHocViewModel: LichHocViewModel,
+    giangVienViewModel: GiangVienViewModel
 ) {
+
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     NavHost(navController = navController, startDestination = NavRoute.HOME.route,
 
     ) {
-        composable(NavRoute.HOME.route,
+        composable(
+            NavRoute.HOME.route,
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.End,
@@ -44,9 +50,12 @@ fun NavgationGraph(
                     AnimatedContentTransitionScope.SlideDirection.Start,
                     animationSpec = tween(300)
                 )
-            }) {
-            HomeScreen(lichHocViewModel)
+            }
+        ) { navBackStackEntry ->
+            val giangvien = navBackStackEntry.savedStateHandle.get<GiangVien>("giangvien")
+            HomeScreen(lichHocViewModel, giangvien)
         }
+
 
         composable(
             route = NavRoute.QUANLY.route,
@@ -154,6 +163,53 @@ fun NavgationGraph(
             }
         ) {
 //            EditCauHinhScreen()
+        }
+
+        composable(
+            route = NavRoute.LOGINGIANGVIEN.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            LoginGVScreen(navController,giangVienViewModel)
+        }
+
+        composable(
+            route = NavRoute.LOGINSINHVIEN.route,
+            enterTransition = {
+                val direction = if (currentRoute == NavRoute.LOGINGIANGVIEN.route)
+                    AnimatedContentTransitionScope.SlideDirection.Start
+                else
+                    AnimatedContentTransitionScope.SlideDirection.End
+
+                slideIntoContainer(
+                    direction,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                val direction = if (currentRoute == NavRoute.LOGINGIANGVIEN.route)
+                    AnimatedContentTransitionScope.SlideDirection.Start
+                else
+                    AnimatedContentTransitionScope.SlideDirection.End
+
+                slideOutOfContainer(
+                    direction,
+                    animationSpec = tween(300)
+                )
+            }
+
+        ) {
+            LoginSVScreen(navController)
         }
     }
 }

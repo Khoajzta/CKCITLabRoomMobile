@@ -1,25 +1,25 @@
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Query
 
-data class GioHangResponse(
-    val giohang: List<GiangVien>
+data class LoginRequest(
+    val Email: String,
+    val MatKhau: String
 )
 
-data class UpdateResponse(
+data class LoginResponse(
     val success: Boolean,
-    val message: String
+    val message: String,
+    val data: GiangVien?
 )
 
-interface GioHangAPIService {
-    @GET("GiangVien/getgiohangtheomakhachhang.php")
-    suspend fun getGioHangByKhachHang(
-        @Query("MaKhachHang") MaKhachHang: Int
-    ): GioHangResponse
-
-    @PUT("GioHang/update.php")
-    suspend fun updateGioHang(
-        @Body gioHang: GiangVien
-    ): UpdateResponse
+interface GiangVienAPIService {
+    @GET("GiangVien/checkLogin.php")
+    suspend fun checkLogin(
+        @Query("email") email: String,
+        @Query("matkhau") matkhau: String
+    ): GiangVien
 }
+

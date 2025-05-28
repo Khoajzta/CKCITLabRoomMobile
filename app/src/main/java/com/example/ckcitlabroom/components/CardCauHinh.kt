@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 
@@ -53,8 +54,7 @@ fun CardCauHinh(cauHinh: CauHinh) {
             .width(300.dp)
             .clickable(
                 indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
+                interactionSource = remember { MutableInteractionSource() }) {
                 expanded = !expanded
             }
             .animateContentSize(
@@ -68,20 +68,48 @@ fun CardCauHinh(cauHinh: CauHinh) {
                 .padding(12.dp)
         ) {
             // Thông tin chính - luôn hiển thị
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                Icon(Icons.Default.Code, contentDescription = "Mã cấu hình", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 4.dp)
+            ) {
+                Icon(
+                    Icons.Default.Code,
+                    contentDescription = "Mã cấu hình",
+                    tint = Color(0xFF3F51B5),
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Mã cấu hình: ${cauHinh.MaCauHinh}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(
+                    text = "Mã cấu hình: ${cauHinh.MaCauHinh}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 2.dp)) {
-                Icon(Icons.Default.Memory, contentDescription = "Mainboard", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 2.dp)
+            ) {
+                Icon(
+                    Icons.Default.Memory,
+                    contentDescription = "Mainboard",
+                    tint = Color(0xFF3F51B5),
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(Modifier.width(6.dp))
                 Text(text = "Mainboard: ${cauHinh.Main}", fontSize = 16.sp)
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 2.dp)) {
-                Icon(Icons.Default.Computer, contentDescription = "CPU", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 2.dp)
+            ) {
+                Icon(
+                    Icons.Default.Computer,
+                    contentDescription = "CPU",
+                    tint = Color(0xFF3F51B5),
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(Modifier.width(6.dp))
                 Text(text = "CPU: ${cauHinh.CPU}", fontSize = 16.sp)
             }
@@ -104,16 +132,32 @@ fun CardCauHinh(cauHinh: CauHinh) {
                     )
 
                     infoItems.forEach { (icon, text) ->
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 2.dp)) {
-                            Icon(icon, contentDescription = null, tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = 2.dp)
+                        ) {
+                            Icon(
+                                icon,
+                                contentDescription = null,
+                                tint = Color(0xFF3F51B5),
+                                modifier = Modifier.size(20.dp)
+                            )
                             Spacer(Modifier.width(6.dp))
                             Text(text = text, fontSize = 16.sp)
                         }
                     }
 
                     // Trạng thái
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
-                        Icon(Icons.Default.Info, contentDescription = "Trạng thái", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Trạng thái",
+                            tint = Color(0xFF3F51B5),
+                            modifier = Modifier.size(20.dp)
+                        )
                         Spacer(Modifier.width(6.dp))
                         Text(text = "Trạng thái: ", fontWeight = FontWeight.SemiBold)
                         val (color, statusText) = when (cauHinh.TrangThai) {
@@ -133,10 +177,7 @@ fun CardCauHinh(cauHinh: CauHinh) {
                         Text(text = statusText, color = color)
                     }
 
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {}
-                    ) {
+                    Button(modifier = Modifier.fillMaxWidth(), onClick = {}) {
                         Text("Chỉnh Sửa")
                     }
                 }

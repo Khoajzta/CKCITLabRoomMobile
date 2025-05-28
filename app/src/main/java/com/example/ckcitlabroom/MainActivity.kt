@@ -3,7 +3,8 @@ package com.example.ckcitlabroom
 import AnimatedNavigationBar
 import ButtonData
 import DotLoadingOverlay
-import LoginScreen
+import GiangVienViewModel
+import LoginSVScreen
 import NavRoute
 import NavgationGraph
 import android.os.Bundle
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -75,6 +77,7 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
     val lichHocViewModel: LichHocViewModel = viewModel()
+    val giangVienViewModel: GiangVienViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
 
@@ -87,7 +90,7 @@ fun MainScreen() {
             CoroutineScope(Dispatchers.Main).launch {
                 delay(500)
                 isLoading = false
-                navController.navigate(NavRoute.HOME.route){
+                navController.navigate(NavRoute.HOME.route) {
                     popUpTo(0) { inclusive = true }
                 }
             }
@@ -97,20 +100,24 @@ fun MainScreen() {
             CoroutineScope(Dispatchers.Main).launch {
                 delay(500)
                 isLoading = false
-                navController.navigate(NavRoute.QUANLY.route){
+                navController.navigate(NavRoute.QUANLY.route) {
                     popUpTo(0) { inclusive = true }
                 }
             }
         }),
-        ButtonData("Quét Mã", Icons.Default.QrCodeScanner,click = {
+        ButtonData("Quét Mã", Icons.Default.QrCodeScanner, click = {
 
         }),
-        ButtonData("Thông Báo", Icons.Default.Notifications,click = {
+        ButtonData("Thông Báo", Icons.Default.Notifications, click = {
 
         }),
-        ButtonData("Thông Tin", Icons.Default.AccountCircle,click = {
-            navController.navigate(NavRoute.ACCOUNT.route){
-                popUpTo(0) { inclusive = true }
+        ButtonData("Thông Tin", Icons.Default.AccountCircle, click = {
+//            navController.navigate(NavRoute.ACCOUNT.route){
+//                popUpTo(0) { inclusive = true }
+//            }
+
+            navController.navigate(NavRoute.ACCOUNT.route) {
+//                popUpTo(0) { inclusive = true }
             }
 
         }),
@@ -122,7 +129,9 @@ fun MainScreen() {
             navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "", tint = Color.White
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = "",
+                        tint = Color.White
                     )
                 }
             })
@@ -151,22 +160,39 @@ fun MainScreen() {
                 }
             },
         )
+    }, {
+
     })
 
     Scaffold(topBar = {
         when (currentRoute) {
-            NavRoute.HOME.route, NavRoute.QUANLY.route, NavRoute.ACCOUNT.route -> topAppBars[1]()
+            NavRoute.LOGINSINHVIEN.route,
+            NavRoute.LOGINGIANGVIEN.route -> {}
+
+            NavRoute.HOME.route,
+            NavRoute.QUANLY.route,
+            NavRoute.ACCOUNT.route -> topAppBars[1]()
+
             else -> topAppBars[0]()
         }
+
     }, bottomBar = {
-        AnimatedNavigationBar(
-            buttons = buttons,
-            barColor = Color.White,
-            circleColor = Color.White,
-            selectedColor = Color(0xff1B8DDE),
-            unselectedColor = Color.Gray,
-            currentRoute = currentRoute
-        )
+        when (currentRoute) {
+            NavRoute.LOGINSINHVIEN.route, NavRoute.LOGINGIANGVIEN.route -> {
+            }
+
+            else -> {
+                AnimatedNavigationBar(
+                    buttons = buttons,
+                    barColor = Color.White,
+                    circleColor = Color.White,
+                    selectedColor = Color(0xff1B8DDE),
+                    unselectedColor = Color.Gray,
+                    currentRoute = currentRoute
+                )
+            }
+        }
+
     }, containerColor = Color(0xff1B8DDE)
     ) { paddingValues ->
         Column(
@@ -181,7 +207,11 @@ fun MainScreen() {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                NavgationGraph(navController,lichHocViewModel)
+                NavgationGraph(
+                    navController,
+                    lichHocViewModel,
+                    giangVienViewModel
+                )
             }
 
             // Hiển thị overlay loading khi isLoading = true

@@ -55,6 +55,8 @@ dependencies {
     implementation("com.composables:icons-lucide:1.0.0")
     implementation ("androidx.compose.material:material:1.8.2")
 
+
+
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     // Fuel library
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
@@ -74,8 +76,9 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
 
-    implementation("androidx.datastore:datastore:1.1.1")
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore:1.1.7")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+
     implementation(libs.play.services.maps)
     implementation(libs.common)
 
