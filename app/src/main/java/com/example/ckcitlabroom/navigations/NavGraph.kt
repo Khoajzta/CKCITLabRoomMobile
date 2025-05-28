@@ -21,11 +21,15 @@ sealed class NavRoute(val route: String) {
     object LOGINGIANGVIEN : NavRoute("logingv_screen")
     object LOGINSINHVIEN : NavRoute("loginsv_screen")
     object QUANLY : NavRoute("quanly_screen")
+
     object QUANLYCAUHINH : NavRoute("quanlycauhinh_screen")
-    object QUANLYMAYTINH : NavRoute("quanlymaytinh_screen")
-    object EDITMAYTINH : NavRoute("editmaytinh_screen")
     object ADDCAUHINH : NavRoute("addcauhinh_screen")
     object EDITCAUHINH : NavRoute("editcauhinh_screen")
+
+    object QUANLYMAYTINH : NavRoute("quanlymaytinh_screen")
+    object EDITMAYTINH : NavRoute("editmaytinh_screen")
+    object ADDTMAYTINH : NavRoute("addmaytinh_screen")
+
     object QUANLYGIANGVIEN : NavRoute("quanlygiangvien_screen")
     object ADDGIANGVIEN : NavRoute("addgiangvien_screen")
     object EDITGIANGVIEN : NavRoute("editgiangvien_screen")
@@ -313,6 +317,24 @@ fun NavgationGraph(
             }
         ) {
 //            EditGiangVienScreen()
+        }
+
+        composable(
+            route = NavRoute.ADDTMAYTINH.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            CreateMayTinhScreen(navController,mayTinhViewModel)
         }
     }
 }

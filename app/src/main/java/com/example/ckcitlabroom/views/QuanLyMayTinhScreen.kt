@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,12 @@ fun QuanLyMayTinh(
         mayTinhViewModel.getAllMayTinh()
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            mayTinhViewModel.stopPollingMayTinh()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,7 +69,7 @@ fun QuanLyMayTinh(
             )
             IconButton(
                 onClick = {
-                    navController.navigate(NavRoute.ADDCAUHINH.route)
+                    navController.navigate(NavRoute.ADDTMAYTINH.route)
                 }
             ) {
                 Icon(

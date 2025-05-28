@@ -72,19 +72,6 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) } // trạng thái hiển thị dialog
 
-    // Lắng nghe kết quả xóa để thông báo hoặc refresh UI (tuỳ bạn xử lý)
-    val deleteResult = maytinhViewModel.maytinhDeleteResult
-    val context = LocalContext.current
-
-    // Hiển thị toast khi có kết quả xóa
-    LaunchedEffect(deleteResult) {
-        if (deleteResult.isNotEmpty()) {
-            Toast.makeText(context, deleteResult, Toast.LENGTH_SHORT).show()
-            // Nếu muốn xóa xong reset lại kết quả
-            maytinhViewModel.maytinhDeleteResult = ""
-        }
-    }
-
     Card(
         modifier = Modifier
             .padding(bottom = 8.dp)
@@ -180,7 +167,6 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
                     onClick = {
                         maytinhViewModel.deleteMayTinh(maytinh.MaMay)
                         showConfirmDialog = false
-                        navController.navigate(NavRoute.QUANLYMAYTINH.route)
                     }
                 ) {
                     Text("Xóa", color = Color.Red)

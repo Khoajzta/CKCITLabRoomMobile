@@ -9,14 +9,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lapstore.api.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MayTinhViewModel : ViewModel() {
 
     var danhSachAllMayTinh by mutableStateOf<List<MayTinh>>(emptyList())
+        private set
+
+    private var pollingJob: Job? = null
+
+    var maytinhCreateResult by mutableStateOf("")
     var maytinhUpdateResult by mutableStateOf("")
-    var maytinhDeleteResult by mutableStateOf("")  // Thêm biến lưu kết quả xóa
+    var maytinhDeleteResult by mutableStateOf("")
 
     var maytinh: MayTinh? by mutableStateOf(null)
         private set
@@ -28,18 +36,25 @@ class MayTinhViewModel : ViewModel() {
         private set
 
     fun getAllMayTinh() {
-        viewModelScope.launch(Dispatchers.IO) {
-            isLoading = true
-            try {
-                val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
-                danhSachAllMayTinh = response.maytinh
-            } catch (e: Exception) {
-                errorMessage = e.message
-                Log.e("MayTinhViewModel", "Lỗi khi lấy danh sách máy tính", e)
-            } finally {
-                isLoading = false
+        // Nếu polling đang chạy thì không chạy thêm
+        if (pollingJob != null) return
+
+        pollingJob = viewModelScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                try {
+                    val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
+                    danhSachAllMayTinh = response.maytinh
+                } catch (e: Exception) {
+                    Log.e("MayTinhViewModel", "Polling lỗi", e)
+                }
+                delay(500)
             }
         }
+    }
+
+    fun stopPollingMayTinh() {
+        pollingJob?.cancel()
+        pollingJob = null
     }
 
     fun getMayTinhByMaMay(mamay: String) {
@@ -50,6 +65,23 @@ class MayTinhViewModel : ViewModel() {
             } catch (e: Exception) {
                 errorMessage = e.message
                 Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun createMayTinh(maytinh: MayTinh) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.maytinhAPIService.createMayTinh(maytinh)
+                }
+                maytinhCreateResult = response.message
+            } catch (e: Exception) {
+                maytinhCreateResult = "Lỗi khi thêm máy tính: ${e.message}"
+                Log.e("MayTinhViewModel", "Lỗi khi thêm máy tính: ${e.message}")
             } finally {
                 isLoading = false
             }
@@ -84,7 +116,8 @@ class MayTinhViewModel : ViewModel() {
                 }
                 maytinhDeleteResult = response.message
                 if (response.message == "MayTinh deleted") {
-                    getAllMayTinh()
+                    val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
+                    danhSachAllMayTinh = response.maytinh
                 }
             } catch (e: Exception) {
                 maytinhDeleteResult = "Lỗi khi xóa máy tính: ${e.message}"
@@ -94,7 +127,6 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
-
 }
 
 
