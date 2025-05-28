@@ -32,13 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun CardGiangVien(giangVien: GiangVien) {
+fun CardSinhVienInfo(sinhvien: SinhVien) {
     Card(
         modifier = Modifier
             .fillMaxWidth().height(640.dp),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(7.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -56,19 +55,19 @@ fun CardGiangVien(giangVien: GiangVien) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = giangVien.TenGiangVien,
+                text = sinhvien.TenSinhVien,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = "Giảng Viên",
+                text = "Sinh Viên",
                 fontSize = 20.sp,
                 color = Color.Gray
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = giangVien.MaGV,
+                text = sinhvien.MaSinhVien,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -98,7 +97,7 @@ fun CardGiangVien(giangVien: GiangVien) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        giangVien.NgaySinh,
+                        sinhvien.NgaySinh,
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp
                     )
@@ -131,7 +130,7 @@ fun CardGiangVien(giangVien: GiangVien) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = giangVien.Khoa,
+                        text = sinhvien.MaLop,
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp
                     )
@@ -165,10 +164,10 @@ fun CardGiangVien(giangVien: GiangVien) {
                 ) {
                     Text(
                         text =
-                        if (giangVien.TrangThai == "1") {
-                            "Đang Giảng Dạy"
+                        if (sinhvien.TrangThai == 1) {
+                            "Đang Học"
                         } else {
-                            "Ngừng Dạy"
+                            "Đình Chỉ"
                         },
 
                         fontWeight = FontWeight.Bold,
