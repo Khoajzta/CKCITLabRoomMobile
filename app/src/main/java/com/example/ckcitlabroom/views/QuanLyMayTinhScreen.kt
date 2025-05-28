@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,25 +28,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun QuanLyMayTinh(navController: NavHostController) {
-    val danhSachMayTinh = listOf(
-        MayTinh(
-            MaMay = "MAY01",
-            TenMay = "MÁY 01",
-            MaCauHinh = "CH01",
-            MaPhong = "F7.1",
-            TrangThai = 1
-        ),
-        MayTinh(
-            MaMay = "MAY02",
-            TenMay = "MÁY 02",
-            MaCauHinh = "CH02",
-            MaPhong = "F7.2",
-            TrangThai = 0
-        )
-    )
+fun QuanLyMayTinh(
+    navController: NavHostController,
+    mayTinhViewModel:MayTinhViewModel
+) {
+
+    val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
+
+    LaunchedEffect(Unit) {
+        mayTinhViewModel.getAllMayTinh()
+    }
 
     Column(
         modifier = Modifier
@@ -82,7 +77,7 @@ fun QuanLyMayTinh(navController: NavHostController) {
             modifier = Modifier.fillMaxSize()
         ) {
             items(danhSachMayTinh) { maytinh ->
-                CardMayTinh(maytinh)
+                CardMayTinh(maytinh,navController)
             }
         }
     }

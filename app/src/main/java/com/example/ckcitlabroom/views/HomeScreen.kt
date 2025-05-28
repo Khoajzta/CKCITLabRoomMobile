@@ -29,15 +29,10 @@ import com.example.lapstore.viewmodels.LichHocViewModel
 fun HomeScreen(viewmodel: LichHocViewModel,giangVien: GiangVien?) {
     val danhSachLichHoc = viewmodel.danhSachLichHoc
 
-    if(giangVien!=null){
-        Log.d("LoginResult", "Đăng nhập thành công: $giangVien")
-    }
-
     LaunchedEffect(Unit) {
         viewmodel.getAllLichHoc()
     }
 
-    Log.d("DanhSachLichHoc", danhSachLichHoc.toString())
 
     Column(
         modifier = Modifier.fillMaxSize(),

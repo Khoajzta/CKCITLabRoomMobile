@@ -115,29 +115,6 @@ fun CardGiangVienInfo(giangVien: GiangVien) {
                 fontSize = 18.sp,
                 fontWeight = FontWeight.ExtraBold
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(Color.White)
-                    .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 10.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = giangVien.Khoa,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    )
-                }
-
-            }
 
             Spacer(modifier = Modifier.height(15.dp))
 
@@ -165,7 +142,7 @@ fun CardGiangVienInfo(giangVien: GiangVien) {
                 ) {
                     Text(
                         text =
-                        if (giangVien.TrangThai == "1") {
+                        if (giangVien.TrangThai == 1) {
                             "Đang Giảng Dạy"
                         } else {
                             "Ngừng Dạy"

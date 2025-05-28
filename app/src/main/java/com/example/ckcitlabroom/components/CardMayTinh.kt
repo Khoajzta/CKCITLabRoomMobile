@@ -1,3 +1,5 @@
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,19 +28,23 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.DisplaySettings
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Mouse
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,19 +53,42 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.example.lapstore.viewmodels.MayTinhViewModel
 
 
 @Composable
-fun CardMayTinh(maytinh: MayTinh) {
+fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
+
+    Log.d("MaMay",maytinh.MaMay)
+
+    val maytinhViewModel: MayTinhViewModel = viewModel()
+
     var expanded by remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) } // trạng thái hiển thị dialog
+
+    // Lắng nghe kết quả xóa để thông báo hoặc refresh UI (tuỳ bạn xử lý)
+    val deleteResult = maytinhViewModel.maytinhDeleteResult
+    val context = LocalContext.current
+
+    // Hiển thị toast khi có kết quả xóa
+    LaunchedEffect(deleteResult) {
+        if (deleteResult.isNotEmpty()) {
+            Toast.makeText(context, deleteResult, Toast.LENGTH_SHORT).show()
+            // Nếu muốn xóa xong reset lại kết quả
+            maytinhViewModel.maytinhDeleteResult = ""
+        }
+    }
+
     Card(
         modifier = Modifier
             .padding(bottom = 8.dp)
             .fillMaxWidth()
-            .width(300.dp)
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
@@ -73,129 +103,98 @@ fun CardMayTinh(maytinh: MayTinh) {
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Computer,
-                    contentDescription = "Mã máy",
-                    tint = Color(0xFF3F51B5),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "Mã máy: ${maytinh.MaMay}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-            }
+        Column(modifier = Modifier.padding(12.dp)) {
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 2.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Memory,
-                    contentDescription = "Tên máy",
-                    tint = Color(0xFF3F51B5),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(text = "Tên Máy: ${maytinh.TenMay}", fontSize = 16.sp)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 2.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Cấu hình",
-                    tint = Color(0xFF3F51B5),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(text = "Cấu Hình: ${maytinh.MaCauHinh}", fontSize = 16.sp)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.MeetingRoom,
-                    contentDescription = "Phòng",
-                    tint = Color(0xFF3F51B5),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(text = "Phòng: ${maytinh.MaPhong}", fontSize = 16.sp)
-            }
-
-
-            // Trạng thái
+            // 4 thông tin đầu
+            Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text("Vị Trí: ${maytinh.ViTri}", fontSize = 16.sp)
+            Text("Phòng: ${maytinh.MaPhong}")
             val (color, statusText) = when (maytinh.TrangThai) {
                 1 -> Color(0xFF4CAF50) to "Hoạt động"
                 0 -> Color(0xFFF44336) to "Không hoạt động"
-                else -> Color(0xFF9E9E9E) to "Không xác định"
+                else -> Color.Gray to "Không xác định"
             }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 12.dp)
-            ) {
-                Text(
-                    text = "Trạng thái: ",
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
-                )
-                // Dấu chấm màu
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Trạng thái: ")
                 Box(
                     modifier = Modifier
                         .size(10.dp)
                         .clip(CircleShape)
                         .background(color)
-                        .padding(end = 4.dp)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = statusText,
-                    color = color,
-                    fontWeight = FontWeight.Bold
-                )
+                Spacer(Modifier.width(4.dp))
+                Text(statusText, color = color)
             }
 
-            // Phần mở rộng ẩn/hiện
+            Spacer(modifier = Modifier.height(8.dp))
+
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
+                    Text("Main: ${maytinh.Main}", fontSize = 16.sp)
+                    Text("CPU: ${maytinh.CPU}", fontSize = 16.sp)
+                    Text("RAM: ${maytinh.RAM}")
+                    Text("VGA: ${maytinh.VGA}")
+                    Text("Màn Hình: ${maytinh.ManHinh}")
+                    Text("Bàn Phím: ${maytinh.BanPhim}")
+                    Text("Chuột: ${maytinh.Chuot}")
+                    Text("HDD: ${maytinh.HDD}")
+                    Text("SSD: ${maytinh.SSD}")
+
+                    Spacer(Modifier.height(8.dp))
+
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = {},
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE),)
+                        onClick = {
+                            navController.navigate(NavRoute.EDITMAYTINH.route + "?mamay=${maytinh.MaMay}")
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE))
                     ) {
-                        Text("Chỉnh Sửa", fontWeight = FontWeight.Bold,color = Color.White)
+                        Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = {},
+                        onClick = {
+                            showConfirmDialog = true
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808))
                     ) {
                         Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             }
-            // Nút chỉnh sửa
-
         }
     }
+
+    // Dialog xác nhận xóa
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            title = { Text("Xác nhận") },
+            text = { Text("Bạn có chắc chắn muốn xóa máy tính này không?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        maytinhViewModel.deleteMayTinh(maytinh.MaMay)
+                        showConfirmDialog = false
+                        navController.navigate(NavRoute.QUANLYMAYTINH.route)
+                    }
+                ) {
+                    Text("Xóa", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showConfirmDialog = false }
+                ) {
+                    Text("Hủy")
+                }
+            }
+        )
+    }
 }
+
+

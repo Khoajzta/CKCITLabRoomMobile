@@ -25,16 +25,16 @@ fun AccountScreen(){
         )
 //        CardSinhVien(sinhvien)
 
-        var giangVien = GiangVien(
-            "GV001",
-            "Nguyễn Văn A",
-            "12/01/1990",
-            "Nam","Công Nghệ Thông Tin",
-            "Nam","Công Nghệ Thông Tin",
-            "1",
-            "",
-            ""
+        val giangVien = GiangVien(
+            MaGV = "GV001",
+            TenGiangVien = "Nguyễn Văn A",
+            NgaySinh = "1985-07-15",
+            GioiTinh = "Nam",
+            MatKhau = "12345678",
+            MaLoaiTaiKhoan = 2,
+            TrangThai = 1
         )
+
         CardGiangVienInfo(giangVien)
     }
 }

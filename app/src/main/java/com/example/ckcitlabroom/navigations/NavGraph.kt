@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.lapstore.viewmodels.LichHocViewModel
+import com.example.lapstore.viewmodels.MayTinhViewModel
 import com.google.ai.client.generativeai.common.server.Segment
 
 
@@ -22,6 +23,7 @@ sealed class NavRoute(val route: String) {
     object QUANLY : NavRoute("quanly_screen")
     object QUANLYCAUHINH : NavRoute("quanlycauhinh_screen")
     object QUANLYMAYTINH : NavRoute("quanlymaytinh_screen")
+    object EDITMAYTINH : NavRoute("editmaytinh_screen")
     object ADDCAUHINH : NavRoute("addcauhinh_screen")
     object EDITCAUHINH : NavRoute("editcauhinh_screen")
     object QUANLYGIANGVIEN : NavRoute("quanlygiangvien_screen")
@@ -33,7 +35,8 @@ sealed class NavRoute(val route: String) {
 fun NavgationGraph(
     navController: NavHostController,
     lichHocViewModel: LichHocViewModel,
-    giangVienViewModel: GiangVienViewModel
+    giangVienViewModel: GiangVienViewModel,
+    mayTinhViewModel: MayTinhViewModel,
 ) {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -129,8 +132,21 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLyMayTinh(navController)
+            QuanLyMayTinh(navController,mayTinhViewModel)
         }
+
+        composable(
+            NavRoute.EDITMAYTINH.route + "?mamay={mamay}",
+            arguments = listOf(
+                navArgument("mamay") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
+            EditMayTinhScreen(mamay)
+        }
+
 
         composable(
             route = NavRoute.QUANLYGIANGVIEN.route,
