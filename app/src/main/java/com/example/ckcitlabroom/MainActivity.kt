@@ -131,7 +131,9 @@ fun MainScreen() {
         TopAppBar(colors = TopAppBarDefaults.topAppBarColors(Color(0XFF1B8DDE)),
             title = { Text("Trở lại", fontWeight = FontWeight.Bold, color = Color.White) },
             navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
+                IconButton(onClick = {
+                    navController.popBackStack()
+                }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBackIosNew,
                         contentDescription = "",

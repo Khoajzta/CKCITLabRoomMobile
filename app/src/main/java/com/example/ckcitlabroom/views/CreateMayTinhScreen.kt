@@ -50,7 +50,6 @@ fun CreateMayTinhScreen(
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel
 ) {
-
     val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
     var danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
 

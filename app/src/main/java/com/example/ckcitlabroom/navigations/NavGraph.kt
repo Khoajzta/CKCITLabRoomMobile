@@ -31,6 +31,8 @@ sealed class NavRoute(val route: String) {
     object ADDTMAYTINH : NavRoute("addmaytinh_screen")
 
     object QUANLYPHONGMAY : NavRoute("quanlyphongmay_screen")
+    object PHONGMAYDETAIL : NavRoute("phongmaydetail_screen")
+    object ADDPHONGMAY : NavRoute("addphongmay_screen")
 
     object QUANLYGIANGVIEN : NavRoute("quanlygiangvien_screen")
     object ADDGIANGVIEN : NavRoute("addgiangvien_screen")
@@ -357,5 +359,36 @@ fun NavgationGraph(
         ) {
             QuanLyPhongMay(navController,phongMayViewModel)
         }
+
+        composable(
+            NavRoute.PHONGMAYDETAIL.route + "?maphong={maphong}",
+            arguments = listOf(
+                navArgument("maphong") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val maphong = navBackStackEntry.arguments?.getString("maphong") ?: ""
+            PhongMayDetailScreen(maphong,navController,phongMayViewModel,mayTinhViewModel)
+        }
+
+        composable(
+            route = NavRoute.ADDPHONGMAY.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            CreatePhongMayScreen(navController,phongMayViewModel)
+        }
+
     }
 }

@@ -34,6 +34,11 @@ interface MayTinhAPIService {
         @Query("MaMay") mamay: String
     ): MayTinh
 
+    @GET("MayTinh/getMayTinhTheoPhong.php")
+    suspend fun getMayTinhByMaPhong(
+        @Query("MaPhong") maphong: String
+    ): MayTinhResponse
+
     @POST("MayTinh/create.php")
     suspend fun createMayTinh(
         @Body maytiinh: MayTinh

@@ -1,6 +1,7 @@
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Query
 
@@ -11,4 +12,24 @@ data class PhongMayResponse(
 interface PhongMayAPIService {
     @GET("PhongMay/read.php")
     suspend fun getAllPhongMay(): PhongMayResponse
+
+    @GET("PhongMay/show.php")
+    suspend fun getPhongMayByMaPhong(
+        @Query("MaPhong") maphong: String
+    ): PhongMay
+
+    @POST("PhongMay/create.php")
+    suspend fun createPhongMay(
+        @Body phongmay: PhongMay
+    ): CreateResponse
+
+    @PUT("PhongMay/update.php")
+    suspend fun updateTrangThaiPhongMay(
+        @Body phongmay: PhongMay
+    ): UpdateResponse
+
+    @PUT("PhongMay/update.php")
+    suspend fun updatePhongMay(
+        @Body phongmay: PhongMay
+    ): UpdateResponse
 }

@@ -20,6 +20,9 @@ class MayTinhViewModel : ViewModel() {
     var danhSachAllMayTinh by mutableStateOf<List<MayTinh>>(emptyList())
         private set
 
+    var danhSachAllMayTinhtheophong by mutableStateOf<List<MayTinh>>(emptyList())
+        private set
+
     private var pollingJob: Job? = null
 
     var maytinhCreateResult by mutableStateOf("")
@@ -71,6 +74,27 @@ class MayTinhViewModel : ViewModel() {
                 Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
             } finally {
                 isLoading = false
+            }
+        }
+    }
+
+    fun getMayTinhByPhong(maphong: String) {
+        if (pollingJob != null) return
+
+        pollingJob = viewModelScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                try {
+                    val response = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaPhong(maphong)
+                    if (response.maytinh != null) {
+                        danhSachAllMayTinhtheophong = response.maytinh!!
+                    } else {
+                        danhSachAllMayTinhtheophong = emptyList()
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("PhongMayViewModel", "Polling lỗi", e)
+                }
+                delay(500)
             }
         }
     }

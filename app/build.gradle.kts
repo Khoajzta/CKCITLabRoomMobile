@@ -81,6 +81,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.play.services.maps)
     implementation(libs.common)
+    implementation(libs.androidx.runtime.livedata)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.09.00")
     implementation(composeBom)

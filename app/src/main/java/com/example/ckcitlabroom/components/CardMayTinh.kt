@@ -80,11 +80,12 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 
 
 @Composable
-fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
-
+fun CardMayTinh(
+    maytinh: MayTinh,
+    navController: NavHostController,
+    maytinhViewModel: MayTinhViewModel
+) {
     Log.d("MaMay",maytinh.MaMay)
-
-    val maytinhViewModel: MayTinhViewModel = viewModel()
 
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }

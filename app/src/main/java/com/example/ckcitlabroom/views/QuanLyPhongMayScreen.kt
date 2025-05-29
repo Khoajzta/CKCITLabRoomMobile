@@ -62,14 +62,14 @@ fun QuanLyPhongMay(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Máy Tính",
+                "Quản Lý Phòng Máy",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 color = Color.White
             )
             IconButton(
                 onClick = {
-                    navController.navigate(NavRoute.ADDTMAYTINH.route)
+                    navController.navigate(NavRoute.ADDPHONGMAY.route)
                 }
             ) {
                 Icon(
@@ -100,7 +100,7 @@ fun QuanLyPhongMay(
                 }
             } else {
                 items(danhSachPhongMay) { phongmay ->
-                    CardPhongMay(phongmay)
+                    CardPhongMay(phongmay,navController,phongMayViewModel)
                 }
             }
         }

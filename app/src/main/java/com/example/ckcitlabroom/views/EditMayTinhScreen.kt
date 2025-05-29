@@ -546,7 +546,7 @@ fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
                     mayTinhViewModel.updateMayTinh(mayTinhMoi)
                     coroutineScope.launch {
                         snackbarData.value = CustomSnackbarData(
-                            message = "Cập nhật máy tính thành công!", type = SnackbarType.ERROR
+                            message = "Cập nhật máy tính thành công!", type = SnackbarType.SUCCESS
                         )
                         snackbarHostState.showSnackbar("Thông báo")
                     }

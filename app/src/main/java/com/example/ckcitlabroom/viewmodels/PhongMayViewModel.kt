@@ -14,17 +14,20 @@ import kotlinx.coroutines.withContext
 
 class PhongMayViewModel : ViewModel() {
 
+    var pm = PhongMay(MaPhong = "", TenPhong = "", TrangThai = 0)
+
     var danhSachAllPhongMay by mutableStateOf(listOf<PhongMay>())
         private set
 
 
     private var pollingJob: Job? = null
 
-    var maytinhCreateResult by mutableStateOf("")
-    var maytinhUpdateResult by mutableStateOf("")
+    var phongmayCreateResult by mutableStateOf("")
+    var phogmayUpdateTrangThaiResult by mutableStateOf("")
+    var phogmayUpdateResult by mutableStateOf("")
     var maytinhDeleteResult by mutableStateOf("")
 
-    var maytinh: MayTinh? by mutableStateOf(null)
+    var phongmay: PhongMay by mutableStateOf(pm)
         private set
 
     var isLoading by mutableStateOf(false)
@@ -59,53 +62,70 @@ class PhongMayViewModel : ViewModel() {
         pollingJob = null
     }
 
-//    fun getMayTinhByMaMay(mamay: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            isLoading = true
-//            try {
-//                maytinh = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaMay(mamay)
-//            } catch (e: Exception) {
-//                errorMessage = e.message
-//                Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
-//            } finally {
-//                isLoading = false
-//            }
-//        }
-//    }
+    fun getPhongMayByMaPhong(maphong: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                phongmay = ITLabRoomRetrofitClient.phongmayAPIService.getPhongMayByMaPhong(maphong)
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("PhongMayViewModel", "Lỗi khi lấy thông tin phòng máy", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 //
-//    fun createMayTinh(maytinh: MayTinh) {
-//        viewModelScope.launch {
-//            isLoading = true
-//            try {
-//                val response = withContext(Dispatchers.IO) {
-//                    ITLabRoomRetrofitClient.maytinhAPIService.createMayTinh(maytinh)
-//                }
-//                maytinhCreateResult = response.message
-//            } catch (e: Exception) {
-//                maytinhCreateResult = "Lỗi khi thêm máy tính: ${e.message}"
-//                Log.e("MayTinhViewModel", "Lỗi khi thêm máy tính: ${e.message}")
-//            } finally {
-//                isLoading = false
-//            }
-//        }
-//    }
+    fun createPhongMay(phongMay: PhongMay) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.phongmayAPIService.createPhongMay(phongMay)
+                }
+                phongmayCreateResult = response.message
+            } catch (e: Exception) {
+                phongmayCreateResult = "Lỗi khi thêm phòng máy: ${e.message}"
+                Log.e("PhongMayViewModel", "Lỗi khi thêm phòng máy: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 //
-//    fun updateMayTinh(maytinh: MayTinh) {
-//        viewModelScope.launch {
-//            isLoading = true
-//            try {
-//                val response = withContext(Dispatchers.IO) {
-//                    ITLabRoomRetrofitClient.maytinhAPIService.updateMayTinh(maytinh)
-//                }
-//                maytinhUpdateResult = response.message
-//            } catch (e: Exception) {
-//                maytinhUpdateResult = "Lỗi khi cập nhật máy tính: ${e.message}"
-//                Log.e("MayTinhViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
-//            } finally {
-//                isLoading = false
-//            }
-//        }
-//    }
+    fun updateTrangThaiPhongMay(phogmay: PhongMay) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.phongmayAPIService.updateTrangThaiPhongMay(phogmay)
+                }
+                phogmayUpdateTrangThaiResult = response.message
+            } catch (e: Exception) {
+                phogmayUpdateTrangThaiResult = "Lỗi khi cập nhật trạng thái phòng máy: ${e.message}"
+                Log.e("PhongMayViewModel", "Lỗi khi cập nhật trạng thái phòng máy: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun updatePhongMay(phogmay: PhongMay) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.phongmayAPIService.updatePhongMay(phogmay)
+                }
+                phogmayUpdateResult = response.message
+            } catch (e: Exception) {
+                phogmayUpdateResult = "Lỗi khi cập nhật phòng máy: ${e.message}"
+                Log.e("PhongMayViewModel", "Lỗi khi cập nhật phòng máy: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 //
 //    // Hàm xóa máy tính
 //    fun deleteMayTinh(mamay: String) {

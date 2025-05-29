@@ -37,7 +37,6 @@ fun QuanLyMayTinh(
     navController: NavHostController,
     mayTinhViewModel:MayTinhViewModel
 ) {
-
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
 
     LaunchedEffect(Unit) {
@@ -100,7 +99,7 @@ fun QuanLyMayTinh(
                 }
             } else {
                 items(danhSachMayTinh) { maytinh ->
-                    CardMayTinh(maytinh, navController)
+                    CardMayTinh(maytinh, navController,mayTinhViewModel)
                 }
             }
         }
