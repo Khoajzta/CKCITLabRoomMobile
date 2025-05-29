@@ -30,6 +30,8 @@ sealed class NavRoute(val route: String) {
     object EDITMAYTINH : NavRoute("editmaytinh_screen")
     object ADDTMAYTINH : NavRoute("addmaytinh_screen")
 
+    object QUANLYPHONGMAY : NavRoute("quanlyphongmay_screen")
+
     object QUANLYGIANGVIEN : NavRoute("quanlygiangvien_screen")
     object ADDGIANGVIEN : NavRoute("addgiangvien_screen")
     object EDITGIANGVIEN : NavRoute("editgiangvien_screen")
@@ -41,6 +43,7 @@ fun NavgationGraph(
     lichHocViewModel: LichHocViewModel,
     giangVienViewModel: GiangVienViewModel,
     mayTinhViewModel: MayTinhViewModel,
+    phongMayViewModel: PhongMayViewModel
 ) {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -148,7 +151,7 @@ fun NavgationGraph(
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
-            EditMayTinhScreen(mamay)
+            EditMayTinhScreen(mamay,phongMayViewModel)
         }
 
 
@@ -334,7 +337,25 @@ fun NavgationGraph(
                 )
             }
         ) {
-            CreateMayTinhScreen(navController,mayTinhViewModel)
+            CreateMayTinhScreen(navController,mayTinhViewModel,phongMayViewModel)
+        }
+
+        composable(
+            route = NavRoute.QUANLYPHONGMAY.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            QuanLyPhongMay(navController,phongMayViewModel)
         }
     }
 }

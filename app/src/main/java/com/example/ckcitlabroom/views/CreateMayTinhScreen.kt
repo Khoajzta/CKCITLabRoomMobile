@@ -1,3 +1,4 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,9 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -37,29 +43,37 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateMayTinhScreen(
-    navController: NavHostController, mayTinhViewModel: MayTinhViewModel
+    navController: NavHostController,
+    mayTinhViewModel: MayTinhViewModel,
+    phongMayViewModel: PhongMayViewModel
 ) {
 
-    val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
+    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
+    var danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    var isExpanded by remember { mutableStateOf(false) }
 
-    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
+    var selectdMaPhong by remember { mutableStateOf("") }
 
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        mayTinhViewModel.getAllMayTinh()
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            mayTinhViewModel.stopPollingMayTinh()
+    // Đồng bộ giá trị selectdMaPhong khi danhSachPhongMay load xong (có dữ liệu)
+    LaunchedEffect(danhSachPhongMay) {
+        if (danhSachPhongMay.isNotEmpty() && selectdMaPhong.isEmpty()) {
+            selectdMaPhong = danhSachPhongMay[0].MaPhong
         }
     }
 
+    // Đồng bộ maPhongState với selectdMaPhong
+    val maPhongState = remember { mutableStateOf("") }
+    LaunchedEffect(selectdMaPhong) {
+        maPhongState.value = selectdMaPhong
+    }
+
+    val selectedTenPhong = danhSachPhongMay.find { it.MaPhong == selectdMaPhong }?.TenPhong ?: ""
+
+    // Các state khác...
     val maMayState = remember { mutableStateOf("") }
     val viTriState = remember { mutableStateOf("") }
     val mainState = remember { mutableStateOf("") }
@@ -71,7 +85,27 @@ fun CreateMayTinhScreen(
     val chuotState = remember { mutableStateOf("") }
     val hddState = remember { mutableStateOf("") }
     val ssdState = remember { mutableStateOf("") }
-    val maPhongState = remember { mutableStateOf("") }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        mayTinhViewModel.getAllMayTinh()
+        phongMayViewModel.getAllPhongMay()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mayTinhViewModel.stopPollingMayTinh()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            phongMayViewModel.stopPollingPhongMay()
+        }
+    }
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -368,24 +402,49 @@ fun CreateMayTinhScreen(
                     Text(
                         text = "Phòng", color = Color.Black, fontWeight = FontWeight.Bold
                     )
+                    Column {
+                        ExposedDropdownMenuBox(
+                            expanded = isExpanded,
+                            onExpandedChange = { isExpanded = !isExpanded },
+                        ) {
+                            OutlinedTextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor()
+                                    .padding(bottom = 12.dp),
+                                value = selectedTenPhong,
+                                onValueChange = { },
+                                readOnly = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    unfocusedContainerColor = Color.White,
+                                    focusedContainerColor = Color.White,
+                                    focusedBorderColor = Color.Black,
+                                    unfocusedBorderColor = Color.Black,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) }
+                            )
 
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        value = maPhongState.value,
-                        onValueChange = { maPhongState.value = it },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White,
-                            focusedBorderColor = Color.Black,
-                            unfocusedBorderColor = Color.Black,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
-                        ),
-                        placeholder = { Text("Nhập thông tin") },
-                        shape = RoundedCornerShape(12.dp),
-                    )
+                            ExposedDropdownMenu(
+                                modifier = Modifier.background(Color.White).height(300.dp).padding(bottom = 8.dp),
+                                expanded = isExpanded,
+                                onDismissRequest = { isExpanded = false },
+                                shape = RoundedCornerShape(12.dp),
+                            ) {
+                                danhSachPhongMay.forEach { phongMay ->
+                                    androidx.compose.material3.DropdownMenuItem(
+                                        text = { Text(phongMay.TenPhong, fontWeight = FontWeight.Bold)},
+                                        onClick = {
+                                            selectdMaPhong = phongMay.MaPhong
+                                            isExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
             }
@@ -402,7 +461,6 @@ fun CreateMayTinhScreen(
                         action = {
                             TextButton(onClick = {
                                 snackbarData.value = null
-                                navController.popBackStack()
                             }) {
                                 Text("Đóng", color = Color.White)
                             }
@@ -428,7 +486,15 @@ fun CreateMayTinhScreen(
                     val maMayMoi = maMayState.value
                     val daTonTai = danhSachMayTinh.any { it.MaMay == maMayMoi }
 
-                    if (daTonTai) {
+                    if(maMayState.value == "" ){
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Mã máy không được để trống!", type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+                    }
+                    else if (daTonTai) {
                         // Hiện snackbar lỗi
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(

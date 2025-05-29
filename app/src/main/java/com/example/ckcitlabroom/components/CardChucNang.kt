@@ -32,7 +32,7 @@ fun CardChucNang(chucnang:ChucNang){
             .fillMaxWidth()
             .height(100.dp).border(
                 width = 1.dp,
-                color = Color.Gray,
+                color = Color.White,
                 shape = RoundedCornerShape(12.dp)
             ),
         elevation = CardDefaults.cardElevation(7.dp),

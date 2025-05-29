@@ -5,12 +5,10 @@ import retrofit2.http.PUT
 import retrofit2.http.Query
 
 data class PhongMayResponse(
-    val lichhoc: List<LichHoc>
+    val phongmay: List<PhongMay>
 )
 
-
-
 interface PhongMayAPIService {
-    @GET("LichHoc/read.php")
-    suspend fun getAllLichHoc(): LichHocResponse
+    @GET("PhongMay/read.php")
+    suspend fun getAllPhongMay(): PhongMayResponse
 }

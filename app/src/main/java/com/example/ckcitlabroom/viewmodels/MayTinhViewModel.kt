@@ -36,16 +36,20 @@ class MayTinhViewModel : ViewModel() {
         private set
 
     fun getAllMayTinh() {
-        // Nếu polling đang chạy thì không chạy thêm
         if (pollingJob != null) return
 
         pollingJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
                     val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
-                    danhSachAllMayTinh = response.maytinh
+                    if (response.maytinh != null) {
+                        danhSachAllMayTinh = response.maytinh!!
+                    } else {
+                        danhSachAllMayTinh = emptyList()
+                    }
+
                 } catch (e: Exception) {
-                    Log.e("MayTinhViewModel", "Polling lỗi", e)
+                    Log.e("PhongMayViewModel", "Polling lỗi", e)
                 }
                 delay(500)
             }
@@ -105,7 +109,6 @@ class MayTinhViewModel : ViewModel() {
         }
     }
 
-    // Hàm xóa máy tính
     fun deleteMayTinh(mamay: String) {
         viewModelScope.launch {
             isLoading = true
@@ -115,18 +118,23 @@ class MayTinhViewModel : ViewModel() {
                     ITLabRoomRetrofitClient.maytinhAPIService.deleteMayTinh(body)
                 }
                 maytinhDeleteResult = response.message
+
                 if (response.message == "MayTinh deleted") {
-                    val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
-                    danhSachAllMayTinh = response.maytinh
+                    // Cập nhật lại danh sách máy tính sau khi xóa thành công
+                    val allResponse = withContext(Dispatchers.IO) {
+                        ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
+                    }
+                    danhSachAllMayTinh = allResponse.maytinh ?: emptyList()
                 }
             } catch (e: Exception) {
-                maytinhDeleteResult = "Lỗi khi xóa máy tính: ${e.message}"
-                Log.e("MayTinhViewModel", "Lỗi khi xóa máy tính: ${e.message}")
+                maytinhDeleteResult = "Lỗi khi xóa máy tính: ${e.localizedMessage ?: e.message}"
+                Log.e("MayTinhViewModel", "Lỗi khi xóa máy tính", e)
             } finally {
                 isLoading = false
             }
         }
     }
+
 }
 
 

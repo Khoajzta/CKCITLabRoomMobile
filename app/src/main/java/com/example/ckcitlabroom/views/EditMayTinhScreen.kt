@@ -7,23 +7,40 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,12 +50,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditMayTinhScreen(maMay: String){
+fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
 
     var mayTinhViewModel: MayTinhViewModel = viewModel()
     var maytinh = mayTinhViewModel.maytinh
+
+    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
+
+    var isExpanded by remember { mutableStateOf(false) }
+
+    var selectdMaPhong by remember { mutableStateOf("") }
+
+    // Đồng bộ maPhongState với selectdMaPhong
+    val maPhongState = remember { mutableStateOf("") }
+    LaunchedEffect(selectdMaPhong) {
+        maPhongState.value = selectdMaPhong
+    }
+
+    val selectedTenPhong = danhSachPhongMay.find { it.MaPhong == selectdMaPhong }?.TenPhong ?: ""
+
+    // Đồng bộ giá trị selectdMaPhong khi danhSachPhongMay load xong (có dữ liệu)
+    LaunchedEffect(danhSachPhongMay) {
+        if (danhSachPhongMay.isNotEmpty() && selectdMaPhong.isEmpty()) {
+            selectdMaPhong = danhSachPhongMay[0].MaPhong
+        }
+    }
 
     val maMayState = remember { mutableStateOf("") }
     val viTriState = remember { mutableStateOf("") }
@@ -51,11 +91,15 @@ fun EditMayTinhScreen(maMay: String){
     val chuotState = remember { mutableStateOf("") }
     val hddState = remember { mutableStateOf("") }
     val ssdState = remember { mutableStateOf("") }
-    val maPhongState = remember { mutableStateOf("") }
     val trangThaiState = remember { mutableStateOf("") }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(maMay) {
         mayTinhViewModel.getMayTinhByMaMay(maMay)
+        phongMayViewModel.getAllPhongMay()
     }
 
     LaunchedEffect(maytinh) {
@@ -71,10 +115,13 @@ fun EditMayTinhScreen(maMay: String){
             chuotState.value = it.Chuot
             hddState.value = it.HDD
             ssdState.value = it.SSD
-            maPhongState.value = it.MaPhong
             trangThaiState.value = it.TrangThai.toString()
+
+            // Cập nhật selectdMaPhong để dropdown chọn đúng phòng
+            selectdMaPhong = it.MaPhong ?: ""
         }
     }
+
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -393,28 +440,51 @@ fun EditMayTinhScreen(maMay: String){
 //
                     item {
                         Text(
-                            text = "Phòng",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
+                            text = "Phòng", color = Color.Black, fontWeight = FontWeight.Bold
                         )
+                        Column {
+                            ExposedDropdownMenuBox(
+                                expanded = isExpanded,
+                                onExpandedChange = { isExpanded = !isExpanded },
+                            ) {
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .menuAnchor()
+                                        .padding(bottom = 12.dp),
+                                    value = selectedTenPhong,
+                                    onValueChange = { },
+                                    readOnly = true,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        unfocusedContainerColor = Color.White,
+                                        focusedContainerColor = Color.White,
+                                        focusedBorderColor = Color.Black,
+                                        unfocusedBorderColor = Color.Black,
+                                        focusedTextColor = Color.Black,
+                                        unfocusedTextColor = Color.Black
+                                    ),
+                                    shape = RoundedCornerShape(12.dp),
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) }
+                                )
 
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 12.dp),
-                            value = maPhongState.value,
-                            onValueChange = { maPhongState.value = it },
-                            colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedContainerColor = Color.White,
-                                focusedContainerColor = Color.White,
-                                focusedBorderColor = Color.Black,
-                                unfocusedBorderColor = Color.Black,
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Black
-                            ),
-                            placeholder = { Text("Nhập thông tin") },
-                            shape = RoundedCornerShape(12.dp),
-                        )
+                                ExposedDropdownMenu(
+                                    modifier = Modifier.background(Color.White).height(300.dp).padding(bottom = 8.dp),
+                                    expanded = isExpanded,
+                                    onDismissRequest = { isExpanded = false },
+                                    shape = RoundedCornerShape(12.dp),
+                                ) {
+                                    danhSachPhongMay.forEach { phongMay ->
+                                        androidx.compose.material3.DropdownMenuItem(
+                                            text = { Text(phongMay.TenPhong, fontWeight = FontWeight.Bold)},
+                                            onClick = {
+                                                selectdMaPhong = phongMay.MaPhong
+                                                isExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
 
                 }else{
@@ -424,7 +494,37 @@ fun EditMayTinhScreen(maMay: String){
 
                 }
             }
-            val context = LocalContext.current
+
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(16.dp)
+            ) { data ->
+                snackbarData.value?.let { customData ->
+                    Snackbar(
+                        containerColor = Color(0xFF1B8DDE),
+                        contentColor = Color.White,
+                        shape = RoundedCornerShape(12.dp),
+                        action = {
+                            TextButton(onClick = {
+                                snackbarData.value = null
+                            }) {
+                                Text("Đóng", color = Color.White)
+                            }
+                        }
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = if (customData.type == SnackbarType.SUCCESS) Color.Cyan else Color.Yellow,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = customData.message)
+                        }
+                    }
+                }
+            }
 
             Button(
                 onClick = {
@@ -444,12 +544,15 @@ fun EditMayTinhScreen(maMay: String){
                         TrangThai = trangThaiState.value.toIntOrNull() ?: 0
                     )
                     mayTinhViewModel.updateMayTinh(mayTinhMoi)
-
-                    Toast.makeText(context, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
+                    coroutineScope.launch {
+                        snackbarData.value = CustomSnackbarData(
+                            message = "Cập nhật máy tính thành công!", type = SnackbarType.ERROR
+                        )
+                        snackbarHostState.showSnackbar("Thông báo")
+                    }
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
+                    .fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {

@@ -11,6 +11,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.DateRange
@@ -44,6 +46,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +62,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.composables.icons.lucide.Activity
+import com.composables.icons.lucide.Building2
+import com.composables.icons.lucide.Circle
+import com.composables.icons.lucide.CircleAlert
+import com.composables.icons.lucide.CircleCheck
+import com.composables.icons.lucide.CircleX
+import com.composables.icons.lucide.Cpu
+import com.composables.icons.lucide.HardDrive
+import com.composables.icons.lucide.Keyboard
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.MapPin
+import com.composables.icons.lucide.MemoryStick
+import com.composables.icons.lucide.Monitor
+import com.composables.icons.lucide.MousePointer2
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 
@@ -70,7 +87,7 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
     val maytinhViewModel: MayTinhViewModel = viewModel()
 
     var expanded by remember { mutableStateOf(false) }
-    var showConfirmDialog by remember { mutableStateOf(false) } // trạng thái hiển thị dialog
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -91,17 +108,65 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-
-            // 4 thông tin đầu
-            Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Text("Vị Trí: ${maytinh.ViTri}", fontSize = 16.sp)
-            Text("Phòng: ${maytinh.MaPhong}")
-            val (color, statusText) = when (maytinh.TrangThai) {
-                1 -> Color(0xFF4CAF50) to "Hoạt động"
-                0 -> Color(0xFFF44336) to "Không hoạt động"
-                else -> Color.Gray to "Không xác định"
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Lucide.Monitor,
+                    contentDescription = "Mã Máy",
+                    tint = Color.Black,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Lucide.MapPin, // icon lucide: Monitor
+                    contentDescription = "Vị trí",
+                    tint = Color.Black,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text("Vị Trí: ${maytinh.ViTri}", fontSize = 16.sp)
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Lucide.Building2, // icon lucide: Monitor
+                    contentDescription = "Mã Máy",
+                    tint = Color.Black,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text("Phòng: ${maytinh.MaPhong}")
+            }
+
+            val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
+                1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
+                0 -> Triple(Color(0xFFF44336), "Không hoạt động", Lucide.CircleX)
+                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
+            }
+
             Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = statusIcon,
+                    contentDescription = "Trạng thái",
+                    tint = color,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(6.dp))
                 Text("Trạng thái: ")
                 Box(
                     modifier = Modifier
@@ -113,6 +178,7 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
                 Text(statusText, color = color)
             }
 
+
             Spacer(modifier = Modifier.height(8.dp))
 
             AnimatedVisibility(
@@ -121,15 +187,140 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-                    Text("Main: ${maytinh.Main}", fontSize = 16.sp)
-                    Text("CPU: ${maytinh.CPU}", fontSize = 16.sp)
-                    Text("RAM: ${maytinh.RAM}")
-                    Text("VGA: ${maytinh.VGA}")
-                    Text("Màn Hình: ${maytinh.ManHinh}")
-                    Text("Bàn Phím: ${maytinh.BanPhim}")
-                    Text("Chuột: ${maytinh.Chuot}")
-                    Text("HDD: ${maytinh.HDD}")
-                    Text("SSD: ${maytinh.SSD}")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Lucide.Cpu,
+                            contentDescription = "Mã Máy",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("Main: ${maytinh.Main}", fontSize = 16.sp)
+                    }
+
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Lucide.Cpu,
+                            contentDescription = "Mã Máy",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("CPU: ${maytinh.CPU}", fontSize = 16.sp)
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Lucide.MemoryStick,
+                            contentDescription = "Mã Máy",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("RAM: ${maytinh.RAM}")
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Lucide.Monitor,
+                            contentDescription = "Mã Máy",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("VGA: ${maytinh.VGA}")
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Lucide.Monitor,
+                            contentDescription = "Mã Máy",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("Màn Hình: ${maytinh.ManHinh}")
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Lucide.Keyboard,
+                            contentDescription = "Mã Máy",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("Bàn Phím: ${maytinh.BanPhim}")
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Lucide.MousePointer2,
+                            contentDescription = "Mã Máy",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("Chuột: ${maytinh.Chuot}")
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Lucide.HardDrive,
+                            contentDescription = "Mã Máy",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("HDD: ${maytinh.HDD}")
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Lucide.HardDrive,
+                            contentDescription = "Mã Máy",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("SSD: ${maytinh.SSD}")
+                    }
 
                     Spacer(Modifier.height(8.dp))
 
@@ -138,7 +329,8 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
                         onClick = {
                             navController.navigate(NavRoute.EDITMAYTINH.route + "?mamay=${maytinh.MaMay}")
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
@@ -147,7 +339,8 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
                         onClick = {
                             showConfirmDialog = true
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
@@ -161,7 +354,7 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },
             title = { Text("Xác nhận") },
-            text = { Text("Bạn có chắc chắn muốn xóa máy tính này không?") },
+            text = { Text("Bạn có chắc chắn muốn xóa máy tính này không?", fontWeight = FontWeight.Bold) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -173,12 +366,14 @@ fun CardMayTinh(maytinh: MayTinh, navController: NavHostController) {
                 }
             },
             dismissButton = {
-                TextButton(
+                Button(
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
                     onClick = { showConfirmDialog = false }
                 ) {
                     Text("Hủy")
                 }
-            }
+            },
+            containerColor = Color.White
         )
     }
 }

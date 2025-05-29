@@ -7,6 +7,7 @@ import GiangVienViewModel
 import LoginSVScreen
 import NavRoute
 import NavgationGraph
+import PhongMayViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -80,6 +81,7 @@ fun MainScreen() {
     val lichHocViewModel: LichHocViewModel = viewModel()
     val giangVienViewModel: GiangVienViewModel = viewModel()
     val mayTinhViewModel: MayTinhViewModel = viewModel()
+    val phongMayViewModel: PhongMayViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
 
@@ -213,7 +215,8 @@ fun MainScreen() {
                     navController,
                     lichHocViewModel,
                     giangVienViewModel,
-                    mayTinhViewModel
+                    mayTinhViewModel,
+                    phongMayViewModel
                 )
             }
 

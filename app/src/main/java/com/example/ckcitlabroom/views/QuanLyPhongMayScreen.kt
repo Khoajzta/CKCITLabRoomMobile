@@ -33,20 +33,20 @@ import androidx.navigation.NavHostController
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun QuanLyMayTinh(
+fun QuanLyPhongMay(
     navController: NavHostController,
-    mayTinhViewModel:MayTinhViewModel
+    phongMayViewModel: PhongMayViewModel
 ) {
 
-    val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
+    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
 
     LaunchedEffect(Unit) {
-        mayTinhViewModel.getAllMayTinh()
+        phongMayViewModel.getAllPhongMay()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            mayTinhViewModel.stopPollingMayTinh()
+            phongMayViewModel.stopPollingPhongMay()
         }
     }
 
@@ -83,7 +83,7 @@ fun QuanLyMayTinh(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (danhSachMayTinh == null || danhSachMayTinh.isEmpty()) {
+            if (danhSachPhongMay == null || danhSachPhongMay.isEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -99,8 +99,8 @@ fun QuanLyMayTinh(
 
                 }
             } else {
-                items(danhSachMayTinh) { maytinh ->
-                    CardMayTinh(maytinh, navController)
+                items(danhSachPhongMay) { phongmay ->
+                    CardPhongMay(phongmay)
                 }
             }
         }

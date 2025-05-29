@@ -8,10 +8,16 @@ import retrofit2.http.PUT
 import retrofit2.http.Query
 
 data class MayTinhResponse(
-    val maytinh: List<MayTinh>
+    val message: String? = null,
+    val maytinh: List<MayTinh>? = null
 )
 
+
 data class UpdateResponse(
+    val message: String
+)
+
+data class DeleteResponse(
     val message: String
 )
 
@@ -41,6 +47,5 @@ interface MayTinhAPIService {
     @HTTP(method = "DELETE", path = "MayTinh/delete.php", hasBody = true)
     suspend fun deleteMayTinh(
         @Body body: Map<String, String>
-    ): UpdateResponse
-
+    ): DeleteResponse
 }
