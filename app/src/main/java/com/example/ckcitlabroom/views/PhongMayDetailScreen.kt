@@ -61,6 +61,8 @@ fun PhongMayDetailScreen(
     val phongmay = phongMayViewModel.phongmay
 
     var showDialog by remember { mutableStateOf(false) }
+    var showDeleteWarning by remember { mutableStateOf(false) }
+    var showConfirmDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         mayTinhViewModel.getMayTinhByPhong(maphong)
@@ -89,7 +91,7 @@ fun PhongMayDetailScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Máy Tính Phòng ${phongmay.TenPhong}",
+                "Danh Sách Máy Tính",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 color = Color.White
@@ -97,9 +99,8 @@ fun PhongMayDetailScreen(
 
         }
 
-
         LazyColumn(
-            modifier = Modifier.height(550.dp)
+            modifier = Modifier.height(495.dp)
         ) {
             if (danhSachMayTinh == null || danhSachMayTinh.isEmpty()) {
                 item {
@@ -118,7 +119,7 @@ fun PhongMayDetailScreen(
                 }
             } else {
                 items(danhSachMayTinh) { maytinh ->
-                    CardMayTinh(maytinh, navController, mayTinhViewModel)
+                    CardMayTinh(maytinh, navController, mayTinhViewModel,phongMayViewModel)
                 }
             }
         }
@@ -136,9 +137,101 @@ fun PhongMayDetailScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White)
             ) {
-                Text("Chỉnh sửa phòng máy", color = Color.Black, fontWeight = FontWeight.Bold)
+                Text("Chỉnh sửa phòng máy", color = Color.Black, fontWeight = FontWeight.ExtraBold)
             }
         }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(55.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    if (danhSachMayTinh.isNullOrEmpty()) {
+                        showConfirmDeleteDialog = true
+                    } else {
+                        showDeleteWarning = true
+                    }
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+            ) {
+                Text("Xóa phòng máy", color = Color.White, fontWeight = FontWeight.ExtraBold)
+            }
+        }
+
+        if (showConfirmDeleteDialog) {
+            AlertDialog(
+                containerColor = Color.White,
+                onDismissRequest = { showConfirmDeleteDialog = false },
+                title = {
+                    Text(
+                        text = "Xác nhận xóa",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Bạn có chắc muốn xóa phòng ${phongmay.MaPhong} không?",
+                        color = Color.Black
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            phongMayViewModel.deletePhongMay(maphong)
+                            navController.popBackStack()
+                            showConfirmDeleteDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                    ) {
+                        Text("Xóa", color = Color.White)
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { showConfirmDeleteDialog = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                    ) {
+                        Text("Hủy", color = Color.White)
+                    }
+                }
+            )
+        }
+
+        if (showDeleteWarning) {
+            AlertDialog(
+                containerColor = Color.White,
+                onDismissRequest = { showDeleteWarning = false },
+                title = {
+                    Text(
+                        text = "Không thể xóa phòng",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Phòng này hiện vẫn còn máy tính, hãy chuyển hết máy tính trước khi xóa phòng.",
+                        color = Color.Black
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { showDeleteWarning = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                    ) {
+                        Text("Đã hiểu", color = Color.White)
+                    }
+                }
+            )
+        }
+
 
         if (showDialog) {
             AlertDialog(

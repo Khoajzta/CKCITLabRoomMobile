@@ -83,12 +83,18 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 fun CardMayTinh(
     maytinh: MayTinh,
     navController: NavHostController,
-    maytinhViewModel: MayTinhViewModel
+    maytinhViewModel: MayTinhViewModel,
+    phongMayViewModel: PhongMayViewModel
 ) {
-    Log.d("MaMay",maytinh.MaMay)
 
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
+
+    var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
+
+    LaunchedEffect(maytinh.MaPhong) {
+        phongMayCard = phongMayViewModel.fetchPhongMayByMaPhong(maytinh.MaPhong)
+    }
 
     Card(
         modifier = Modifier
@@ -130,7 +136,7 @@ fun CardMayTinh(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Lucide.MapPin, // icon lucide: Monitor
+                    imageVector = Lucide.MapPin,
                     contentDescription = "Vị trí",
                     tint = Color.Black,
                     modifier = Modifier.size(20.dp)
@@ -145,13 +151,13 @@ fun CardMayTinh(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Lucide.Building2, // icon lucide: Monitor
+                    imageVector = Lucide.Building2,
                     contentDescription = "Mã Máy",
                     tint = Color.Black,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Phòng: ${maytinh.MaPhong}")
+                Text("Phòng: ${phongMayCard?.TenPhong ?: "Đang tải..."}")
             }
 
             val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
@@ -340,7 +346,7 @@ fun CardMayTinh(
                         onClick = {
                             showConfirmDialog = true
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
@@ -354,8 +360,8 @@ fun CardMayTinh(
     if (showConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },
-            title = { Text("Xác nhận") },
-            text = { Text("Bạn có chắc chắn muốn xóa máy tính này không?", fontWeight = FontWeight.Bold) },
+            title = { Text("Xác nhận", color = Color.Black, fontWeight = FontWeight.Bold) },
+            text = { Text("Bạn có chắc chắn muốn xóa máy tính này không?", fontWeight = FontWeight.Bold, color = Color.Black) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -371,7 +377,7 @@ fun CardMayTinh(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
                     onClick = { showConfirmDialog = false }
                 ) {
-                    Text("Hủy")
+                    Text("Hủy", color = Color.White)
                 }
             },
             containerColor = Color.White

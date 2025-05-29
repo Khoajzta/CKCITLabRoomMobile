@@ -1,6 +1,7 @@
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Query
@@ -32,4 +33,9 @@ interface PhongMayAPIService {
     suspend fun updatePhongMay(
         @Body phongmay: PhongMay
     ): UpdateResponse
+
+    @HTTP(method = "DELETE", path = "PhongMay/delete.php", hasBody = true)
+    suspend fun deletePhongMay(
+        @Body body: Map<String, String>
+    ): DeleteResponse
 }

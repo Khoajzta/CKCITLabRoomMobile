@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -49,18 +50,30 @@ import com.composables.icons.lucide.Building2
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
+import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Hotel
 import com.composables.icons.lucide.LayoutTemplate
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Warehouse
+import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
 fun CardPhongMay(
-    phongmay: PhongMay, navController: NavHostController, phongMayViewModel: PhongMayViewModel
+    phongmay: PhongMay,
+    navController: NavHostController,
+    phongMayViewModel: PhongMayViewModel,
+    mayTinhViewModel: MayTinhViewModel
 ) {
+
+    var danhsachmaytinh = mayTinhViewModel.danhSachAllMayTinh
+    val soLuongMay = danhsachmaytinh?.count { it.MaPhong == phongmay.MaPhong } ?: 0
+
 
     var showDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        mayTinhViewModel.getAllMayTinh()
+    }
 
     Card(
         modifier = Modifier
@@ -90,6 +103,20 @@ fun CardPhongMay(
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(text = "Tên Phòng: ${phongmay.TenPhong}", fontSize = 16.sp)
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 2.dp)
+            ) {
+                Icon(
+                    imageVector = Lucide.Hash, // hoặc Icons.Default.RoomPreferences
+                    contentDescription = "Tên Phòng",
+                    tint = Color(0xFF3F51B5),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(text = "Số lượng máy: ${soLuongMay}", fontSize = 16.sp)
             }
 
             val (color, statusText, statusIcon) = when (phongmay.TrangThai) {

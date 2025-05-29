@@ -35,7 +35,8 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 @Composable
 fun QuanLyMayTinh(
     navController: NavHostController,
-    mayTinhViewModel:MayTinhViewModel
+    mayTinhViewModel:MayTinhViewModel,
+    phongMayViewModel: PhongMayViewModel
 ) {
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
 
@@ -99,7 +100,7 @@ fun QuanLyMayTinh(
                 }
             } else {
                 items(danhSachMayTinh) { maytinh ->
-                    CardMayTinh(maytinh, navController,mayTinhViewModel)
+                    CardMayTinh(maytinh, navController,mayTinhViewModel,phongMayViewModel)
                 }
             }
         }

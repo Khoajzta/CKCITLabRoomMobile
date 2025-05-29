@@ -16,6 +16,10 @@ class PhongMayViewModel : ViewModel() {
 
     var pm = PhongMay(MaPhong = "", TenPhong = "", TrangThai = 0)
 
+    var phongmay: PhongMay by mutableStateOf(pm)
+        private set
+
+
     var danhSachAllPhongMay by mutableStateOf(listOf<PhongMay>())
         private set
 
@@ -25,10 +29,8 @@ class PhongMayViewModel : ViewModel() {
     var phongmayCreateResult by mutableStateOf("")
     var phogmayUpdateTrangThaiResult by mutableStateOf("")
     var phogmayUpdateResult by mutableStateOf("")
-    var maytinhDeleteResult by mutableStateOf("")
+    var phongmayDeleteResult by mutableStateOf("")
 
-    var phongmay: PhongMay by mutableStateOf(pm)
-        private set
 
     var isLoading by mutableStateOf(false)
         private set
@@ -75,7 +77,17 @@ class PhongMayViewModel : ViewModel() {
             }
         }
     }
-//
+
+    suspend fun fetchPhongMayByMaPhong(maphong: String): PhongMay {
+        return try {
+            ITLabRoomRetrofitClient.phongmayAPIService.getPhongMayByMaPhong(maphong)
+        } catch (e: Exception) {
+            Log.e("PhongMayViewModel", "Lỗi khi lấy thông tin phòng máy (suspend)", e)
+            pm // trả về phòng mặc định hoặc null tùy bạn
+        }
+    }
+
+    //
     fun createPhongMay(phongMay: PhongMay) {
         viewModelScope.launch {
             isLoading = true
@@ -92,7 +104,8 @@ class PhongMayViewModel : ViewModel() {
             }
         }
     }
-//
+
+    //
     fun updateTrangThaiPhongMay(phogmay: PhongMay) {
         viewModelScope.launch {
             isLoading = true
@@ -126,26 +139,32 @@ class PhongMayViewModel : ViewModel() {
             }
         }
     }
-//
+
+    //
 //    // Hàm xóa máy tính
-//    fun deleteMayTinh(mamay: String) {
-//        viewModelScope.launch {
-//            isLoading = true
-//            try {
-//                val body = mapOf("MaMay" to mamay)
-//                val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
-//                if (response.maytinh != null) {
-//                    danhSachAllPhongMay = response.maytinh!!
-//                } else {
-//                    danhSachAllPhongMay = emptyList()
-//                }
-//
-//            } catch (e: Exception) {
-//                maytinhDeleteResult = "Lỗi khi xóa máy tính: ${e.message}"
-//                Log.e("MayTinhViewModel", "Lỗi khi xóa máy tính: ${e.message}")
-//            } finally {
-//                isLoading = false
-//            }
-//        }
-//    }
+    fun deletePhongMay(maphong: String) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val body = mapOf("MaPhong" to maphong)
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.phongmayAPIService.deletePhongMay(body)
+                }
+                phongmayDeleteResult = response.message
+
+                if (response.message == "phongmay deleted") {
+                    // Cập nhật lại danh sách máy tính sau khi xóa thành công
+                    val allResponse = withContext(Dispatchers.IO) {
+                        ITLabRoomRetrofitClient.phongmayAPIService.getAllPhongMay()
+                    }
+                    danhSachAllPhongMay = allResponse.phongmay ?: emptyList()
+                }
+            } catch (e: Exception) {
+                phongmayDeleteResult = "Lỗi khi xóa máy tính: ${e.localizedMessage ?: e.message}"
+                Log.e("MayTinhViewModel", "Lỗi khi xóa máy tính", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 }

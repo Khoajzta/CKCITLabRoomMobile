@@ -141,7 +141,7 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLyMayTinh(navController,mayTinhViewModel)
+            QuanLyMayTinh(navController,mayTinhViewModel,phongMayViewModel)
         }
 
         composable(
@@ -357,7 +357,7 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLyPhongMay(navController,phongMayViewModel)
+            QuanLyPhongMay(navController,phongMayViewModel,mayTinhViewModel)
         }
 
         composable(
