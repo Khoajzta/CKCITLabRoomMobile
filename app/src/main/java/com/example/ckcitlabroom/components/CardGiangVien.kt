@@ -92,6 +92,12 @@ fun CardGiangVien(giangvien: GiangVien) {
                 Text(text = "Ngày Sinh: ${giangvien.NgaySinh}", fontSize = 16.sp)
             }
 
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 2.dp)) {
+                Icon(Icons.Default.Email, contentDescription = "Email", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(text = "Email: ${giangvien.Email}", fontSize = 16.sp)
+            }
+
             // Phần mở rộng ẩn/hiện
             AnimatedVisibility(
                 visible = expanded,

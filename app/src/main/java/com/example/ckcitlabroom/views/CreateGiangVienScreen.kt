@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import android.app.DatePickerDialog
 import android.content.Context
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,16 +45,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import java.util.Calendar
 
 
 
 @Composable
 fun CreateGiangVienScreen() {
+    val viewModel: GiangVienViewModel = viewModel()
     val context = LocalContext.current
     val fieldLabels = listOf(
         "Mã Giảng viên", "Tên Giảng viên", "Giới tính", "Mã loại tài khoản",
-        "Mật Khẩu", "Trạng thái"
+        "Email", "Mật Khẩu", "Trạng thái"
     )
 
     val textFieldStates = remember {
@@ -168,7 +171,30 @@ fun CreateGiangVienScreen() {
 
             Button(
                 onClick = {
-                    // Xử lý lưu thông tin ở đây
+                    try {
+                        val newGiangVien = GiangVien(
+                            MaGV = textFieldStates[0].value,
+                            TenGiangVien = textFieldStates[1].value,
+                            GioiTinh = textFieldStates[2].value,
+                            MaLoaiTaiKhoan = textFieldStates[3].value.toIntOrNull() ?: 0,
+                            Email = textFieldStates[4].value,
+                            MatKhau = textFieldStates[5].value,
+                            TrangThai = textFieldStates[6].value.toIntOrNull() ?: 0,
+                            NgaySinh = ngaySinhState.value
+                        )
+
+                        viewModel.createGiangVien(
+                            giangVien = newGiangVien,
+                            onSuccess = {
+                                Toast.makeText(context, "Thêm thành công", Toast.LENGTH_SHORT).show()
+                            },
+                            onError = { error ->
+                                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Lỗi dữ liệu đầu vào: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

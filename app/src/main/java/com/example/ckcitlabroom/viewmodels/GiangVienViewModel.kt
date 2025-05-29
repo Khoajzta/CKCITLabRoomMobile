@@ -28,5 +28,22 @@ class GiangVienViewModel : ViewModel() {
             }
         }
     }
+
+    fun createGiangVien(giangVien: GiangVien, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = ITLabRoomRetrofitClient.giangVienAPIService.createGiangVien(giangVien)
+                withContext(Dispatchers.Main) {
+                    onSuccess()
+                }
+            } catch (e: Exception) {
+                Log.e("GiangVienViewModel", "Lỗi khi thêm giảng viên", e)
+                withContext(Dispatchers.Main) {
+                    onError("Lỗi khi thêm giảng viên: ${e.message}")
+                }
+            }
+        }
+    }
+
 }
 

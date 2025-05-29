@@ -15,11 +15,18 @@ data class LoginResponse(
     val data: GiangVien?
 )
 
+
 interface GiangVienAPIService {
     @GET("GiangVien/checkLogin.php")
     suspend fun checkLogin(
         @Query("email") email: String,
         @Query("matkhau") matkhau: String
     ): GiangVien
+
+
+    @POST("GiangVien/create.php")
+    suspend fun createGiangVien(
+        @Body giangVien: GiangVien
+    ): CreateResponse
 }
 

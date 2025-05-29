@@ -37,6 +37,7 @@ fun QuanLyGiangVien(navController: NavHostController) {
             NgaySinh = "1999-03-15",
             GioiTinh = "Nam",
             MatKhau = "12345678",
+            Email = "abc@gmail.com",
             MaLoaiTaiKhoan = 1,
             TrangThai = 1
         ),
@@ -46,6 +47,7 @@ fun QuanLyGiangVien(navController: NavHostController) {
             NgaySinh = "1996-06-27",
             GioiTinh = "Nữ",
             MatKhau = "12345678",
+            Email = "xyz@gmail.com",
             MaLoaiTaiKhoan = 1,
             TrangThai = 0
         )
