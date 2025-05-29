@@ -1,5 +1,6 @@
 package com.example.lapstore.viewmodels
 
+import LichSuChuyenMay
 import MayTinh
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -15,9 +16,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MayTinhViewModel : ViewModel() {
-
-    var mt = MayTinh("","",""",""","","","","","","","","","",1)
+class LichSuChuyenMayViewModel : ViewModel() {
 
     var danhSachAllMayTinh by mutableStateOf<List<MayTinh>>(emptyList())
         private set
@@ -25,14 +24,13 @@ class MayTinhViewModel : ViewModel() {
     var danhSachAllMayTinhtheophong by mutableStateOf<List<MayTinh>>(emptyList())
         private set
 
-    private var pollingAllMayTinhJob: Job? = null
-    private var pollingMayTinhTheoPhongJob: Job? = null
+    private var pollingJob: Job? = null
 
-    var maytinhCreateResult by mutableStateOf("")
+    var lichsuchuyenmayCreateResult by mutableStateOf("")
     var maytinhUpdateResult by mutableStateOf("")
     var maytinhDeleteResult by mutableStateOf("")
 
-    var maytinh: MayTinh by mutableStateOf(mt)
+    var maytinh: MayTinh? by mutableStateOf(null)
         private set
 
     var isLoading by mutableStateOf(false)
@@ -42,24 +40,29 @@ class MayTinhViewModel : ViewModel() {
         private set
 
     fun getAllMayTinh() {
-        if (pollingAllMayTinhJob != null) return
+        if (pollingJob != null) return
 
-        pollingAllMayTinhJob = viewModelScope.launch(Dispatchers.IO) {
+        pollingJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
                     val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
-                    danhSachAllMayTinh = response.maytinh ?: emptyList()
+                    if (response.maytinh != null) {
+                        danhSachAllMayTinh = response.maytinh!!
+                    } else {
+                        danhSachAllMayTinh = emptyList()
+                    }
+
                 } catch (e: Exception) {
-                    Log.e("PhongMayViewModel", "Polling all máy lỗi", e)
+                    Log.e("PhongMayViewModel", "Polling lỗi", e)
                 }
                 delay(500)
             }
         }
     }
 
-    fun stopPollingAllMayTinh() {
-        pollingAllMayTinhJob?.cancel()
-        pollingAllMayTinhJob = null
+    fun stopPollingMayTinh() {
+        pollingJob?.cancel()
+        pollingJob = null
     }
 
     fun getMayTinhByMaMay(mamay: String) {
@@ -77,37 +80,37 @@ class MayTinhViewModel : ViewModel() {
     }
 
     fun getMayTinhByPhong(maphong: String) {
-        if (pollingMayTinhTheoPhongJob != null) return
+        if (pollingJob != null) return
 
-        pollingMayTinhTheoPhongJob = viewModelScope.launch(Dispatchers.IO) {
+        pollingJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
                     val response = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaPhong(maphong)
-                    danhSachAllMayTinhtheophong = response.maytinh ?: emptyList()
+                    if (response.maytinh != null) {
+                        danhSachAllMayTinhtheophong = response.maytinh!!
+                    } else {
+                        danhSachAllMayTinhtheophong = emptyList()
+                    }
+
                 } catch (e: Exception) {
-                    Log.e("PhongMayViewModel", "Polling theo phòng lỗi", e)
+                    Log.e("PhongMayViewModel", "Polling lỗi", e)
                 }
                 delay(500)
             }
         }
     }
 
-    fun stopPollingMayTinhTheoPhong() {
-        pollingMayTinhTheoPhongJob?.cancel()
-        pollingMayTinhTheoPhongJob = null
-    }
-
-    fun createMayTinh(maytinh: MayTinh) {
+    fun createLichSuChuyenMay(lichSuChuyenMay: LichSuChuyenMay) {
         viewModelScope.launch {
             isLoading = true
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.maytinhAPIService.createMayTinh(maytinh)
+                    ITLabRoomRetrofitClient.lichSuChuyenMayAPIService.createLichSuChuyenMay(lichSuChuyenMay)
                 }
-                maytinhCreateResult = response.message
+                lichsuchuyenmayCreateResult = response.message
             } catch (e: Exception) {
-                maytinhCreateResult = "Lỗi khi thêm máy tính: ${e.message}"
-                Log.e("MayTinhViewModel", "Lỗi khi thêm máy tính: ${e.message}")
+                lichsuchuyenmayCreateResult = "Lỗi khi thêm lich su: ${e.message}"
+                Log.e("LichSuChuyenMayViewModel", "Lỗi khi thêm lich su: ${e.message}")
             } finally {
                 isLoading = false
             }

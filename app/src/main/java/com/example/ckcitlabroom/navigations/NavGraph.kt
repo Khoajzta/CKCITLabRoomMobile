@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.lapstore.viewmodels.LichHocViewModel
+import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import com.google.ai.client.generativeai.common.server.Segment
 
@@ -33,10 +34,14 @@ sealed class NavRoute(val route: String) {
     object QUANLYPHONGMAY : NavRoute("quanlyphongmay_screen")
     object PHONGMAYDETAIL : NavRoute("phongmaydetail_screen")
     object ADDPHONGMAY : NavRoute("addphongmay_screen")
+    object PHONGMAYCHUYEN : NavRoute("phongmaychuyen_screen")
 
     object QUANLYGIANGVIEN : NavRoute("quanlygiangvien_screen")
     object ADDGIANGVIEN : NavRoute("addgiangvien_screen")
     object EDITGIANGVIEN : NavRoute("editgiangvien_screen")
+
+
+    object LICHSUCHUYENMAY : NavRoute("lichsuchuyenmay_screen")
 }
 
 @Composable
@@ -45,7 +50,8 @@ fun NavgationGraph(
     lichHocViewModel: LichHocViewModel,
     giangVienViewModel: GiangVienViewModel,
     mayTinhViewModel: MayTinhViewModel,
-    phongMayViewModel: PhongMayViewModel
+    phongMayViewModel: PhongMayViewModel,
+    lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
 ) {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -373,6 +379,18 @@ fun NavgationGraph(
         }
 
         composable(
+            NavRoute.PHONGMAYCHUYEN.route + "?maphong={maphong}",
+            arguments = listOf(
+                navArgument("maphong") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val maphong = navBackStackEntry.arguments?.getString("maphong") ?: ""
+            PhongMayChuyenScreen(maphong,navController,phongMayViewModel,mayTinhViewModel,lichSuChuyenMayViewModel)
+        }
+
+        composable(
             route = NavRoute.ADDPHONGMAY.route,
             enterTransition = {
                 slideIntoContainer(
@@ -390,5 +408,24 @@ fun NavgationGraph(
             CreatePhongMayScreen(navController,phongMayViewModel)
         }
 
+        ///Chuyển máy
+
+        composable(
+            route = NavRoute.LICHSUCHUYENMAY.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
+            SuChuyenMayScreen(navController,mayTinhViewModel,lichSuChuyenMayViewModel,phongMayViewModel)
+        }
     }
 }

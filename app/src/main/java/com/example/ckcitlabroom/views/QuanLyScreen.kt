@@ -26,9 +26,10 @@ fun QuanLyScreen(navController: NavHostController) {
         ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = {navController.navigate(NavRoute.QUANLYMAYTINH.route)}),
         ChucNang("Quản Lý Đơn Nhập", iconComputer, Click = { navController.navigate(NavRoute.QUANLYCAUHINH.route) }),
         ChucNang("Quản Lý Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
+        ChucNang("Chuyển Máy", iconComputer, Click = { navController.navigate(NavRoute.LICHSUCHUYENMAY.route) }),
         ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = {navController.navigate(NavRoute.QUANLYGIANGVIEN.route)}),
         ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, {}),
-        ChucNang("Quản Lý Lịch", Icons.Outlined.CalendarMonth, {})
+        ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, {})
     )
 
 

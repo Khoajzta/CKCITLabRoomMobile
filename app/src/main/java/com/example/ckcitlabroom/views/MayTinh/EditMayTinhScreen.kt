@@ -1,6 +1,3 @@
-import android.app.DatePickerDialog
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,8 +21,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -44,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -437,56 +431,6 @@ fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
                             shape = RoundedCornerShape(12.dp),
                         )
                     }
-//
-                    item {
-                        Text(
-                            text = "Phòng", color = Color.Black, fontWeight = FontWeight.Bold
-                        )
-                        Column {
-                            ExposedDropdownMenuBox(
-                                expanded = isExpanded,
-                                onExpandedChange = { isExpanded = !isExpanded },
-                            ) {
-                                OutlinedTextField(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor()
-                                        .padding(bottom = 12.dp),
-                                    value = selectedTenPhong,
-                                    onValueChange = { },
-                                    readOnly = true,
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        unfocusedContainerColor = Color.White,
-                                        focusedContainerColor = Color.White,
-                                        focusedBorderColor = Color.Black,
-                                        unfocusedBorderColor = Color.Black,
-                                        focusedTextColor = Color.Black,
-                                        unfocusedTextColor = Color.Black
-                                    ),
-                                    shape = RoundedCornerShape(12.dp),
-                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) }
-                                )
-
-                                ExposedDropdownMenu(
-                                    modifier = Modifier.background(Color.White).height(300.dp).padding(bottom = 8.dp),
-                                    expanded = isExpanded,
-                                    onDismissRequest = { isExpanded = false },
-                                    shape = RoundedCornerShape(12.dp),
-                                ) {
-                                    danhSachPhongMay.forEach { phongMay ->
-                                        androidx.compose.material3.DropdownMenuItem(
-                                            text = { Text(phongMay.TenPhong, fontWeight = FontWeight.Bold)},
-                                            onClick = {
-                                                selectdMaPhong = phongMay.MaPhong
-                                                isExpanded = false
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-
                 }else{
                     item {
                         Text("Lỗi khi lấy API")
@@ -540,7 +484,7 @@ fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
                         Chuot = chuotState.value,
                         HDD = hddState.value,
                         SSD = ssdState.value,
-                        MaPhong = maPhongState.value,
+                        MaPhong = maytinh.MaPhong,
                         TrangThai = trangThaiState.value.toIntOrNull() ?: 0
                     )
                     mayTinhViewModel.updateMayTinh(mayTinhMoi)

@@ -7,32 +7,31 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Query
 
-data class MayTinhResponse(
+data class LichSuChuyenMayResponse(
     val message: String? = null,
     val maytinh: List<MayTinh>? = null
 )
 
-
-interface MayTinhAPIService {
-    @GET("MayTinh/read.php")
+interface LichSuChuyenMayAPIService {
+    @GET("LichSuChuyenMay/read.php")
     suspend fun getAllMayTinh(): MayTinhResponse
 
-    @GET("MayTinh/show.php")
+    @GET("LichSuChuyenMay/show.php")
     suspend fun getMayTinhByMaMay(
         @Query("MaMay") mamay: String
     ): MayTinh
 
-    @GET("MayTinh/getMayTinhTheoPhong.php")
+    @GET("LichSuChuyenMay/getMayTinhTheoPhong.php")
     suspend fun getMayTinhByMaPhong(
         @Query("MaPhong") maphong: String
     ): MayTinhResponse
 
-    @POST("MayTinh/create.php")
-    suspend fun createMayTinh(
-        @Body maytiinh: MayTinh
+    @POST("LichSuChuyenMay/create.php")
+    suspend fun createLichSuChuyenMay(
+        @Body lichsuchuyenmay: LichSuChuyenMay
     ): CreateResponse
 
-    @PUT("MayTinh/update.php")
+    @PUT("LichSuChuyenMay/update.php")
     suspend fun updateMayTinh(
         @Body maytiinh: MayTinh
     ): UpdateResponse
