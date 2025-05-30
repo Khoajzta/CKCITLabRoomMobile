@@ -1,13 +1,10 @@
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,36 +22,7 @@ import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuanLyCauHinh(navController: NavHostController) {
-    val danhSachCauHinh = listOf(
-        CauHinh(
-            MaCauHinh = "CH001",
-            Main = "Asus B660",
-            CPU = "Intel i5-12400F",
-            RAM = "16GB DDR4",
-            VGA = "GTX 1660",
-            ManHinh = "27 inch",
-            BanPhim = "Logitech K120",
-            Chuot = "Logitech M90",
-            HDD = "Samsung x70 evo 500gb",
-            NgayNhap = "2025-05-20",
-            TrangThai = 1
-        ),
-        CauHinh(
-            MaCauHinh = "CH002",
-            Main = "MSI B550",
-            CPU = "Ryzen 5 5600X",
-            RAM = "16GB DDR4",
-            VGA = "RTX 3060",
-            ManHinh = "24 inch",
-            BanPhim = "Razer Cynosa",
-            Chuot = "Razer DeathAdder",
-            HDD = "Samsung x70 evo 500gb",
-            NgayNhap = "2025-05-18",
-            TrangThai = 0
-        )
-    )
-
+fun QuanLyDonNhap(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -89,9 +57,9 @@ fun QuanLyCauHinh(navController: NavHostController) {
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            items(danhSachCauHinh) { cauHinh ->
-                CardCauHinh(cauHinh)
-            }
+//            items(danhSachCauHinh) { cauHinh ->
+//                CardCauHinh(cauHinh)
+//            }
         }
     }
 }

@@ -9,17 +9,17 @@ import retrofit2.http.Query
 
 data class LichSuChuyenMayResponse(
     val message: String? = null,
-    val maytinh: List<MayTinh>? = null
+    val lichsuchuyenmay: List<LichSuChuyenMay>? = null
 )
 
 interface LichSuChuyenMayAPIService {
     @GET("LichSuChuyenMay/read.php")
     suspend fun getAllMayTinh(): MayTinhResponse
 
-    @GET("LichSuChuyenMay/show.php")
-    suspend fun getMayTinhByMaMay(
+    @GET("LichSuChuyenMay/getLichSuByMaMay.php")
+    suspend fun getLichSuByMaMay(
         @Query("MaMay") mamay: String
-    ): MayTinh
+    ): LichSuChuyenMayResponse
 
     @GET("LichSuChuyenMay/getMayTinhTheoPhong.php")
     suspend fun getMayTinhByMaPhong(

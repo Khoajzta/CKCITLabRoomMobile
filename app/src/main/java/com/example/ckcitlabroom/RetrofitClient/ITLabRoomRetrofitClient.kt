@@ -18,7 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object Constants {
 //    const val BASE_URL = "http://chillcup.io.vn/ITLabRoomAPI/api/"
-    const val BASE_URL = "http://192.168.1.164/ITLabRoomAPI/api/"
+    const val BASE_URL = "http://192.168.1.33/ITLabRoomAPI/api/"
 }
 
 object ITLabRoomRetrofitClient {

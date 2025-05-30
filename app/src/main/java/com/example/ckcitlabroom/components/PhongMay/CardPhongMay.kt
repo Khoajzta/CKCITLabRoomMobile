@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
@@ -83,7 +84,7 @@ fun CardPhongMay(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Tên Phòng: ${phongmay.TenPhong}", fontSize = 16.sp)
+                Text(text = "Phòng: ${phongmay.TenPhong}", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
             }
 
             Row(

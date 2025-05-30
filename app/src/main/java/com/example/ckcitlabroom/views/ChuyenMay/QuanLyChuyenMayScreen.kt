@@ -23,15 +23,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.History
 import com.composables.icons.lucide.Lucide
-import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SuChuyenMayScreen(
+fun QuanLyChuyenMayScreen(
     navController: NavHostController,
     mayTinhViewModel: MayTinhViewModel,
-    lichSuChuyenMayViewModel: LichSuChuyenMayViewModel,
     phongMayViewModel: PhongMayViewModel
 ) {
     val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
@@ -66,7 +64,11 @@ fun SuChuyenMayScreen(
                 fontSize = 25.sp
             )
 
-            IconButton(onClick = { /* Có thể mở lịch sử tại đây nếu cần */ }) {
+            IconButton(
+                onClick = {
+                    navController.navigate(NavRoute.LICHSUCHUYENMAY.route)
+                }
+            ) {
                 Icon(
                     modifier = Modifier.size(30.dp),
                     imageVector = Lucide.History,
@@ -79,7 +81,7 @@ fun SuChuyenMayScreen(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if(danhSachPhongMay.isNullOrEmpty()){
+            if (danhSachPhongMay.isNullOrEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -93,9 +95,9 @@ fun SuChuyenMayScreen(
                         )
                     }
                 }
-            }else{
+            } else {
                 items(danhSachPhongMay) { phongmay ->
-                   CardPhongMayChuyen(phongmay,navController,phongMayViewModel,mayTinhViewModel)
+                    CardPhongMayChuyen(phongmay, navController, phongMayViewModel, mayTinhViewModel)
                 }
             }
         }

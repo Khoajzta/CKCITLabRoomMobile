@@ -106,7 +106,7 @@ fun CardMayTinh(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
             }
 
             Row(
@@ -121,7 +121,7 @@ fun CardMayTinh(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Vị Trí: ${maytinh.ViTri}", fontSize = 16.sp)
+                Text("Vị Trí: ${maytinh.ViTri}", fontSize = 16.sp,fontWeight = FontWeight.Bold)
             }
 
             Row(
@@ -161,7 +161,7 @@ fun CardMayTinh(
                         .background(color)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color)
+                Text(statusText, color = color,fontWeight = FontWeight.Bold)
             }
 
 
@@ -185,7 +185,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Main: ${maytinh.Main}", fontSize = 16.sp)
+                        Text("Main: ${maytinh.Main}", fontSize = 16.sp,fontWeight = FontWeight.Bold)
                     }
 
 
@@ -201,7 +201,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("CPU: ${maytinh.CPU}", fontSize = 16.sp)
+                        Text("CPU: ${maytinh.CPU}", fontSize = 16.sp,fontWeight = FontWeight.Bold)
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -215,7 +215,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("RAM: ${maytinh.RAM}")
+                        Text("RAM: ${maytinh.RAM}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -230,7 +230,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("VGA: ${maytinh.VGA}")
+                        Text("VGA: ${maytinh.VGA}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -245,7 +245,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Màn Hình: ${maytinh.ManHinh}")
+                        Text("Màn Hình: ${maytinh.ManHinh}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -260,7 +260,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Bàn Phím: ${maytinh.BanPhim}")
+                        Text("Bàn Phím: ${maytinh.BanPhim}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -275,7 +275,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Chuột: ${maytinh.Chuot}")
+                        Text("Chuột: ${maytinh.Chuot}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -290,7 +290,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("HDD: ${maytinh.HDD}")
+                        Text("HDD: ${maytinh.HDD}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -305,7 +305,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("SSD: ${maytinh.SSD}")
+                        Text("SSD: ${maytinh.SSD}",fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(Modifier.height(8.dp))

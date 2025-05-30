@@ -1,4 +1,10 @@
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -135,16 +141,20 @@ fun PhongMayChuyenScreen(
                 items(danhSachMayTinhtheophong) { maytinh ->
                     CardMayTinhChuyen(
                         maytinh,
-                        navController,
                         mayTinhViewModel,
                         phongMayViewModel,
-                        selectedMayTinhs
+                        selectedMayTinhs,
+                        lichSuChuyenMayViewModel
                     )
                 }
             }
         }
 
-        if(selectedMayTinhs.isNotEmpty()){
+        AnimatedVisibility(
+            visible = selectedMayTinhs.isNotEmpty(),
+            enter = fadeIn(animationSpec = tween(durationMillis = 300)) + slideInVertically(initialOffsetY = { it }),
+            exit = fadeOut(animationSpec = tween(durationMillis = 200)) + slideOutVertically(targetOffsetY = { it })
+        ) {
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -163,6 +173,7 @@ fun PhongMayChuyenScreen(
                 Text("Chuyển máy", color = Color.Black, fontWeight = FontWeight.ExtraBold)
             }
         }
+
 
         // Dialog xác nhận chuyển máy
         if (showDialog) {

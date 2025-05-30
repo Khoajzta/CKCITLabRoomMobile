@@ -19,6 +19,9 @@ class PhongMayViewModel : ViewModel() {
     var phongmay: PhongMay by mutableStateOf(pm)
         private set
 
+    var phongmaymoi: PhongMay by mutableStateOf(pm)
+        private set
+
 
     var danhSachAllPhongMay by mutableStateOf(listOf<PhongMay>())
         private set
@@ -69,6 +72,20 @@ class PhongMayViewModel : ViewModel() {
             isLoading = true
             try {
                 phongmay = ITLabRoomRetrofitClient.phongmayAPIService.getPhongMayByMaPhong(maphong)
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("PhongMayViewModel", "Lỗi khi lấy thông tin phòng máy", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun getPhongMayMoi(maphong: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                phongmaymoi = ITLabRoomRetrofitClient.phongmayAPIService.getPhongMayByMaPhong(maphong)
             } catch (e: Exception) {
                 errorMessage = e.message
                 Log.e("PhongMayViewModel", "Lỗi khi lấy thông tin phòng máy", e)

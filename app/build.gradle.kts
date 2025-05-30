@@ -56,7 +56,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended-android:1.7.5")
     implementation("com.composables:icons-lucide:1.0.0")
     implementation ("androidx.compose.material:material:1.8.2")
-    implementation("com.composables:icons-lucide:1.0.0")
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     // Fuel library

@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
@@ -76,7 +77,7 @@ fun CardPhongMayChuyen(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Tên Phòng: ${phongmay.TenPhong}", fontSize = 16.sp)
+                Text(text = "Phòng: ${phongmay.TenPhong}", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
             }
 
             Row(
@@ -90,7 +91,7 @@ fun CardPhongMayChuyen(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Số lượng máy: ${soLuongMay}", fontSize = 16.sp)
+                Text(text = "Số lượng máy: ${soLuongMay}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
 
             val (color, statusText, statusIcon) = when (phongmay.TrangThai) {
@@ -115,7 +116,7 @@ fun CardPhongMayChuyen(
                         .background(color)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color)
+                Text(statusText, color = color, fontWeight = FontWeight.Bold)
             }
         }
     }

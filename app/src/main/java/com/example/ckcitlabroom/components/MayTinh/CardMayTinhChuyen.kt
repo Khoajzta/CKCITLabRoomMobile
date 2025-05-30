@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SwapHorizontalCircle
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -31,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,17 +56,21 @@ import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Monitor
+import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardMayTinhChuyen(
     maytinh: MayTinh,
-    navController: NavHostController,
     maytinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
-    selectedMayTinhs: SnapshotStateList<MayTinh>
+    selectedMayTinhs: SnapshotStateList<MayTinh>,
+    lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
     var isExpanded by remember { mutableStateOf(false) }
@@ -73,6 +79,9 @@ fun CardMayTinhChuyen(
     var selectdMaPhong by remember { mutableStateOf("") }
     var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
     val maPhongState = remember { mutableStateOf("") }
+
+    var showDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
         phongMayViewModel.getAllPhongMay()
@@ -96,33 +105,26 @@ fun CardMayTinhChuyen(
 
     val isSelected = selectedMayTinhs.contains(maytinh)
 
-    Card(
-        modifier = Modifier
-            .padding(bottom = 8.dp)
-            .fillMaxWidth()
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onLongPress = {
-                        if (selectedMayTinhs.any { it.MaMay == maytinh.MaMay }) {
-                            selectedMayTinhs.removeAll { it.MaMay == maytinh.MaMay }
-                        } else {
-                            selectedMayTinhs.add(maytinh)
-                        }
-                        Log.d(
-                            "SelectedMachines",
-                            "Máy đã chọn: ${selectedMayTinhs.map { it.MaMay }}"
-                        )
-                    },
-                    onTap = {
-                        expanded = !expanded
-                    }
+    Card(modifier = Modifier
+        .padding(bottom = 8.dp)
+        .fillMaxWidth()
+        .pointerInput(Unit) {
+            detectTapGestures(onLongPress = {
+                if (selectedMayTinhs.any { it.MaMay == maytinh.MaMay }) {
+                    selectedMayTinhs.removeAll { it.MaMay == maytinh.MaMay }
+                } else {
+                    selectedMayTinhs.add(maytinh)
+                }
+                Log.d(
+                    "SelectedMachines", "Máy đã chọn: ${selectedMayTinhs.map { it.MaMay }}"
                 )
-            }.shadow(7.dp, shape = RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFFBBDEFB) else Color.White
-        ),
-        elevation = CardDefaults.cardElevation(10.dp)
-    ) {
+            }, onTap = {
+                expanded = !expanded
+            })
+        }
+        .shadow(7.dp, shape = RoundedCornerShape(12.dp)), colors = CardDefaults.cardColors(
+        containerColor = if (isSelected) Color(0xFFBBDEFB) else Color.White
+    ), elevation = CardDefaults.cardElevation(10.dp)) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -136,7 +138,7 @@ fun CardMayTinhChuyen(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
             }
 
             Row(
@@ -213,11 +215,10 @@ fun CardMayTinhChuyen(
                             expanded = isExpanded,
                             onExpandedChange = { isExpanded = !isExpanded },
                         ) {
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor()
-                                    .padding(bottom = 12.dp),
+                            OutlinedTextField(modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                                .padding(bottom = 12.dp),
                                 value = selectedTenPhong,
                                 onValueChange = { },
                                 readOnly = true,
@@ -230,8 +231,7 @@ fun CardMayTinhChuyen(
                                     unfocusedTextColor = Color.Black
                                 ),
                                 shape = RoundedCornerShape(12.dp),
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) }
-                            )
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) })
 
                             ExposedDropdownMenu(
                                 modifier = Modifier
@@ -243,19 +243,16 @@ fun CardMayTinhChuyen(
                                 shape = RoundedCornerShape(12.dp),
                             ) {
                                 danhSachPhongMay.forEach { phongMay ->
-                                    androidx.compose.material3.DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                text = phongMay.TenPhong,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color.Black
-                                            )
-                                        },
-                                        onClick = {
-                                            selectdMaPhong = phongMay.MaPhong
-                                            isExpanded = false
-                                        }
-                                    )
+                                    androidx.compose.material3.DropdownMenuItem(text = {
+                                        Text(
+                                            text = phongMay.TenPhong,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Black
+                                        )
+                                    }, onClick = {
+                                        selectdMaPhong = phongMay.MaPhong
+                                        isExpanded = false
+                                    })
                                 }
                             }
                         }
@@ -268,6 +265,14 @@ fun CardMayTinhChuyen(
                             .fillMaxWidth()
                             .height(55.dp),
                         onClick = {
+                            if (maPhongState.value == maytinh.MaPhong) {
+                                showDialog = true
+                                return@Button
+                            }
+
+                            val ngayChuyen =
+                                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
                             val mayTinhMoi = MayTinh(
                                 MaMay = maytinh.MaMay,
                                 ViTri = maytinh.ViTri,
@@ -284,6 +289,16 @@ fun CardMayTinhChuyen(
                                 TrangThai = 1
                             )
                             maytinhViewModel.updateMayTinh(mayTinhMoi)
+
+                            val lichSu = LichSuChuyenMay(
+                                MaLichSu = 0,
+                                MaPhongCu = maytinh.MaPhong,
+                                MaPhongMoi = maPhongState.value,
+                                NgayChuyen = ngayChuyen,
+                                MaMay = maytinh.MaMay
+                            )
+
+                            lichSuChuyenMayViewModel.createLichSuChuyenMay(lichSu)
                             expanded = !expanded
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
@@ -292,6 +307,19 @@ fun CardMayTinhChuyen(
                         Text("Chuyển máy", fontWeight = FontWeight.ExtraBold, color = Color.White)
                     }
 
+                    if (showDialog) {
+                        AlertDialog(
+                            containerColor = Color.White,
+                            onDismissRequest = { showDialog = false },
+                            confirmButton = {
+                                TextButton(onClick = { showDialog = false }) {
+                                    Text("OK", color = Color(0xff1B8DDE), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                }
+                            },
+                            title = { Text("Thông báo",fontWeight = FontWeight.ExtraBold, color = Color(0xff1B8DDE)) },
+                            text = { Text("Phòng mới phải khác phòng hiện tại!", fontSize = 16.sp, fontWeight = FontWeight.Bold ,color = Color.Black) }
+                        )
+                    }
                 }
             }
         }
