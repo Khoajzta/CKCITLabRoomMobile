@@ -9,6 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lapstore.api.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -16,6 +19,23 @@ class GiangVienViewModel : ViewModel() {
 
     var giangvien: GiangVien? by mutableStateOf(null)
         private set
+
+    var danhSachAllGiangVien by mutableStateOf<List<GiangVien>>(emptyList())
+        private set
+    var giangvienCreateResult by mutableStateOf("")
+    var giangvienUpdateResult by mutableStateOf("")
+    var giangvienDeleteResult by mutableStateOf("")
+
+    private var pollingJob: Job? = null
+    var isLoading by mutableStateOf(false)
+        private set
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
+
+    fun stopPollingGiangVien() {
+        pollingJob?.cancel()
+        pollingJob = null
+    }
 
     fun checkLogin(email: String, matkhau: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -29,18 +49,84 @@ class GiangVienViewModel : ViewModel() {
         }
     }
 
-    fun createGiangVien(giangVien: GiangVien, onSuccess: () -> Unit, onError: (String) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun getAllGiangVien() {
+        if (pollingJob != null) return
+
+        pollingJob = viewModelScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                try {
+                    val response = ITLabRoomRetrofitClient.giangVienAPIService.getAllGiangVien()
+                    if (response.giangvien != null) {
+                        danhSachAllGiangVien = response.giangvien!!
+                    } else {
+                        danhSachAllGiangVien = emptyList()
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("GiangVienViewModel", "Polling lỗi", e)
+                }
+                delay(500)
+            }
+        }
+    }
+
+
+    fun createGiangVien(giangVien: GiangVien) {
+        viewModelScope.launch {
+            isLoading = true
             try {
-                val response = ITLabRoomRetrofitClient.giangVienAPIService.createGiangVien(giangVien)
-                withContext(Dispatchers.Main) {
-                    onSuccess()
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.giangVienAPIService.createGiangVien(giangVien)
+                }
+                giangvienCreateResult = response.message
+            } catch (e: Exception) {
+                giangvienCreateResult = "Lỗi khi thêm giảng viên: ${e.message}"
+                Log.e("GiangVienViewModel", "Lỗi khi thêm giảng viên: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun updateGiangVien(giangVien: GiangVien) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.giangVienAPIService.updateGiangVien(giangVien)
+                }
+                giangvienUpdateResult = response.message
+            } catch (e: Exception) {
+                giangvienUpdateResult = "Lỗi khi cập nhật máy tính: ${e.message}"
+                Log.e("MayTinhViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun deleteMayTinh(mamay: String) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val body = mapOf("MaMay" to mamay)
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.giangVienAPIService.deleteGiangVien(body)
+                }
+                giangvienDeleteResult = response.message
+
+                if (response.message == "MayTinh deleted") {
+                    // Cập nhật lại danh sách máy tính sau khi xóa thành công
+                    val allResponse = withContext(Dispatchers.IO) {
+                        ITLabRoomRetrofitClient.giangVienAPIService.getAllGiangVien()
+                    }
+                    danhSachAllGiangVien = allResponse.giangvien ?: emptyList()
                 }
             } catch (e: Exception) {
-                Log.e("GiangVienViewModel", "Lỗi khi thêm giảng viên", e)
-                withContext(Dispatchers.Main) {
-                    onError("Lỗi khi thêm giảng viên: ${e.message}")
-                }
+                giangvienDeleteResult = "Lỗi khi xóa máy tính: ${e.localizedMessage ?: e.message}"
+                Log.e("MayTinhViewModel", "Lỗi khi xóa máy tính", e)
+            } finally {
+                isLoading = false
             }
         }
     }

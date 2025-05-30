@@ -20,6 +20,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,29 +31,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 @Composable
-fun QuanLyGiangVien(navController: NavHostController) {
-    val danhSachGiangVien = listOf(
-        GiangVien(
-            MaGV = "GV01",
-            TenGiangVien = "Nguyê Văn A",
-            NgaySinh = "1999-03-15",
-            GioiTinh = "Nam",
-            MatKhau = "12345678",
-            Email = "abc@gmail.com",
-            MaLoaiTaiKhoan = 1,
-            TrangThai = 1
-        ),
-        GiangVien(
-            MaGV = "GV01",
-            TenGiangVien = "Trần Thị B",
-            NgaySinh = "1996-06-27",
-            GioiTinh = "Nữ",
-            MatKhau = "12345678",
-            Email = "xyz@gmail.com",
-            MaLoaiTaiKhoan = 1,
-            TrangThai = 0
-        )
-    )
+fun QuanLyGiangVien(
+    navController: NavHostController,
+    giangVienViewModel: GiangVienViewModel
+) {
+    val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien
+
+    LaunchedEffect(Unit) {
+        giangVienViewModel.getAllGiangVien()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            giangVienViewModel.stopPollingGiangVien()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -66,7 +60,7 @@ fun QuanLyGiangVien(navController: NavHostController) {
         ) {
             Text(
                 "Quản Lý Giảng Viên",
-                        fontWeight = FontWeight.ExtraBold,
+                fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 color = Color.White
             )
@@ -83,12 +77,27 @@ fun QuanLyGiangVien(navController: NavHostController) {
             }
         }
 
-        // Danh sách cấu hình
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            items(danhSachGiangVien) { giangvien ->
-                CardGiangVien(giangvien)
+            if (danhSachGiangVien == null || danhSachGiangVien.isEmpty()) {
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Chưa có giảng viên nào",
+                            color = Color.White,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+            } else {
+                items(danhSachGiangVien) { giangvien ->
+                    CardGiangVien(giangvien, navController, giangVienViewModel)
+                }
             }
         }
     }

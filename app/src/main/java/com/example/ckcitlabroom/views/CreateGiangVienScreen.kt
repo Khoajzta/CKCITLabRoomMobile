@@ -29,60 +29,57 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-
 import androidx.compose.ui.unit.dp
-import android.app.DatePickerDialog
-import android.content.Context
-import android.widget.DatePicker
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import java.util.Calendar
 
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateGiangVienScreen() {
-    val viewModel: GiangVienViewModel = viewModel()
-    val context = LocalContext.current
-    val fieldLabels = listOf(
-        "Mã Giảng viên", "Tên Giảng viên", "Giới tính", "Mã loại tài khoản",
-        "Email", "Mật Khẩu", "Trạng thái"
-    )
+fun CreateGiangVienScreen(
+    navController: NavHostController,
+    giangVienViewModel: GiangVienViewModel,
+) {
+    val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
-    val textFieldStates = remember {
-        fieldLabels.map { mutableStateOf("") }
-    }
-
+    val maGVState = remember { mutableStateOf("") }
+    val tenGVState = remember { mutableStateOf("") }
     val ngaySinhState = remember { mutableStateOf("") }
+    val gioiTinhState = remember { mutableStateOf("") }
+    val emailState = remember { mutableStateOf("") }
+    val matKhauState = remember { mutableStateOf("") }
+    val maLoaiTKState = remember { mutableStateOf(1) } // mặc định 1
+    val trangThaiState = remember { mutableStateOf(1) } // mặc định active
 
-    val calendar = Calendar.getInstance()
+    var gioiTinhExpanded by remember { mutableStateOf(false) }
+    val gioiTinhOptions = listOf("Nam", "Nữ", "Khác")
 
-    val datePickerDialog = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            ngaySinhState.value = "$dayOfMonth/${month + 1}/$year"
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
+    LaunchedEffect(Unit) {
+        giangVienViewModel.getAllGiangVien()
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            giangVienViewModel.stopPollingGiangVien()
+        }
+    }
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
-            .padding(8.dp)
             .fillMaxWidth()
-            .height(600.dp),
+            .height(700.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(
@@ -91,10 +88,12 @@ fun CreateGiangVienScreen() {
                 .padding(16.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text("Thêm Giảng Viên", fontWeight = FontWeight.ExtraBold)
+                Text("Thêm Giảng Viên", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             }
 
             LazyColumn(
@@ -102,48 +101,16 @@ fun CreateGiangVienScreen() {
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-
-                items(fieldLabels.indices.toList()) { index ->
-                    Text(
-                        text = fieldLabels[index],
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        value = textFieldStates[index].value,
-                        onValueChange = { textFieldStates[index].value = it },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White,
-                            focusedBorderColor = Color.Black,
-                            unfocusedBorderColor = Color.Black,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
-                        ),
-                        placeholder = { Text("Nhập thông tin") },
-                        shape = RoundedCornerShape(12.dp),
-                    )
-                }
-
-                // Ô Ngày nhập
                 item {
-                    Text(
-                        text = "Ngày sinh",
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
-
+                    Text("Mã GV", fontWeight = FontWeight.Bold, color = Color.Black)
                     OutlinedTextField(
+                        value = maGVState.value,
+                        onValueChange = { maGVState.value = it },
+                        placeholder = { Text("Nhập mã giảng viên") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 12.dp),
-                        value = ngaySinhState.value,
-                        onValueChange = {},
-                        readOnly = true,
+                        shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedContainerColor = Color.White,
                             focusedContainerColor = Color.White,
@@ -151,64 +118,233 @@ fun CreateGiangVienScreen() {
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
-                        ),
-                        placeholder = { Text("Chọn ngày") },
+                        )
+                    )
+
+                    Text("Tên Giảng Viên", fontWeight = FontWeight.Bold, color = Color.Black)
+                    OutlinedTextField(
+                        value = tenGVState.value,
+                        onValueChange = { tenGVState.value = it },
+                        placeholder = { Text("Nhập tên giảng viên") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
                         shape = RoundedCornerShape(12.dp),
-                        trailingIcon = {
-                            IconButton(onClick = {
-                                datePickerDialog.show()
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.DateRange,
-                                    contentDescription = "Chọn ngày"
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
+                        )
+                    )
+
+                    Text("Ngày Sinh (yyyy-MM-dd)", fontWeight = FontWeight.Bold, color = Color.Black)
+                    OutlinedTextField(
+                        value = ngaySinhState.value,
+                        onValueChange = { ngaySinhState.value = it },
+                        placeholder = { Text("Nhập ngày sinh") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
+                        )
+                    )
+
+                    Text("Giới Tính", fontWeight = FontWeight.Bold, color = Color.Black)
+                    ExposedDropdownMenuBox(
+                        expanded = gioiTinhExpanded,
+                        onExpandedChange = { gioiTinhExpanded = !gioiTinhExpanded }
+                    ) {
+                        OutlinedTextField(
+                            value = gioiTinhState.value,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = gioiTinhExpanded)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            placeholder = { Text("Chọn giới tính") },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedContainerColor = Color.White,
+                                focusedContainerColor = Color.White,
+                                focusedBorderColor = Color.Black,
+                                unfocusedBorderColor = Color.Black,
+                                focusedTextColor = Color.Black,
+                                unfocusedTextColor = Color.Black
+                            )
+                        )
+                        ExposedDropdownMenu(
+                            expanded = gioiTinhExpanded,
+                            onDismissRequest = { gioiTinhExpanded = false }
+                        ) {
+                            gioiTinhOptions.forEach { selectionOption ->
+                                DropdownMenuItem(
+                                    text = { Text(selectionOption) },
+                                    onClick = {
+                                        gioiTinhState.value = selectionOption
+                                        gioiTinhExpanded = false
+                                    }
                                 )
                             }
-                        },
-                        singleLine = true
+                        }
+                    }
+
+                    Text("Email", fontWeight = FontWeight.Bold, color = Color.Black)
+                    OutlinedTextField(
+                        value = emailState.value,
+                        onValueChange = { emailState.value = it },
+                        placeholder = { Text("Nhập email") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
+                        )
                     )
+
+                    Text("Mật Khẩu", fontWeight = FontWeight.Bold, color = Color.Black)
+                    OutlinedTextField(
+                        value = matKhauState.value,
+                        onValueChange = { matKhauState.value = it },
+                        placeholder = { Text("Nhập mật khẩu") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
+                        )
+                    )
+                }
+                item {
+                    Text("Trạng Thái:", fontWeight = FontWeight.Bold, color = Color.Black)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = trangThaiState.value == 1,
+                                onClick = { trangThaiState.value = 1 }
+                            )
+                            Text("Hoạt động")
+                        }
+                        Spacer(modifier = Modifier.width(24.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = trangThaiState.value == 0,
+                                onClick = { trangThaiState.value = 0 }
+                            )
+                            Text("Ngưng hoạt động")
+                        }
+                    }
+                }
+            }
+
+
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(16.dp)
+            ) { data ->
+                snackbarData.value?.let { customData ->
+                    Snackbar(
+                        containerColor = Color(0xFF1B8DDE),
+                        contentColor = Color.White,
+                        shape = RoundedCornerShape(12.dp),
+                        action = {
+                            TextButton(onClick = { snackbarData.value = null }) {
+                                Text("Đóng", color = Color.White)
+                            }
+                        }
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = if (customData.type == SnackbarType.SUCCESS) Color.Cyan else Color.Yellow,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = customData.message)
+                        }
+                    }
                 }
             }
 
             Button(
                 onClick = {
-                    try {
-                        val newGiangVien = GiangVien(
-                            MaGV = textFieldStates[0].value,
-                            TenGiangVien = textFieldStates[1].value,
-                            GioiTinh = textFieldStates[2].value,
-                            MaLoaiTaiKhoan = textFieldStates[3].value.toIntOrNull() ?: 0,
-                            Email = textFieldStates[4].value,
-                            MatKhau = textFieldStates[5].value,
-                            TrangThai = textFieldStates[6].value.toIntOrNull() ?: 0,
-                            NgaySinh = ngaySinhState.value
-                        )
-
-                        viewModel.createGiangVien(
-                            giangVien = newGiangVien,
-                            onSuccess = {
-                                Toast.makeText(context, "Thêm thành công", Toast.LENGTH_SHORT).show()
-                            },
-                            onError = { error ->
-                                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                    if (maGVState.value.isBlank() || tenGVState.value.isBlank() ||
+                        ngaySinhState.value.isBlank() || gioiTinhState.value.isBlank() ||
+                        emailState.value.isBlank() || matKhauState.value.isBlank()
+                    ) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Vui lòng nhập đầy đủ thông tin!", type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+                    } else {
+                        val daTonTai = danhSachGiangVien.any { it.MaGV == maGVState.value }
+                        if (daTonTai) {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Mã giảng viên đã tồn tại!", type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
                             }
-                        )
-                    } catch (e: Exception) {
-                        Toast.makeText(context, "Lỗi dữ liệu đầu vào: ${e.message}", Toast.LENGTH_SHORT).show()
+                        } else {
+                            val giangVienMoi = GiangVien(
+                                MaGV = maGVState.value,
+                                TenGiangVien = tenGVState.value,
+                                NgaySinh = ngaySinhState.value,
+                                GioiTinh = gioiTinhState.value,
+                                Email = emailState.value,
+                                MatKhau = matKhauState.value,
+                                MaLoaiTaiKhoan = 1,  // mặc định 1
+                                TrangThai = trangThaiState.value
+                            )
+                            giangVienViewModel.createGiangVien(giangVienMoi)
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Thêm giảng viên thành công",
+                                    type = SnackbarType.SUCCESS
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                                delay(1000)
+                                navController.popBackStack()
+                            }
+                        }
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(Color.Cyan)
+                colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {
-                Text("Thêm Giảng Viên")
+                Text("Thêm giảng viên")
             }
         }
     }
 }
-
-
-
-
 
