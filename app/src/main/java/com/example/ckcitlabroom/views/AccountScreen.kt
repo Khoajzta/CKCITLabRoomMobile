@@ -13,16 +13,16 @@ fun AccountScreen(){
         verticalArrangement = Arrangement.Top
     ) {
         // Thẻ thông tin
-        var sinhvien = SinhVien(
-            "0306221353",
-            "Nguyễn Văn Minh Mẫn",
-            "12/01/2004",
-            "Nam",
-            "CĐTH22DDD",
-            "123456",
-            1,
-            1
-        )
+//        var sinhvien = SinhVien(
+//            "0306221353",
+//            "Nguyễn Văn Minh Mẫn",
+//            "12/01/2004",
+//            "Nam",
+//            "CĐTH22DDD",
+//            "LOP01",
+//            "12345678",
+//            2
+//        )
 //        CardSinhVien(sinhvien)
 
         val giangVien = GiangVien(

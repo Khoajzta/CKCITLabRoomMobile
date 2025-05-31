@@ -3,6 +3,7 @@ data class SinhVien(
 	var TenSinhVien:String,
 	var NgaySinh:String,
 	var GioiTinh:String,
+	var Email: String,
 	var MaLop:String,
 	var MatKhau:String,
 	var MaLoaiTaiKhoan:Int,

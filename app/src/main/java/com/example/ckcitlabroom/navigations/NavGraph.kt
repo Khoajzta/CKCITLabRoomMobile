@@ -37,6 +37,10 @@ sealed class NavRoute(val route: String) {
     object QUANLYGIANGVIEN : NavRoute("quanlygiangvien_screen")
     object ADDGIANGVIEN : NavRoute("addgiangvien_screen")
     object EDITGIANGVIEN : NavRoute("editgiangvien_screen")
+
+    object QUANLYSINHVIEN : NavRoute("quanlysinhvien_screen")
+    object ADDSINHVIEN : NavRoute("addsinhvien_screen")
+    object EDITSINHVIEN : NavRoute("editsinhvien_screen")
 }
 
 @Composable
@@ -45,7 +49,8 @@ fun NavgationGraph(
     lichHocViewModel: LichHocViewModel,
     giangVienViewModel: GiangVienViewModel,
     mayTinhViewModel: MayTinhViewModel,
-    phongMayViewModel: PhongMayViewModel
+    phongMayViewModel: PhongMayViewModel,
+    sinhVienViewModel: SinhVienViewModel
 ) {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -156,12 +161,7 @@ fun NavgationGraph(
             EditMayTinhScreen(mamay,phongMayViewModel)
         }
 
-
-        composable(
-            route = NavRoute.QUANLYGIANGVIEN.route,
-        ) {
-            QuanLyGiangVien(navController,giangVienViewModel)
-        }
+        
 
         composable(
             route = NavRoute.ADDCAUHINH.route,
@@ -271,7 +271,41 @@ fun NavgationGraph(
         }
 
         composable(
-            route = NavRoute.EDITGIANGVIEN.route,
+            NavRoute.EDITGIANGVIEN.route + "?magv={magv}",
+            arguments = listOf(
+                navArgument("magv") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val magv = navBackStackEntry.arguments?.getString("magv") ?: ""
+            EditGiangVienScreen(magv)
+        }
+//        composable(
+//            route = NavRoute.EDITGIANGVIEN.route,
+//            enterTransition = {
+//                slideIntoContainer(
+//                    AnimatedContentTransitionScope.SlideDirection.Up,
+//                    animationSpec = tween(200)
+//                )
+//            },
+//            exitTransition = {
+//                slideOutOfContainer(
+//                    AnimatedContentTransitionScope.SlideDirection.Down,
+//                    animationSpec = tween(200)
+//                )
+//            }
+//        ) {
+//            EditGiangVienScreen(magv = )
+//        }
+
+        composable(
+            route = NavRoute.QUANLYSINHVIEN.route,
+        ) {
+            QuanLySinhVien(navController, sinhVienViewModel)
+        }
+        composable(
+            route = NavRoute.ADDSINHVIEN.route,
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Up,
@@ -285,11 +319,11 @@ fun NavgationGraph(
                 )
             }
         ) {
-//            EditGiangVienScreen()
+            CreateSinhVienScreen(navController, sinhVienViewModel)
         }
 
         composable(
-            route = NavRoute.ADDGIANGVIEN.route,
+            route = NavRoute.EDITSINHVIEN.route,
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Up,
@@ -303,25 +337,7 @@ fun NavgationGraph(
                 )
             }
         ) {
-            CreateGiangVienScreen(navController, giangVienViewModel)
-        }
-
-        composable(
-            route = NavRoute.EDITGIANGVIEN.route,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(200)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(200)
-                )
-            }
-        ) {
-//            EditGiangVienScreen()
+//            EditSinhVienScreen()
         }
 
         composable(
