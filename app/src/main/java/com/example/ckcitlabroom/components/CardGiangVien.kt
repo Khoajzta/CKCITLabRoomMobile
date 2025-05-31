@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -42,15 +43,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavHostController
+import com.composables.icons.lucide.Circle
+import com.composables.icons.lucide.Lucide
+import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun CardGiangVien(giangvien: GiangVien) {
+fun CardGiangVien(
+    giangVien: GiangVien,
+    navController: NavHostController,
+    giangVienViewModel: GiangVienViewModel
+) {
     var expanded by remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) }
+
+    // Chọn màu trạng thái dựa trên giangVien.TrangThai (1: hoạt động, 0: không hoạt động)
+    val (color, statusText) = when (giangVien.TrangThai) {
+        1 -> Color(0xFF4CAF50) to "Hoạt động"
+        0 -> Color(0xFFF44336) to "Không hoạt động"
+        else -> Color.Gray to "Không xác định"
+    }
+
     Card(
         modifier = Modifier
             .padding(bottom = 8.dp)
             .fillMaxWidth()
-            .width(300.dp)
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
@@ -62,88 +79,103 @@ fun CardGiangVien(giangvien: GiangVien) {
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
-        ) {
-            // Thông tin chính - luôn hiển thị
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                Icon(Icons.Default.Code, contentDescription = "Mã GV", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Lucide.Circle, contentDescription = "Mã GV", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Mã Giảng Viên: ${giangvien.MaGV}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Mã GV: ${giangVien.MaGV}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 2.dp)) {
-                Icon(Icons.Default.PersonOutline, contentDescription = "Tên GV", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Lucide.Circle, contentDescription = "Tên GV", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Tên Giảng Viên: ${giangvien.TenGiangVien}", fontSize = 16.sp)
+                Text("Tên: ${giangVien.TenGiangVien}", fontSize = 16.sp)
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 2.dp)) {
-                Icon(Icons.Default.Transgender, contentDescription = "Giới Tính", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Lucide.Circle, contentDescription = "Ngày sinh", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Giới Tính: ${giangvien.GioiTinh}", fontSize = 16.sp)
+                Text("Ngày sinh: ${giangVien.NgaySinh}", fontSize = 16.sp)
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 2.dp)) {
-                Icon(Icons.Default.DateRange, contentDescription = "Ngày Sinh", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Lucide.Circle, contentDescription = "Giới tính", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Ngày Sinh: ${giangvien.NgaySinh}", fontSize = 16.sp)
+                Text("Giới tính: ${giangVien.GioiTinh}")
             }
 
-            // Phần mở rộng ẩn/hiện
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Lucide.Circle, contentDescription = "Email", tint = Color.Black, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Email: ${giangVien.Email}")
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Lucide.Circle, contentDescription = "Trạng thái", tint = color, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Trạng thái: ", fontWeight = FontWeight.Bold)
+                Spacer(Modifier.width(4.dp))
+                Text(statusText, color = color)
+            }
+
+            Spacer(Modifier.height(8.dp))
+
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-                    val infoItems = listOf(
-                        Icons.Default.AdminPanelSettings to "Mã Loại Tài khoản: ${giangvien.MaLoaiTaiKhoan}",
-                        Icons.Default.Password to "Mật Khẩu: ${giangvien.MatKhau}"
-                    )
+                    // Nếu bạn muốn show thêm thông tin khác, có thể thêm ở đây
 
-                    infoItems.forEach { (icon, text) ->
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 2.dp)) {
-                            Icon(icon, contentDescription = null, tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text(text = text, fontSize = 16.sp)
-                        }
-                    }
-
-                    // Trạng thái
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
-                        Icon(Icons.Default.Info, contentDescription = "Trạng thái", tint = Color(0xFF3F51B5), modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(text = "Trạng thái: ", fontWeight = FontWeight.SemiBold)
-                        val (color, statusText) = when (giangvien.TrangThai) {
-                            1 -> Color(0xFF4CAF50) to "Đang dạy"
-                            0 -> Color(0xFFF44336) to "Không hoạt động"
-                            else -> Color(0xFF9E9E9E) to "Không xác định"
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .clip(CircleShape)
-                                .background(color)
-                                .align(Alignment.CenterVertically)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = statusText, color = color)
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            navController.navigate("edit_giangvien?magv=${giangVien.MaGV}")
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
 
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = {}
+                        onClick = { showConfirmDialog = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Chỉnh Sửa")
+                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             }
         }
     }
+
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            title = { Text("Xác nhận") },
+            text = { Text("Bạn có chắc chắn muốn xóa giảng viên này không?", fontWeight = FontWeight.Bold) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+//                        giangVienViewModel.deleteGiangVien(giangVien.MaGV)
+//                        showConfirmDialog = false
+                    }
+                ) {
+                    Text("Xóa", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                    onClick = { showConfirmDialog = false }
+                ) {
+                    Text("Hủy")
+                }
+            },
+            containerColor = Color.White
+        )
+    }
 }
-
-

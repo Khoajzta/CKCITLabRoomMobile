@@ -31,6 +31,7 @@ fun AccountScreen(){
             NgaySinh = "1985-07-15",
             GioiTinh = "Nam",
             MatKhau = "12345678",
+            Email = "abc@gmail.com",
             MaLoaiTaiKhoan = 2,
             TrangThai = 1
         )

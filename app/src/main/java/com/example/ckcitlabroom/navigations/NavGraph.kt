@@ -222,7 +222,7 @@ fun NavgationGraph(
         composable(
             route = NavRoute.QUANLYGIANGVIEN.route,
         ) {
-            QuanLyGiangVien(navController)
+            QuanLyGiangVien(navController,giangVienViewModel)
         }
 
         composable(
@@ -311,7 +311,7 @@ fun NavgationGraph(
         composable(
             route = NavRoute.QUANLYGIANGVIEN.route,
         ) {
-            QuanLyGiangVien(navController)
+            QuanLyGiangVien(navController, giangVienViewModel)
         }
 
         composable(
@@ -329,7 +329,7 @@ fun NavgationGraph(
                 )
             }
         ) {
-            CreateGiangVienScreen()
+            CreateGiangVienScreen(navController, giangVienViewModel)
         }
 
         composable(
@@ -365,7 +365,7 @@ fun NavgationGraph(
                 )
             }
         ) {
-            CreateGiangVienScreen()
+            CreateGiangVienScreen(navController, giangVienViewModel)
         }
 
         composable(
