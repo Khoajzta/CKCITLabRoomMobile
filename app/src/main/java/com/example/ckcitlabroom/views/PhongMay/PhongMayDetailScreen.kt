@@ -244,7 +244,7 @@ fun PhongMayDetailScreen(
 
                     ) {
                         Text(
-                            text = "Mã Phòng", color = Color.Black, fontWeight = FontWeight.Bold
+                            text = "Mã Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold
                         )
 
                         Box(
@@ -265,13 +265,13 @@ fun PhongMayDetailScreen(
                                     phongmay.MaPhong,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Black,
-                                    fontSize = 17.sp
+                                    fontSize = 15.sp
                                 )
                             }
                         }
 
                         Text(
-                            text = "Tên Phòng", color = Color.Black, fontWeight = FontWeight.Bold
+                            text = "Tên Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold
                         )
 
                         OutlinedTextField(

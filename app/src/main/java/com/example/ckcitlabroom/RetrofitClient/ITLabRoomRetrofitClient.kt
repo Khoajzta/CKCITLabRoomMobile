@@ -2,6 +2,8 @@ package com.example.lapstore.api
 
 import CaHocAPIService
 import CauHinhAPIService
+import ChiTietDonNhapAPIService
+import DonNhapAPIService
 import GiangVienAPIService
 import LichHocAPIService
 import LichSuChuyenMayAPIService
@@ -18,7 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object Constants {
 //    const val BASE_URL = "http://chillcup.io.vn/ITLabRoomAPI/api/"
-    const val BASE_URL = "http://192.168.1.33/ITLabRoomAPI/api/"
+    const val BASE_URL = "http://192.168.1.209/ITLabRoomAPI/api/"
 }
 
 object ITLabRoomRetrofitClient {
@@ -116,5 +118,21 @@ object ITLabRoomRetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
             .build()
             .create(LichSuChuyenMayAPIService::class.java)
+    }
+
+    val donnhapAPIService: DonNhapAPIService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+            .create(DonNhapAPIService::class.java)
+    }
+
+    val chitietdonnhapAPIService: ChiTietDonNhapAPIService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+            .create(ChiTietDonNhapAPIService::class.java)
     }
 }

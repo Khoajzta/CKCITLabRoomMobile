@@ -1,3 +1,5 @@
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -6,6 +8,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,6 +60,9 @@ import com.composables.icons.lucide.MemoryStick
 import com.composables.icons.lucide.Monitor
 import com.composables.icons.lucide.MousePointer2
 import com.example.lapstore.viewmodels.MayTinhViewModel
+import android.graphics.Paint
+
+
 
 
 @Composable
@@ -65,6 +72,16 @@ fun CardMayTinh(
     maytinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel
 ) {
+
+
+//    val qrText = maytinh.QRCode
+//
+//    val qrBitmap = remember(qrText) {
+//        generateQRCode(qrText, 300)  // kích thước 300x300 px
+//    }
+
+
+
 
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -93,6 +110,17 @@ fun CardMayTinh(
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            QRCodeImage(base64Str = maytinh.QRCode, modifier = Modifier.size(100.dp))
+
+        }
+
+
+
         Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -106,7 +134,7 @@ fun CardMayTinh(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                Text("Tên Máy: ${maytinh.TenMay}", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
             }
 
             Row(
@@ -308,6 +336,7 @@ fun CardMayTinh(
                         Text("SSD: ${maytinh.SSD}",fontWeight = FontWeight.Bold)
                     }
 
+
                     Spacer(Modifier.height(8.dp))
 
                     Button(
@@ -320,16 +349,16 @@ fun CardMayTinh(
                     ) {
                         Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            showConfirmDialog = true
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
-                    }
+//                    Button(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        onClick = {
+//                            showConfirmDialog = true
+//                        },
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336)),
+//                        shape = RoundedCornerShape(12.dp)
+//                    ) {
+//                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
+//                    }
                 }
             }
         }

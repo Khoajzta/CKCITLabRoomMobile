@@ -126,6 +126,21 @@ fun CardMayTinhLichSuChuyen(
             ) {
                 Icon(
                     imageVector = Lucide.Building2,
+                    contentDescription = "Tên máy",
+                    tint = Color.Black,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text("Tên Máy: ${maytinh?.TenMay ?: "Đang tải..."}")
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Lucide.Building2,
                     contentDescription = "Mã Máy",
                     tint = Color.Black,
                     modifier = Modifier.size(20.dp)

@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 
 class MayTinhViewModel : ViewModel() {
 
-    var mt = MayTinh("","",""",""","","","","","","","","","",1)
+    var mt = MayTinh("","",""",""","","","","","","","","","","","",1)
 
     var danhSachAllMayTinh by mutableStateOf<List<MayTinh>>(emptyList())
         private set
@@ -156,7 +156,6 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
-
 }
 
 

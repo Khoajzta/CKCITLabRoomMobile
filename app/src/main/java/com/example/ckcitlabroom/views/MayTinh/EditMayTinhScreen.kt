@@ -48,7 +48,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
+fun EditMayTinhScreen(
+    maMay: String,
+    phongMayViewModel:PhongMayViewModel
+){
 
     var mayTinhViewModel: MayTinhViewModel = viewModel()
     var maytinh = mayTinhViewModel.maytinh
@@ -75,6 +78,7 @@ fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
     }
 
     val maMayState = remember { mutableStateOf("") }
+    val tenMayState = remember { mutableStateOf("") }
     val viTriState = remember { mutableStateOf("") }
     val mainState = remember { mutableStateOf("") }
     val cpuState = remember { mutableStateOf("") }
@@ -99,7 +103,8 @@ fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
     LaunchedEffect(maytinh) {
         maytinh?.let {
             maMayState.value = it.MaMay
-            viTriState.value = if (maytinh.ViTri.isNullOrBlank()) "Kho" else maytinh.ViTri
+            tenMayState.value = it.TenMay
+            viTriState.value = it.ViTri
             mainState.value = it.Main
             cpuState.value = it.CPU
             ramState.value = it.RAM
@@ -170,6 +175,32 @@ fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
                                 )
                             }
                         }
+                    }
+
+                    item {
+                        Text(
+                            text = "Tên Máy",
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 12.dp),
+                            value = tenMayState.value,
+                            onValueChange = { tenMayState.value = it },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedContainerColor = Color.White,
+                                focusedContainerColor = Color.White,
+                                focusedBorderColor = Color.Black,
+                                unfocusedBorderColor = Color.Black,
+                                focusedTextColor = Color.Black,
+                                unfocusedTextColor = Color.Black
+                            ),
+                            placeholder = { Text("Nhập thông tin") },
+                            shape = RoundedCornerShape(12.dp),
+                        )
                     }
 
                     item {
@@ -474,6 +505,7 @@ fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
                 onClick = {
                     val mayTinhMoi = MayTinh(
                         MaMay = maMayState.value,
+                        TenMay = tenMayState.value,
                         ViTri = viTriState.value,
                         Main = mainState.value,
                         CPU = cpuState.value,
@@ -485,6 +517,7 @@ fun EditMayTinhScreen(maMay: String,phongMayViewModel:PhongMayViewModel){
                         HDD = hddState.value,
                         SSD = ssdState.value,
                         MaPhong = maytinh.MaPhong,
+                        QRCode = maytinh.QRCode,
                         TrangThai = trangThaiState.value.toIntOrNull() ?: 0
                     )
                     mayTinhViewModel.updateMayTinh(mayTinhMoi)

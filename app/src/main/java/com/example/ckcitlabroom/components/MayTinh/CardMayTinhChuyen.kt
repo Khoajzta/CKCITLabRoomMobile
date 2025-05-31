@@ -275,7 +275,8 @@ fun CardMayTinhChuyen(
 
                             val mayTinhMoi = MayTinh(
                                 MaMay = maytinh.MaMay,
-                                ViTri = maytinh.ViTri,
+                                TenMay = maytinh.MaMay,
+                                ViTri = maytinh.TenMay,
                                 Main = maytinh.Main,
                                 CPU = maytinh.CPU,
                                 RAM = maytinh.RAM,
@@ -286,6 +287,7 @@ fun CardMayTinhChuyen(
                                 HDD = maytinh.HDD,
                                 SSD = maytinh.SSD,
                                 MaPhong = maPhongState.value,
+                                QRCode = maytinh.QRCode,
                                 TrangThai = 1
                             )
                             maytinhViewModel.updateMayTinh(mayTinhMoi)

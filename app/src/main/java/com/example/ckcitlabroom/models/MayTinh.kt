@@ -1,9 +1,11 @@
+import android.graphics.Bitmap
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class MayTinh(
     var MaMay: String,
+    var TenMay: String,
     var ViTri: String,
     var Main: String,
     var CPU: String,
@@ -15,5 +17,6 @@ data class MayTinh(
     var HDD: String,
     var SSD: String,
     var MaPhong: String,
+    var QRCode: String,
     var TrangThai: Int
 ) : Parcelable

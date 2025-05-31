@@ -2,7 +2,6 @@ package com.example.ckcitlabroom
 
 import AnimatedNavigationBar
 import ButtonData
-import DotLoadingOverlay
 import GiangVienViewModel
 import LoginSVScreen
 import NavRoute
@@ -54,6 +53,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
+import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+import com.example.lapstore.viewmodels.DonNhapyViewModel
 import com.example.lapstore.viewmodels.LichHocViewModel
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
@@ -84,6 +85,8 @@ fun MainScreen() {
     val mayTinhViewModel: MayTinhViewModel = viewModel()
     val phongMayViewModel: PhongMayViewModel = viewModel()
     val lichSuChuyenMayViewModel: LichSuChuyenMayViewModel = viewModel()
+    val donNhapyViewModel:DonNhapyViewModel = viewModel()
+    val chitietdonNhapyViewModel:ChiTietDonNhapyViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
 
@@ -112,7 +115,7 @@ fun MainScreen() {
             }
         }),
         ButtonData("Quét Mã", Icons.Default.QrCodeScanner, click = {
-
+            navController.navigate(NavRoute.QUETQRCODE.route)
         }),
         ButtonData("Thông Báo", Icons.Default.Notifications, click = {
 
@@ -221,14 +224,12 @@ fun MainScreen() {
                     giangVienViewModel,
                     mayTinhViewModel,
                     phongMayViewModel,
-                    lichSuChuyenMayViewModel
+                    lichSuChuyenMayViewModel,
+                    donNhapyViewModel,
+                    chitietdonNhapyViewModel
                 )
             }
 
-            // Hiển thị overlay loading khi isLoading = true
-//             if (isLoading) {
-//                 DotLoadingOverlay()
-//             }
         }
     }
 }

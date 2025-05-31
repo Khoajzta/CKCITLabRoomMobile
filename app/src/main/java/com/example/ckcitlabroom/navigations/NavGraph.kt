@@ -1,4 +1,5 @@
 import android.transition.Transition
+import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.*
 import androidx.compose.animation.core.spring
@@ -10,6 +11,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+import com.example.lapstore.viewmodels.DonNhapyViewModel
 import com.example.lapstore.viewmodels.LichHocViewModel
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
@@ -24,12 +27,17 @@ sealed class NavRoute(val route: String) {
     object QUANLY : NavRoute("quanly_screen")
 
     object QUANLYDONNHAP : NavRoute("quanlydonnhap_screen")
+    object ADDDONNHAP : NavRoute("adddonnhap_screen")
+    object CHITIETDONNHAP : NavRoute("chitietdonnhap_screen")
+
+
     object ADDCAUHINH : NavRoute("addcauhinh_screen")
     object EDITCAUHINH : NavRoute("editcauhinh_screen")
 
     object QUANLYMAYTINH : NavRoute("quanlymaytinh_screen")
     object EDITMAYTINH : NavRoute("editmaytinh_screen")
     object ADDTMAYTINH : NavRoute("addmaytinh_screen")
+    object MAYTINHDETAIL : NavRoute("maytinhdetail_screen")
 
     object QUANLYPHONGMAY : NavRoute("quanlyphongmay_screen")
     object PHONGMAYDETAIL : NavRoute("phongmaydetail_screen")
@@ -40,10 +48,12 @@ sealed class NavRoute(val route: String) {
     object ADDGIANGVIEN : NavRoute("addgiangvien_screen")
     object EDITGIANGVIEN : NavRoute("editgiangvien_screen")
 
-
     object QUANLYCHUYENMAY : NavRoute("quanlychuyenmay_screen")
     object LICHSUCHUYENMAY : NavRoute("lichsuchuyenmay_screen")
     object CHITIETLICHSUCHUYENMAY : NavRoute("chitietlichsuchuyenmay_screen")
+
+
+    object QUETQRCODE : NavRoute("quetqrcode_screen")
 }
 
 @Composable
@@ -53,7 +63,9 @@ fun NavgationGraph(
     giangVienViewModel: GiangVienViewModel,
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
-    lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
+    lichSuChuyenMayViewModel: LichSuChuyenMayViewModel,
+    donNhapyViewModel: DonNhapyViewModel,
+    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel
 ) {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -131,7 +143,37 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLyDonNhap(navController)
+            QuanLyDonNhap(navController,donNhapyViewModel)
+        }
+
+        composable(
+            route = NavRoute.ADDDONNHAP.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
+            CreateDonNhapScreen(navController,mayTinhViewModel,phongMayViewModel,donNhapyViewModel,chiTietDonNhapyViewModel)
+        }
+
+        composable(
+            NavRoute.CHITIETDONNHAP.route + "?madonnhap={madonnhap}",
+            arguments = listOf(
+                navArgument("madonnhap") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val madonnhap = navBackStackEntry.arguments?.getString("madonnhap") ?: ""
+            ChiTietDonNhapScreen(madonnhap,navController,chiTietDonNhapyViewModel,mayTinhViewModel,phongMayViewModel)
         }
 
         composable(
@@ -162,6 +204,18 @@ fun NavgationGraph(
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
             EditMayTinhScreen(mamay,phongMayViewModel)
+        }
+
+        composable(
+            NavRoute.MAYTINHDETAIL.route + "?mamay={mamay}",
+            arguments = listOf(
+                navArgument("mamay") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
+            MayTinhDetailScreen(mamay,phongMayViewModel)
         }
 
 
@@ -459,5 +513,30 @@ fun NavgationGraph(
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
             ChiTietLichSuChuyenMay(mamay,lichSuChuyenMayViewModel,phongMayViewModel,mayTinhViewModel)
         }
+
+
+
+        composable(
+            route = NavRoute.QUETQRCODE.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
+            QRCodeScannerScreen(
+                onResult = { qrCodeValue ->
+                    navController.navigate(NavRoute.MAYTINHDETAIL.route + "?mamay=${qrCodeValue}")
+                }
+            )
+        }
+
     }
 }
