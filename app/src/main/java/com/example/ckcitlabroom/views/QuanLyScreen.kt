@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,22 +16,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 
 
 @Composable
-fun QuanLyScreen(navController: NavHostController) {
+fun QuanLyScreen(
+    navController: NavHostController,
+    giangVienViewModel: GiangVienViewModel
+) {
+    val giangVien = giangVienViewModel.giangvienSet
 
-
-    val dsChucNang = listOf(
-        ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = {navController.navigate(NavRoute.QUANLYMAYTINH.route)}),
-        ChucNang("Quản Lý Đơn Nhập", iconComputer, Click = { navController.navigate(NavRoute.QUANLYDONNHAP.route) }),
-        ChucNang("Quản Lý Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
-        ChucNang("Chuyển Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYCHUYENMAY.route) }),
-        ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = {navController.navigate(NavRoute.QUANLYGIANGVIEN.route)}),
-        ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, {}),
-        ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, {})
-    )
+    val dsChucNang = if (giangVien?.MaLoaiTaiKhoan == 1) {
+        listOf(
+            ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = { navController.navigate(NavRoute.QUANLYMAYTINH.route) }),
+            ChucNang("Quản Lý Đơn Nhập", iconComputer, Click = { navController.navigate(NavRoute.QUANLYDONNHAP.route) }),
+            ChucNang("Quản Lý Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
+            ChucNang("Chuyển Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYCHUYENMAY.route) }),
+            ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = { navController.navigate(NavRoute.QUANLYGIANGVIEN.route) }),
+            ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = {}),
+            ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {})
+        )
+    } else {
+        listOf(
+            ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {})
+        )
+    }
 
 
     Column(

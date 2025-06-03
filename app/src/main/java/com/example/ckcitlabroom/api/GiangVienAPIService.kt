@@ -6,29 +6,41 @@ import retrofit2.http.PUT
 import retrofit2.http.Query
 
 data class LoginRequest(
-    val Email: String,
-    val MatKhau: String
+    val email: String,
+    val matkhau: String
 )
 
-data class LoginResponse(
-    val success: Boolean,
-    val message: String,
-    val data: GiangVien?
+data class GiangVienRequest(
+    val email_or_magv: String
 )
+
 data class GiangVienResponse(
     val message: String? = null,
     val giangvien: List<GiangVien>? = null
 )
 
+data class LoginResponse(
+    val result: Boolean,
+    val message: String? = null
+)
+
 interface GiangVienAPIService {
-    @GET("GiangVien/checkLogin.php")
-    suspend fun checkLogin(
-        @Query("email") email: String,
-        @Query("matkhau") matkhau: String
-    ): GiangVien
+
+    @POST("GiangVien/checklogin.php")
+    suspend fun CheckLogin(@Body request: LoginRequest): LoginResponse
+
 
     @GET("GiangVien/read.php")
     suspend fun getAllGiangVien(): GiangVienResponse
+
+    @GET("GiangVien/getGiangVienTheoMaOrEmail.php")
+    suspend fun getGiangVienByEmailOrMaGV(@Query("key") key: String): GiangVien
+
+
+    @GET("MayTinh/show.php")
+    suspend fun getMayTinhByMaMay(
+        @Query("MaMay") mamay: String
+    ): MayTinh
 
     @GET("GiangVien/show.php")
     suspend fun getGiangVienByByID(

@@ -45,14 +45,6 @@ fun CardGiangVienInfo(giangVien: GiangVien) {
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            // Avatar
-            Box(
-                modifier = Modifier
-                    .size(135.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF2196F3)) // Avatar màu xanh
-            )
-
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(

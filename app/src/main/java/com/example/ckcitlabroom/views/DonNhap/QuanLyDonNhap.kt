@@ -79,12 +79,16 @@ fun QuanLyDonNhap(
 
             if(danhsachdonnhap.isNullOrEmpty()){
                 item {
-                    Row {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = "Chưa có đơn nhập nào",
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                            fontSize = 17.sp
                         )
                     }
                 }

@@ -83,7 +83,7 @@ fun QuanLyPhongMay(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Chưa có máy tính nào",
+                            "Chưa có phòng nào",
                             color = Color.White,
                             modifier = Modifier.padding(16.dp)
                         )

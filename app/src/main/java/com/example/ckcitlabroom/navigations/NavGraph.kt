@@ -69,26 +69,19 @@ fun NavgationGraph(
 ) {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-    NavHost(navController = navController, startDestination = NavRoute.HOME.route,
+    NavHost(navController = navController, startDestination = NavRoute.LOGINSINHVIEN.route,
 
     ) {
         composable(
-            NavRoute.HOME.route,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(300)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(300)
-                )
-            }
+            NavRoute.HOME.route + "?magiangvien={magiangvien}",
+            arguments = listOf(
+                navArgument("magiangvien") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
         ) { navBackStackEntry ->
-            val giangvien = navBackStackEntry.savedStateHandle.get<GiangVien>("giangvien")
-            HomeScreen(lichHocViewModel, giangvien)
+            val magiangvien = navBackStackEntry.arguments?.getString("magiangvien") ?: ""
+            HomeScreen(lichHocViewModel,magiangvien)
         }
 
 
@@ -107,25 +100,20 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLyScreen(navController)
+            QuanLyScreen(navController,giangVienViewModel)
         }
 
         composable(
-            route = NavRoute.ACCOUNT.route,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(300)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(300)
-                )
-            }
-        ) {
-            AccountScreen()
+            NavRoute.ACCOUNT.route + "?magiangvien={magiangvien}",
+            arguments = listOf(
+                navArgument("magiangvien") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val magiangvien = navBackStackEntry.arguments?.getString("magiangvien") ?: ""
+            val masinhvien = navBackStackEntry.arguments?.getString("magiangvien") ?: ""
+            AccountScreen(magiangvien,masinhvien,giangVienViewModel)
         }
 
         composable(

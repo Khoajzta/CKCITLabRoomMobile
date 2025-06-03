@@ -11,17 +11,24 @@ import com.example.lapstore.api.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GiangVienViewModel : ViewModel() {
 
-    var giangvien: GiangVien? by mutableStateOf(null)
+    var giangvien by mutableStateOf<GiangVien?>(null)
+        private set
+
+
+    var giangvienSet: GiangVien? by mutableStateOf(null)
         private set
 
     var danhSachAllGiangVien by mutableStateOf<List<GiangVien>>(emptyList())
         private set
+
     var giangvienCreateResult by mutableStateOf("")
     var giangvienUpdateResult by mutableStateOf("")
     var giangvienDeleteResult by mutableStateOf("")
@@ -37,17 +44,32 @@ class GiangVienViewModel : ViewModel() {
         pollingJob = null
     }
 
-    fun checkLogin(email: String, matkhau: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun setGV(gv: GiangVien?) {
+        giangvienSet = gv
+    }
+
+    private val _loginResult = MutableStateFlow<LoginResponse?>(null)
+    val loginResult: StateFlow<LoginResponse?> = _loginResult
+
+    fun checkLogin(email: String, matKhau: String) {
+        viewModelScope.launch {
             try {
-                Log.d("TaiKhoanViewModel", "Gửi yêu cầu đến API với tên tài khoản: $email")
-                giangvien = ITLabRoomRetrofitClient.giangVienAPIService.checkLogin(email,matkhau)
-//                Log.d("TaiKhoanViewModel", "Dữ liệu trả về: $taikhoan")
+                val request = LoginRequest(email, matKhau)
+                val response = ITLabRoomRetrofitClient.giangVienAPIService.CheckLogin(request)
+                _loginResult.value = response
             } catch (e: Exception) {
-                Log.e("TaiKhoanViewModel", "Lỗi khi lấy dữ liệu từ API", e)
+                _loginResult.value = LoginResponse(
+                    result = false,
+                    message = "Lỗi kết nối: ${e.message}"
+                )
             }
         }
     }
+
+    fun resetLoginResult() {
+        _loginResult.value = null
+    }
+
 
     fun getAllGiangVien() {
         if (pollingJob != null) return
@@ -66,6 +88,34 @@ class GiangVienViewModel : ViewModel() {
                     Log.e("GiangVienViewModel", "Polling lỗi", e)
                 }
                 delay(500)
+            }
+        }
+    }
+
+    fun getGiangVienByMaGV(magv: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                giangvien = ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByByID(magv)
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun getGiangVienByMaGOrEmail(key: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                giangvien = ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByEmailOrMaGV(key)
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("GiangVienViewModel", "Lỗi khi lấy thông tin máy tính", e)
+            } finally {
+                isLoading = false
             }
         }
     }

@@ -26,7 +26,8 @@ import com.example.lapstore.viewmodels.LichHocViewModel
 
 
 @Composable
-fun HomeScreen(viewmodel: LichHocViewModel,giangVien: GiangVien?) {
+fun HomeScreen(viewmodel: LichHocViewModel,magiangvien:String) {
+
     val danhSachLichHoc = viewmodel.danhSachLichHoc
 
     LaunchedEffect(Unit) {

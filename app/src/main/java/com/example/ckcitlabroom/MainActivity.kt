@@ -8,6 +8,7 @@ import NavRoute
 import NavgationGraph
 import PhongMayViewModel
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -92,6 +93,9 @@ fun MainScreen() {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
+
+    var giangVien = giangVienViewModel.giangvienSet
+
     // Danh sách các button cho Bottom Navigation Bar
     val buttons = listOf(
         ButtonData("Home", Icons.Default.Home, click = {
@@ -125,9 +129,8 @@ fun MainScreen() {
 //                popUpTo(0) { inclusive = true }
 //            }
 
-            navController.navigate(NavRoute.ACCOUNT.route) {
-//                popUpTo(0) { inclusive = true }
-            }
+            if(giangVien!=null)
+                navController.navigate(NavRoute.ACCOUNT.route + "?magiangvien=${giangVien.MaGV}")
 
         }),
     )
