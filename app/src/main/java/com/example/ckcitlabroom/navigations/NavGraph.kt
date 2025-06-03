@@ -5,6 +5,8 @@ import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -59,6 +61,11 @@ sealed class NavRoute(val route: String) {
     object QUANLYSINHVIEN : NavRoute("quanlysinhvien_screen")
     object ADDSINHVIEN : NavRoute("addsinhvien_screen")
     object EDITSINHVIEN : NavRoute("editsinhvien_screen")
+
+
+    object ADDPHIEUSUACHUA : NavRoute("addphieusuachua_screen")
+    object STARTSCREEN : NavRoute("start_screen")
+
 }
 
 @Composable
@@ -70,25 +77,55 @@ fun NavgationGraph(
     phongMayViewModel: PhongMayViewModel,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel,
     donNhapyViewModel: DonNhapyViewModel,
-    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel
-    sinhVienViewModel: SinhVienViewModel
+    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
+    sinhVienViewModel: SinhVienViewModel,
 ) {
 
+    val context = LocalContext.current.applicationContext
+    val userPreferences = remember { SinhVienPreferences(context) }
+
+
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-    NavHost(navController = navController, startDestination = NavRoute.LOGINSINHVIEN.route,
+    NavHost(navController = navController, startDestination = NavRoute.STARTSCREEN.route,
 
     ) {
+
         composable(
-            NavRoute.HOME.route + "?magiangvien={magiangvien}",
-            arguments = listOf(
-                navArgument("magiangvien") { type = NavType.StringType; nullable = true }
-            ),
-            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
-            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
-        ) { navBackStackEntry ->
-            val magiangvien = navBackStackEntry.arguments?.getString("magiangvien") ?: ""
-            HomeScreen(lichHocViewModel,magiangvien)
+            route = NavRoute.STARTSCREEN.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            StartupCheckScreen(navController,sinhVienViewModel,giangVienViewModel)
         }
+
+        composable(
+            route = NavRoute.HOME.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    tween(300)
+                )
+            }
+        ) { navBackStackEntry ->
+            HomeScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel)
+        }
+
 
 
         composable(
@@ -106,20 +143,15 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLyScreen(navController,giangVienViewModel)
+            QuanLyScreen(navController,giangVienViewModel,sinhVienViewModel)
         }
 
         composable(
-            NavRoute.ACCOUNT.route + "?magiangvien={magiangvien}",
-            arguments = listOf(
-                navArgument("magiangvien") { type = NavType.StringType; nullable = true }
-            ),
+            NavRoute.ACCOUNT.route,
             enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
         ) { navBackStackEntry ->
-            val magiangvien = navBackStackEntry.arguments?.getString("magiangvien") ?: ""
-            val masinhvien = navBackStackEntry.arguments?.getString("magiangvien") ?: ""
-            AccountScreen(magiangvien,masinhvien,giangVienViewModel)
+            AccountScreen(giangVienViewModel,sinhVienViewModel,navController)
         }
 
         composable(
@@ -209,14 +241,7 @@ fun NavgationGraph(
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
-            MayTinhDetailScreen(mamay,phongMayViewModel)
-        }
-
-
-        composable(
-            route = NavRoute.QUANLYGIANGVIEN.route,
-        ) {
-            QuanLyGiangVien(navController,giangVienViewModel)
+            MayTinhDetailScreen(mamay,phongMayViewModel,navController)
         }
 
         composable(
@@ -299,7 +324,7 @@ fun NavgationGraph(
             }
 
         ) {
-            LoginSVScreen(navController)
+            LoginSVScreen(navController,sinhVienViewModel)
         }
 
         composable(
@@ -546,6 +571,24 @@ fun NavgationGraph(
                     navController.navigate(NavRoute.MAYTINHDETAIL.route + "?mamay=${qrCodeValue}")
                 }
             )
+        }
+
+        composable(
+            route = NavRoute.ADDPHIEUSUACHUA.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+//            CreatePhieuSuaChua()
         }
 
     }

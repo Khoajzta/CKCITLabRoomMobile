@@ -47,4 +47,7 @@ interface SinhVienAPIService {
         @Body body: Map<String, String>
     ): DeleteResponse
 
+    @GET("SinhVien/getSinhVienTheoMaOrEmail.php")
+    suspend fun getSinhVienByEmailOrMaSV(@Query("key") key: String): SinhVien
+
 }

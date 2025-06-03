@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,16 +24,30 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 
 @Composable
-fun CardSinhVienInfo(sinhvien: SinhVien) {
+fun CardSinhVienInfo(
+    sinhvien: SinhVien,
+    navController: NavHostController,
+    sinhVienViewModel: SinhVienViewModel
+) {
+
+    val context = LocalContext.current
+    val sinhVienPreferences = remember { SinhVienPreferences(context) }
+
+    val loginState by sinhVienPreferences.loginStateFlow.collectAsState(initial = LoginSinhVienState())
     Card(
         modifier = Modifier
             .fillMaxWidth().height(640.dp),
@@ -196,13 +211,24 @@ fun CardSinhVienInfo(sinhvien: SinhVien) {
 
                 Button(
                     modifier = Modifier.width(170.dp),
-                    onClick = { /* TODO */ },
+                    onClick = {
+                        sinhVienViewModel.setSV(null)
+                        sinhVienViewModel.resetLoginResult()
+                        sinhVienViewModel.logout()
+
+                        Log.d("Thông báo","Xóa thành công")
+                        Log.d("SV",loginState.tenSinhVien.toString())
+                        navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                            popUpTo(NavRoute.HOME.route) { inclusive = true }
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
                 ) {
                     Icon(Icons.Default.Logout, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Đăng xuất")
                 }
+
             }
         }
     }

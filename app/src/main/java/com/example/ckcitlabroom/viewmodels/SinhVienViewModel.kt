@@ -1,52 +1,103 @@
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lapstore.api.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
 
-class SinhVienViewModel : ViewModel() {
+class SinhVienViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val context = getApplication<Application>().applicationContext
+    private val sinhvienPreferences = SinhVienPreferences(context)
 
     var sinhvien: SinhVien? by mutableStateOf(null)
         private set
 
+    var sinhvienSet: SinhVien? by mutableStateOf(null)
+        private set
+
     var danhSachAllSinhVien by mutableStateOf<List<SinhVien>>(emptyList())
         private set
+
     var sinhvienCreateResult by mutableStateOf("")
     var sinhvienUpdateResult by mutableStateOf("")
     var sinhvienDeleteResult by mutableStateOf("")
 
     private var pollingJob: Job? = null
+
     var isLoading by mutableStateOf(false)
         private set
+
     var errorMessage by mutableStateOf<String?>(null)
         private set
+
+    private val _loginResult = MutableStateFlow<LoginResponse?>(null)
+    val loginResult: StateFlow<LoginResponse?> = _loginResult
 
     fun stopPollingSinhVien() {
         pollingJob?.cancel()
         pollingJob = null
     }
 
-//    fun checkLogin(email: String, matkhau: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            try {
-//                Log.d("TaiKhoanViewModel", "Gửi yêu cầu đến API với tên tài khoản: $email")
-//                sinhvien = ITLabRoomRetrofitClient.sinhvienAPIService.checkLogin(email,matkhau)
-////                Log.d("TaiKhoanViewModel", "Dữ liệu trả về: $taikhoan")
-//            } catch (e: Exception) {
-//                Log.e("TaiKhoanViewModel", "Lỗi khi lấy dữ liệu từ API", e)
-//            }
-//        }
-//    }
+    fun setSV(sv: SinhVien?) {
+        sinhvienSet = sv
+    }
+
+    fun checkLogin(email: String, matKhau: String) {
+        viewModelScope.launch {
+            try {
+                val request = LoginRequest(email, matKhau)
+                val response = ITLabRoomRetrofitClient.sinhvienAPIService.CheckLogin(request)
+                _loginResult.value = response
+            } catch (e: Exception) {
+                _loginResult.value = LoginResponse(
+                    result = false, message = "Lỗi kết nối: ${e.message}"
+                )
+            }
+        }
+    }
+
+    fun setSVFromPrefs(state: LoginSinhVienState) {
+        if (state.isLoggedIn && state.maSinhVien != null && state.tenSinhVien != null) {
+            sinhvien = SinhVien(
+                MaSinhVien = state.maSinhVien,
+                TenSinhVien = state.tenSinhVien,
+                NgaySinh = "",
+                GioiTinh = "",
+                MaLop = "",
+                Email = "",
+                MatKhau = "",
+                MaLoaiTaiKhoan = 3,
+                TrangThai = 0
+            )
+        }
+    }
+
+
+    fun logout() {
+        viewModelScope.launch {
+            sinhvienPreferences.logout()
+            sinhvien = null
+            _loginResult.value = null
+        }
+    }
+
 
     fun getAllSinhVien() {
         if (pollingJob != null) return
@@ -55,12 +106,7 @@ class SinhVienViewModel : ViewModel() {
             while (isActive) {
                 try {
                     val response = ITLabRoomRetrofitClient.sinhvienAPIService.getAllSinhVien()
-                    if (response.sinhvien != null) {
-                        danhSachAllSinhVien = response.sinhvien!!
-                    } else {
-                        danhSachAllSinhVien = emptyList()
-                    }
-
+                    danhSachAllSinhVien = response.sinhvien ?: emptyList()
                 } catch (e: Exception) {
                     Log.e("SinhVienViewModel", "Polling lỗi", e)
                 }
@@ -68,7 +114,6 @@ class SinhVienViewModel : ViewModel() {
             }
         }
     }
-
 
     fun createSinhVien(sinhVien: SinhVien) {
         viewModelScope.launch {
@@ -79,31 +124,14 @@ class SinhVienViewModel : ViewModel() {
                 }
                 sinhvienCreateResult = response.message
             } catch (e: Exception) {
-                sinhvienCreateResult = "Lỗi khi thêm giảng viên: ${e.message}"
-                Log.e("GiangVienViewModel", "Lỗi khi thêm giảng viên: ${e.message}")
+                sinhvienCreateResult = "Lỗi khi thêm sinh viên: ${e.message}"
+                Log.e("SinhVienViewModel", "Lỗi khi thêm sinh viên: ${e.message}")
             } finally {
                 isLoading = false
             }
         }
     }
 
-//    fun updateGiangVien(giangVien: GiangVien) {
-//        viewModelScope.launch {
-//            isLoading = true
-//            try {
-//                val response = withContext(Dispatchers.IO) {
-//                    ITLabRoomRetrofitClient.giangVienAPIService.updateGiangVien(giangVien)
-//                }
-//                giangvienUpdateResult = response.message
-//            } catch (e: Exception) {
-//                giangvienUpdateResult = "Lỗi khi cập nhật máy tính: ${e.message}"
-//                Log.e("MayTinhViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
-//            } finally {
-//                isLoading = false
-//            }
-//        }
-//    }
-//
     fun deleteSinhVien(masinhvien: String) {
         viewModelScope.launch {
             isLoading = true
@@ -115,7 +143,6 @@ class SinhVienViewModel : ViewModel() {
                 sinhvienDeleteResult = response.message
 
                 if (response.message == "MaSinhVien deleted") {
-                    // Cập nhật lại danh sách máy tính sau khi xóa thành công
                     val allResponse = withContext(Dispatchers.IO) {
                         ITLabRoomRetrofitClient.sinhvienAPIService.getAllSinhVien()
                     }
@@ -130,5 +157,30 @@ class SinhVienViewModel : ViewModel() {
         }
     }
 
+    fun resetLoginResult() {
+        _loginResult.value = null
+    }
+
+    fun getSinhVienByMaGOrEmail(key: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                val result = ITLabRoomRetrofitClient.sinhvienAPIService.getSinhVienByEmailOrMaSV(key)
+                sinhvien = result
+            } catch (e: HttpException) {
+                errorMessage = "Lỗi HTTP: ${e.code()} - ${e.message()}"
+                Log.e("API", "Lỗi HTTP", e)
+            } catch (e: IOException) {
+                errorMessage = "Không thể kết nối tới server"
+                Log.e("API", "Lỗi mạng", e)
+            } catch (e: Exception) {
+                errorMessage = "Lỗi không xác định: ${e.localizedMessage}"
+                Log.e("API", "Lỗi khác", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 }
+
 

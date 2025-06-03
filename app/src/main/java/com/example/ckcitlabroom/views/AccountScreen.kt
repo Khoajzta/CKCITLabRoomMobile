@@ -6,14 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 
 @Composable
 fun AccountScreen(
-    magiangvien:String,
-    masinhvien:String,
-    giangVienViewModel: GiangVienViewModel
+    giangVienViewModel: GiangVienViewModel,
+    sinhVienViewModel: SinhVienViewModel,
+    navController: NavHostController
 ){
     var giangvien = giangVienViewModel.giangvienSet
+    var sinhvien = sinhVienViewModel.sinhvienSet
 
 
     Column(
@@ -22,22 +24,10 @@ fun AccountScreen(
         verticalArrangement = Arrangement.Top
     ) {
 
-        // Thẻ thông tin
-//        var sinhvien = SinhVien(
-//            "0306221353",
-//            "Nguyễn Văn Minh Mẫn",
-//            "12/01/2004",
-//            "Nam",
-//            "CĐTH22DDD",
-//            "LOP01",
-//            "12345678",
-//            2
-//        )
-//        CardSinhVien(sinhvien)
-
-
         if(giangvien!=null)
-            CardGiangVienInfo(giangvien)
+            CardGiangVienInfo(giangvien,navController,giangVienViewModel)
+        if(sinhvien!=null)
+            CardSinhVienInfo(sinhvien, navController, sinhVienViewModel)
     }
 }
 

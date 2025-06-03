@@ -26,12 +26,20 @@ import com.example.lapstore.viewmodels.LichHocViewModel
 
 
 @Composable
-fun HomeScreen(viewmodel: LichHocViewModel,magiangvien:String) {
+fun HomeScreen(
+    lichhocviewmodel: LichHocViewModel,
+    giangVienViewModel: GiangVienViewModel,
+    sinhVienViewModel: SinhVienViewModel
+) {
 
-    val danhSachLichHoc = viewmodel.danhSachLichHoc
+    var sinhvien = sinhVienViewModel.sinhvienSet
+    var giangVien = giangVienViewModel.giangvienSet
+
+
+    val danhSachLichHoc = lichhocviewmodel.danhSachLichHoc
 
     LaunchedEffect(Unit) {
-        viewmodel.getAllLichHoc()
+        lichhocviewmodel.getAllLichHoc()
     }
 
 

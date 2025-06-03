@@ -1,10 +1,11 @@
-
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lapstore.api.ITLabRoomRetrofitClient
@@ -17,11 +18,13 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class GiangVienViewModel : ViewModel() {
+class GiangVienViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val context = getApplication<Application>().applicationContext
+    private val giangvienPreferences = GiangVienPreferences(context)
 
     var giangvien by mutableStateOf<GiangVien?>(null)
         private set
-
 
     var giangvienSet: GiangVien? by mutableStateOf(null)
         private set
@@ -59,10 +62,17 @@ class GiangVienViewModel : ViewModel() {
                 _loginResult.value = response
             } catch (e: Exception) {
                 _loginResult.value = LoginResponse(
-                    result = false,
-                    message = "Lỗi kết nối: ${e.message}"
+                    result = false, message = "Lỗi kết nối: ${e.message}"
                 )
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            giangvienPreferences.logout()
+            giangvien = null
+            _loginResult.value = null
         }
     }
 
@@ -92,7 +102,6 @@ class GiangVienViewModel : ViewModel() {
         }
     }
 
-
     fun getGiangVienByMaGV(magv: String) {
         viewModelScope.launch(Dispatchers.IO) {
             isLoading = true
@@ -102,44 +111,33 @@ class GiangVienViewModel : ViewModel() {
                 errorMessage = e.message
                 Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
 
-    fun getGiangVienById(magv: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            isLoading = true
-            try {
-                val result = ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByByID(magv)
-                giangvien = result
-            } catch (e: Exception) {
-                errorMessage = e.message
-                Log.e("GiangVienViewModel", "Lỗi khi lấy thông tin giảng viên", e)
-            } finally {
-                isLoading = false
+                fun getGiangVienById(magv: String) {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        isLoading = true
+                        try {
+                            val result =
+                                ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByByID(magv)
+                            giangvien = result
+                        } catch (e: Exception) {
+                            errorMessage = e.message
+                            Log.e("GiangVienViewModel", "Lỗi khi lấy thông tin giảng viên", e)
+                        } finally {
+                            isLoading = false
+                        }
+                    }
+                }
             }
         }
     }
-
-
-    fun getGiangVienByMaGOrEmail(key: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            isLoading = true
-            try {
-                giangvien = ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByEmailOrMaGV(key)
-            } catch (e: Exception) {
-                errorMessage = e.message
-                Log.e("GiangVienViewModel", "Lỗi khi lấy thông tin máy tính", e)
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-
 
     fun createGiangVien(giangVien: GiangVien) {
         viewModelScope.launch {
             isLoading = true
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.giangVienAPIService.createGiangVien(giangVien)
+                    ITLabRoomRetrofitClient.giangVienAPIService.createGiangVien(
+                        giangVien
+                    )
                 }
                 giangvienCreateResult = response.message
             } catch (e: Exception) {
@@ -151,12 +149,31 @@ class GiangVienViewModel : ViewModel() {
         }
     }
 
+    fun getGiangVienByMaGOrEmail(key: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                giangvien =
+                    ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByEmailOrMaGV(
+                        key
+                    )
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("GiangVienViewModel", "Lỗi khi lấy thông tin máy tính", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     fun updateGiangVien(giangVien: GiangVien) {
         viewModelScope.launch {
             isLoading = true
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.giangVienAPIService.updateGiangVien(giangVien)
+                    ITLabRoomRetrofitClient.giangVienAPIService.updateGiangVien(
+                        giangVien
+                    )
                 }
                 giangvienUpdateResult = response.message
             } catch (e: Exception) {
@@ -186,7 +203,8 @@ class GiangVienViewModel : ViewModel() {
                     danhSachAllGiangVien = allResponse.giangvien ?: emptyList()
                 }
             } catch (e: Exception) {
-                giangvienDeleteResult = "Lỗi khi xóa Giảng viên: ${e.localizedMessage ?: e.message}"
+                giangvienDeleteResult =
+                    "Lỗi khi xóa Giảng viên: ${e.localizedMessage ?: e.message}"
                 Log.e("GiangVienViewModel", "Lỗi khi xóa giảng viên", e)
             } finally {
                 isLoading = false
@@ -194,5 +212,17 @@ class GiangVienViewModel : ViewModel() {
         }
     }
 
-}
 
+    fun setGVFromPrefs(state: LoginGiangVienState) {
+        giangvien = GiangVien(
+            MaGV = state.maGiangVien.toString(),
+            TenGiangVien = state.tenGiangVien.toString(),
+            NgaySinh = "",
+            GioiTinh = "",
+            Email = "",
+            MatKhau = "",
+            MaLoaiTaiKhoan = 3,
+            TrangThai = 0
+        )
+    }
+}

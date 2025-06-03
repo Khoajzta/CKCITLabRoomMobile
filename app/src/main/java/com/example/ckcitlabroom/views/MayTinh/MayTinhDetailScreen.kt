@@ -43,13 +43,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun MayTinhDetailScreen(
     maMay: String,
-    phongMayViewModel:PhongMayViewModel
+    phongMayViewModel:PhongMayViewModel,
+    navController: NavHostController
 ){
 
     var mayTinhViewModel: MayTinhViewModel = viewModel()
@@ -114,7 +116,7 @@ fun MayTinhDetailScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text("Chỉnh Sửa Cấu hình", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                Text("Cấu Hình Máy Tính", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             }
 
             LazyColumn(
@@ -521,40 +523,33 @@ fun MayTinhDetailScreen(
                 }
             }
 
-//            Button(
-//                onClick = {
-//                    val mayTinhMoi = MayTinh(
-//                        MaMay = maMayState.value,
-//                        TenMay = tenMayState.value,
-//                        ViTri = viTriState.value,
-//                        Main = mainState.value,
-//                        CPU = cpuState.value,
-//                        RAM = ramState.value,
-//                        VGA = vgaState.value,
-//                        ManHinh = manHinhState.value,
-//                        BanPhim = banPhimState.value,
-//                        Chuot = chuotState.value,
-//                        HDD = hddState.value,
-//                        SSD = ssdState.value,
-//                        MaPhong = maytinh.MaPhong,
-//                        QRCode = maytinh.QRCode,
-//                        TrangThai = trangThaiState.value.toIntOrNull() ?: 0
-//                    )
-//                    mayTinhViewModel.updateMayTinh(mayTinhMoi)
-//                    coroutineScope.launch {
-//                        snackbarData.value = CustomSnackbarData(
-//                            message = "Cập nhật máy tính thành công!", type = SnackbarType.SUCCESS
-//                        )
-//                        snackbarHostState.showSnackbar("Thông báo")
-//                    }
-//                },
-//                modifier = Modifier
-//                    .fillMaxWidth(),
-//                shape = RoundedCornerShape(12.dp),
-//                colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
-//            ) {
-//                Text("Lưu Cấu Hình")
-//            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    modifier = Modifier.width(170.dp),
+                    onClick = {
+
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                ) {
+                    Text("Cấu hình đúng", color = Color.White)
+                }
+
+                Button(
+                    modifier = Modifier.width(170.dp),
+                    onClick = {
+                        navController.navigate(NavRoute.ADDPHIEUSUACHUA.route)
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
+                ) {
+                    Text("Cấu hình sai", color = Color.White)
+                }
+            }
         }
     }
 }

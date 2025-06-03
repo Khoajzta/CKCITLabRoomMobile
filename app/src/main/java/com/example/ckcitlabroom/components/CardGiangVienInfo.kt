@@ -30,12 +30,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 
 @Composable
-fun CardGiangVienInfo(giangVien: GiangVien) {
+fun CardGiangVienInfo(
+    giangVien: GiangVien,
+    navController: NavHostController,
+    giangVienViewModel: GiangVienViewModel
+) {
     Card(
         modifier = Modifier
-            .fillMaxWidth().height(640.dp),
+            .fillMaxWidth().height(600.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(7.dp)
@@ -100,16 +105,6 @@ fun CardGiangVienInfo(giangVien: GiangVien) {
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            // Lớp
-            Text(
-                text = "Lớp:",
-                modifier = Modifier.align(Alignment.Start),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-
-            Spacer(modifier = Modifier.height(15.dp))
-
             // Trạng thái
             Text(
                 text = "Trạng Thái",
@@ -166,7 +161,15 @@ fun CardGiangVienInfo(giangVien: GiangVien) {
 
                 Button(
                     modifier = Modifier.width(170.dp),
-                    onClick = { /* TODO */ },
+                    onClick = {
+                        giangVienViewModel.setGV(null)
+                        giangVienViewModel.resetLoginResult()
+                        giangVienViewModel.logout()
+                        navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                            popUpTo(NavRoute.HOME.route) { inclusive = true }
+                        }
+
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
                 ) {
                     Icon(Icons.Default.Logout, contentDescription = null)

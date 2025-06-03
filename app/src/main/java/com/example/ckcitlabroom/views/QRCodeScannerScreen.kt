@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -71,7 +72,7 @@ fun RequestCameraPermission(onGranted: () -> Unit) {
 fun QRCodeScannerScreen(onResult: (String) -> Unit) {
     var hasPermission by remember { mutableStateOf(false) }
 
-    // Xin quyền trước khi vào camera
+    // Xin quyền camera
     if (!hasPermission) {
         RequestCameraPermission {
             hasPermission = true
@@ -84,19 +85,9 @@ fun QRCodeScannerScreen(onResult: (String) -> Unit) {
         val scanner = BarcodeScanning.getClient()
         val scanned = remember { mutableStateOf(false) }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                modifier = Modifier.padding(bottom = 15.dp),
-                text = "Scan Mã Máy",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
-            )
-
             AndroidView(
                 factory = {
                     val previewView = PreviewView(it)
@@ -146,16 +137,30 @@ fun QRCodeScannerScreen(onResult: (String) -> Unit) {
 
                     previewView
                 },
+                modifier = Modifier.fillMaxSize()
+            )
+
+            // Text tiêu đề
+            Text(
+                text = "Scan Mã Máy",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.White,
                 modifier = Modifier
-                    .height(250.dp)
-                    .width(250.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(2.dp, Color.White, RoundedCornerShape(16.dp))
+                    .align(Alignment.TopCenter)
+                    .padding(top = 50.dp)
+            )
+
+            // Ô vuông trung tâm làm khung quét
+            Box(
+                modifier = Modifier
+                    .size(250.dp)
+                    .align(Alignment.Center)
+                    .border(3.dp, Color.White, RoundedCornerShape(12.dp))
             )
         }
-
-
     }
 }
+
 
 
