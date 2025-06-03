@@ -92,6 +92,7 @@ class GiangVienViewModel : ViewModel() {
         }
     }
 
+
     fun getGiangVienByMaGV(magv: String) {
         viewModelScope.launch(Dispatchers.IO) {
             isLoading = true
@@ -100,11 +101,22 @@ class GiangVienViewModel : ViewModel() {
             } catch (e: Exception) {
                 errorMessage = e.message
                 Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
+
+    fun getGiangVienById(magv: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                val result = ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByByID(magv)
+                giangvien = result
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("GiangVienViewModel", "Lỗi khi lấy thông tin giảng viên", e)
             } finally {
                 isLoading = false
             }
         }
     }
+
 
     fun getGiangVienByMaGOrEmail(key: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -119,6 +131,7 @@ class GiangVienViewModel : ViewModel() {
             }
         }
     }
+
 
 
     fun createGiangVien(giangVien: GiangVien) {
@@ -148,33 +161,33 @@ class GiangVienViewModel : ViewModel() {
                 giangvienUpdateResult = response.message
             } catch (e: Exception) {
                 giangvienUpdateResult = "Lỗi khi cập nhật máy tính: ${e.message}"
-                Log.e("MayTinhViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
+                Log.e("GiangVienViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
             } finally {
                 isLoading = false
             }
         }
     }
 
-    fun deleteMayTinh(mamay: String) {
+    fun deleteGiangVien(magv: String) {
         viewModelScope.launch {
             isLoading = true
             try {
-                val body = mapOf("MaMay" to mamay)
+                val body = mapOf("MaGV" to magv)
                 val response = withContext(Dispatchers.IO) {
                     ITLabRoomRetrofitClient.giangVienAPIService.deleteGiangVien(body)
                 }
                 giangvienDeleteResult = response.message
 
-                if (response.message == "MayTinh deleted") {
-                    // Cập nhật lại danh sách máy tính sau khi xóa thành công
+                if (response.message == "GiangVien deleted") {
+                    // Cập nhật lại danh sách sau khi xóa thành công
                     val allResponse = withContext(Dispatchers.IO) {
                         ITLabRoomRetrofitClient.giangVienAPIService.getAllGiangVien()
                     }
                     danhSachAllGiangVien = allResponse.giangvien ?: emptyList()
                 }
             } catch (e: Exception) {
-                giangvienDeleteResult = "Lỗi khi xóa máy tính: ${e.localizedMessage ?: e.message}"
-                Log.e("MayTinhViewModel", "Lỗi khi xóa máy tính", e)
+                giangvienDeleteResult = "Lỗi khi xóa Giảng viên: ${e.localizedMessage ?: e.message}"
+                Log.e("GiangVienViewModel", "Lỗi khi xóa giảng viên", e)
             } finally {
                 isLoading = false
             }

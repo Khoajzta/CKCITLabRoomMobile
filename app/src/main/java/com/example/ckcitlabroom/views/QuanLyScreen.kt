@@ -27,6 +27,7 @@ fun QuanLyScreen(
 ) {
     val giangVien = giangVienViewModel.giangvienSet
 
+
     val dsChucNang = if (giangVien?.MaLoaiTaiKhoan == 1) {
         listOf(
             ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = { navController.navigate(NavRoute.QUANLYMAYTINH.route) }),
@@ -42,6 +43,17 @@ fun QuanLyScreen(
             ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {})
         )
     }
+
+
+    val dsChucNang = listOf(
+        ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = {navController.navigate(NavRoute.QUANLYMAYTINH.route)}),
+        ChucNang("Quản Lý Đơn Nhập", iconComputer, Click = { navController.navigate(NavRoute.QUANLYCAUHINH.route) }),
+        ChucNang("Quản Lý Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
+        ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = {navController.navigate(NavRoute.QUANLYGIANGVIEN.route)}),
+        ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = {navController.navigate(NavRoute.QUANLYSINHVIEN.route)}),
+        ChucNang("Quản Lý Lịch", Icons.Outlined.CalendarMonth, {})
+    )
+
 
 
     Column(

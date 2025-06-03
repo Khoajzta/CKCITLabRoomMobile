@@ -1,4 +1,3 @@
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -7,36 +6,28 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
@@ -49,18 +40,18 @@ import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.PersonStanding
 
 @Composable
-fun CardGiangVien(
-    giangVien: GiangVien,
+fun CardSinhVien(
+    sinhVien: SinhVien,
     navController: NavHostController,
-    giangVienViewModel: GiangVienViewModel
+    sinhVienViewModel: SinhVienViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
 
-    // Chọn màu trạng thái dựa trên giangVien.TrangThai (1: hoạt động, 0: không hoạt động)
-    val (color, statusText) = when (giangVien.TrangThai) {
-        1 -> Color(0xFF4CAF50) to "Hoạt động"
-        0 -> Color(0xFFF44336) to "Không hoạt động"
+    // Chọn màu trạng thái dựa trên sinhVien.TrangThai (1: hoạt động, 0: không hoạt động)
+    val (color, statusText) = when (sinhVien.TrangThai) {
+        1 -> Color(0xFF4CAF50) to "Đang học"
+        0 -> Color(0xFFF44336) to "Đình chỉ"
         else -> Color.Gray to "Không xác định"
     }
 
@@ -81,33 +72,33 @@ fun CardGiangVien(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Circle, contentDescription = "Mã GV", tint = Color.Black, modifier = Modifier.size(20.dp))
+                Icon(imageVector = Lucide.Circle, contentDescription = "Mã SV", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Mã GV: ${giangVien.MaGV}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Mã SV: ${sinhVien.MaSinhVien}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.PersonStanding, contentDescription = "Tên GV", tint = Color.Black, modifier = Modifier.size(20.dp))
+                Icon(imageVector = Lucide.PersonStanding, contentDescription = "Tên SV", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Tên: ${giangVien.TenGiangVien}", fontSize = 16.sp)
+                Text("Tên: ${sinhVien.TenSinhVien}", fontSize = 16.sp)
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(imageVector = Lucide.Circle, contentDescription = "Ngày sinh", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Ngày sinh: ${giangVien.NgaySinh}", fontSize = 16.sp)
+                Text("Ngày sinh: ${sinhVien.NgaySinh}", fontSize = 16.sp)
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(imageVector = Lucide.Circle, contentDescription = "Giới tính", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Giới tính: ${giangVien.GioiTinh}")
+                Text("Giới tính: ${sinhVien.GioiTinh}")
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(imageVector = Lucide.Circle, contentDescription = "Email", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Email: ${giangVien.Email}")
+                Text("Email: ${sinhVien.Email}")
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -126,13 +117,11 @@ fun CardGiangVien(
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-                    // Nếu bạn muốn show thêm thông tin khác, có thể thêm ở đây
-
                     Button(
-                        onClick = {
-                            navController.navigate(NavRoute.EDITGIANGVIEN.route + "?magv=${giangVien.MaGV}")
-                        },
                         modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            navController.navigate("edit_sinhvien?masv=${sinhVien.MaSinhVien}")
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
@@ -156,11 +145,11 @@ fun CardGiangVien(
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },
             title = { Text("Xác nhận") },
-            text = { Text("Bạn có chắc chắn muốn xóa giảng viên này không?", fontWeight = FontWeight.Bold) },
+            text = { Text("Bạn có chắc chắn muốn xóa sinh viên này không?", fontWeight = FontWeight.Bold) },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        giangVienViewModel.deleteGiangVien(giangVien.MaGV)
+                        sinhVienViewModel.deleteSinhVien(sinhVien.MaSinhVien)
                         showConfirmDialog = false
                     }
                 ) {
