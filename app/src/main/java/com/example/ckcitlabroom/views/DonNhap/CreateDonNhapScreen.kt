@@ -1,3 +1,4 @@
+import android.app.DatePickerDialog
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.background
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -23,6 +25,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Snackbar
@@ -32,12 +35,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -53,6 +59,7 @@ import java.util.Date
 import java.util.Locale
 import kotlin.random.Random
 import kotlinx.coroutines.*
+import java.util.Calendar
 
 @Composable
 fun CreateDonNhapScreen(
@@ -76,6 +83,9 @@ fun CreateDonNhapScreen(
     val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
+    var showDatePicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
 
     LaunchedEffect(Unit) {
         mayTinhViewModel.getAllMayTinh()
@@ -84,6 +94,7 @@ fun CreateDonNhapScreen(
 
     val soluongState = remember { mutableStateOf("") }
     val nhacungcapState = remember { mutableStateOf("") }
+    val ngayNhapState = remember { mutableStateOf("") }
     val mainState = remember { mutableStateOf("") }
     val cpuState = remember { mutableStateOf("") }
     val ramState = remember { mutableStateOf("") }
@@ -93,6 +104,30 @@ fun CreateDonNhapScreen(
     val chuotState = remember { mutableStateOf("") }
     val hddState = remember { mutableStateOf("") }
     val ssdState = remember { mutableStateOf("") }
+
+
+    if (showDatePicker) {
+        val datePickerDialog = DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                calendar.set(year, month, dayOfMonth)
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                ngayNhapState.value = sdf.format(calendar.time)
+                showDatePicker = false // Reset khi chọn xong
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+
+        // Xử lý khi người dùng đóng dialog mà không chọn gì
+        datePickerDialog.setOnDismissListener {
+            showDatePicker = false
+        }
+
+        datePickerDialog.show()
+    }
+
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -144,6 +179,38 @@ fun CreateDonNhapScreen(
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
                     )
+                }
+
+                item {
+                    Text(
+                        text = "Ngày Nhập",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        value = ngayNhapState.value,
+                        onValueChange = { ngayNhapState.value = it },
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(Icons.Default.DateRange, contentDescription = "Chọn ngày")
+                            }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
+                        ),
+                        placeholder = { Text("Chọn ngày") },
+                        shape = RoundedCornerShape(12.dp),
+                    )
+
                 }
 
                 item {
@@ -453,12 +520,24 @@ fun CreateDonNhapScreen(
                 Button(
                     onClick = {
                         CoroutineScope(Dispatchers.Main).launch {
-                            val currentDate = Date()
-                            val sdfMaDon = SimpleDateFormat("ddMMyyyy")
-                            val sdfNgayNhap = SimpleDateFormat("yyyy-MM-dd")
+                            val sdfInput = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val sdfMaDon = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+                            val sdfNgayNhap = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-                            val maDonNhap = sdfMaDon.format(currentDate) + Random.nextInt(1000, 9999)
-                            val ngayNhap = sdfNgayNhap.format(currentDate)
+                            val parsedDate = try {
+                                sdfInput.parse(ngayNhapState.value)
+                            } catch (e: Exception) {
+                                null
+                            }
+
+                            if (parsedDate == null) {
+                                dialogMessage.value = "Ngày nhập không hợp lệ!"
+                                openDialog.value = true
+                                return@launch
+                            }
+
+                            val maDonNhap = sdfMaDon.format(parsedDate) + Random.nextInt(1000, 9999)
+                            val ngayNhap = sdfNgayNhap.format(parsedDate)
 
                             val soLuong = soluongState.value.toIntOrNull() ?: 0
                             val nhaCungCap = nhacungcapState.value.trim()
@@ -518,7 +597,7 @@ fun CreateDonNhapScreen(
                                         TrangThai = 1
                                     )
                                     mayTinhViewModel.createMayTinh(mayTinh)
-                                    delay(500)
+                                    delay(200)
 
                                     val chitietdonnhap = ChiTietDonNhap(
                                         MaDonNhap = maDonNhap,

@@ -165,7 +165,7 @@ fun LoginGVScreen(
                     OutlinedTextField(
                         value = emailState.value,
                         onValueChange = { emailState.value = it },
-                        placeholder = { Text("Email hoặc Mã số sinh viên") },
+                        placeholder = { Text("Email hoặc Mã GV") },
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier

@@ -50,7 +50,6 @@ fun CardPhongMay(
     var danhsachmaytinh = mayTinhViewModel.danhSachAllMayTinh
     val soLuongMay = danhsachmaytinh?.count { it.MaPhong == phongmay.MaPhong } ?: 0
 
-
     var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -64,7 +63,11 @@ fun CardPhongMay(
             .width(300.dp)
             .clickable(
             ) {
-                navController.navigate(NavRoute.PHONGMAYDETAIL.route + "?maphong=${phongmay.MaPhong}")
+                if (phongmay.MaPhong.contains("KHO", ignoreCase = true)) {
+                    navController.navigate(NavRoute.PHONGMAYDONNHAP.route + "?maphong=${phongmay.MaPhong}")
+                } else {
+                    navController.navigate(NavRoute.PHONGMAYDETAIL.route + "?maphong=${phongmay.MaPhong}")
+                }
             },
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {

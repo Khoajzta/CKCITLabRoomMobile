@@ -5,8 +5,8 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
 fun CreatePhieuSuaChua(
-    mamay:String,
-    mayTinhViewModel: MayTinhViewModel,
+//    mamay:String,
+//    mayTinhViewModel: MayTinhViewModel,
 ){
     Column {
         Text(
