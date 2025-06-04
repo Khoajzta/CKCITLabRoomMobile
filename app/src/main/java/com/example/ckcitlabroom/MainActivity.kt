@@ -55,6 +55,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
+import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.lapstore.viewmodels.LichHocViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -84,6 +85,7 @@ fun MainScreen() {
     val mayTinhViewModel: MayTinhViewModel = viewModel()
     val phongMayViewModel: PhongMayViewModel = viewModel()
     val sinhVienViewModel: SinhVienViewModel = viewModel()
+    val lopHocViewModel: LopHocViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
 
@@ -221,7 +223,8 @@ fun MainScreen() {
                     giangVienViewModel,
                     mayTinhViewModel,
                     phongMayViewModel,
-                    sinhVienViewModel
+                    sinhVienViewModel,
+                    lopHocViewModel
                 )
             }
 

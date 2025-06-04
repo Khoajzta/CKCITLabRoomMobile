@@ -25,9 +25,9 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditGiangVienScreen(
+    giangVienViewModel: GiangVienViewModel,
     magv: String
 ) {
-    var giangVienViewModel: GiangVienViewModel = viewModel()
     var giangVien = giangVienViewModel.giangvien
 
     val maGVState = remember { mutableStateOf("") }
@@ -35,7 +35,7 @@ fun EditGiangVienScreen(
     val ngaySinhState = remember { mutableStateOf("") }
     val gioiTinhState = remember { mutableStateOf("") }
     val emailState = remember { mutableStateOf("") }
-    val trangThaiState = remember { mutableStateOf(1) } // Mặc định hoạt động
+    val trangThaiState = remember { mutableStateOf(0) } // Mặc định hoạt động
 
     var gioiTinhExpanded by remember { mutableStateOf(false) }
     val gioiTinhOptions = listOf("Nam", "Nữ", "Khác")

@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 class GiangVienViewModel : ViewModel() {
 
     var giangvien: GiangVien? by mutableStateOf(null)
-        private set
+    private set
 
     var danhSachAllGiangVien by mutableStateOf<List<GiangVien>>(emptyList())
         private set
@@ -74,11 +74,10 @@ class GiangVienViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             isLoading = true
             try {
-                val result = ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByByID(magv)
-                giangvien = result
+                giangvien = ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByByID(magv)
             } catch (e: Exception) {
                 errorMessage = e.message
-                Log.e("GiangVienViewModel", "Lỗi khi lấy thông tin giảng viên", e)
+                Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
             } finally {
                 isLoading = false
             }

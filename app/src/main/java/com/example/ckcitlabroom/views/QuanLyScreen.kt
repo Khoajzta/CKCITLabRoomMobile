@@ -8,7 +8,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Class
 import androidx.compose.material.icons.outlined.DesktopWindows
+import androidx.compose.material.icons.outlined.MeetingRoom
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.SupervisorAccount
 import androidx.compose.runtime.Composable
@@ -28,7 +30,8 @@ fun QuanLyScreen(navController: NavHostController) {
         ChucNang("Quản Lý Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
         ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = {navController.navigate(NavRoute.QUANLYGIANGVIEN.route)}),
         ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = {navController.navigate(NavRoute.QUANLYSINHVIEN.route)}),
-        ChucNang("Quản Lý Lịch", Icons.Outlined.CalendarMonth, {})
+        ChucNang("Quản Lý Lịch", Icons.Outlined.CalendarMonth, {}),
+        ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = {navController.navigate(NavRoute.QUANLYLOPHOC.route)})
     )
 
 
