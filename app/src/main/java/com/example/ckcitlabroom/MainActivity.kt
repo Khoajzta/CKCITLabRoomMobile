@@ -249,14 +249,7 @@ fun MainScreen() {
                     giangVienViewModel,
                     mayTinhViewModel,
                     phongMayViewModel,
-                    sinhVienViewModel,
-                    lopHocViewModel
-
-                    navController = navController,
-                    lichHocViewModel = lichHocViewModel,
-                    giangVienViewModel = giangVienViewModel,
-                    mayTinhViewModel = mayTinhViewModel,
-                    phongMayViewModel = phongMayViewModel,
+                    lopHocViewModel,
                     lichSuChuyenMayViewModel = lichSuChuyenMayViewModel,
                     donNhapyViewModel = donNhapyViewModel,
                     chiTietDonNhapyViewModel = chitietdonNhapyViewModel,
