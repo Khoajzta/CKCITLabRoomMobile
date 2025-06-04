@@ -60,8 +60,6 @@ fun CreateGiangVienScreen(
     val gioiTinhState = remember { mutableStateOf("") }
     val emailState = remember { mutableStateOf("") }
     val matKhauState = remember { mutableStateOf("") }
-    val maLoaiTKState = remember { mutableStateOf(1) } // mặc định 1
-    val trangThaiState = remember { mutableStateOf(1) } // mặc định active
 
     var gioiTinhExpanded by remember { mutableStateOf(false) }
     val gioiTinhOptions = listOf("Nam", "Nữ", "Khác")
@@ -239,28 +237,6 @@ fun CreateGiangVienScreen(
                         )
                     )
                 }
-                item {
-                    Text("Trạng Thái:", fontWeight = FontWeight.Bold, color = Color.Black)
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = trangThaiState.value == 1,
-                                onClick = { trangThaiState.value = 1 }
-                            )
-                            Text("Hoạt động")
-                        }
-                        Spacer(modifier = Modifier.width(24.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = trangThaiState.value == 0,
-                                onClick = { trangThaiState.value = 0 }
-                            )
-                            Text("Ngưng hoạt động")
-                        }
-                    }
-                }
             }
 
 
@@ -322,8 +298,13 @@ fun CreateGiangVienScreen(
                                 GioiTinh = gioiTinhState.value,
                                 Email = emailState.value,
                                 MatKhau = matKhauState.value,
+
+                                MaLoaiTaiKhoan = 2,
+                                TrangThai = 1
+
                                 MaLoaiTaiKhoan = 1,
                                 TrangThai = trangThaiState.value
+
                             )
                             giangVienViewModel.createGiangVien(giangVienMoi)
                             coroutineScope.launch {

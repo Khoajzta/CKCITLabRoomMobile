@@ -20,6 +20,9 @@ import kotlinx.coroutines.withContext
 
 class GiangVienViewModel(application: Application) : AndroidViewModel(application) {
 
+    var giangvien: GiangVien? by mutableStateOf(null)
+    private set
+
     private val context = getApplication<Application>().applicationContext
     private val giangvienPreferences = GiangVienPreferences(context)
 
@@ -111,6 +114,10 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
                 errorMessage = e.message
                 Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
 
+            } finally {
+                isLoading = false
+
+
                 fun getGiangVienById(magv: String) {
                     viewModelScope.launch(Dispatchers.IO) {
                         isLoading = true
@@ -126,6 +133,7 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
                         }
                     }
                 }
+
             }
         }
     }

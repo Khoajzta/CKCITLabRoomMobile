@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
 import com.example.lapstore.viewmodels.DonNhapyViewModel
 import com.example.lapstore.viewmodels.LichHocViewModel
@@ -64,6 +65,11 @@ sealed class NavRoute(val route: String) {
     object EDITSINHVIEN : NavRoute("editsinhvien_screen")
 
 
+    object QUANLYLOPHOC : NavRoute("quanlylophoc_screen")
+    object ADDLOPHOC : NavRoute("addlophoc_screen")
+    object EDITLOPHOC : NavRoute("editlophoc_screen")
+
+
     object ADDPHIEUSUACHUA : NavRoute("addphieusuachua_screen")
     object STARTSCREEN : NavRoute("start_screen")
 
@@ -76,10 +82,14 @@ fun NavgationGraph(
     giangVienViewModel: GiangVienViewModel,
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
+    sinhVienViewModel: SinhVienViewModel,
+    lopHocViewModel: LopHocViewModel
+
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel,
     donNhapyViewModel: DonNhapyViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     sinhVienViewModel: SinhVienViewModel,
+
 ) {
 
     val context = LocalContext.current.applicationContext
@@ -222,6 +232,24 @@ fun NavgationGraph(
         }
 
         composable(
+            route = NavRoute.ADDTMAYTINH.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            CreateMayTinhScreen(navController,mayTinhViewModel,phongMayViewModel)
+        }
+
+        composable(
             NavRoute.EDITMAYTINH.route + "?mamay={mamay}",
             arguments = listOf(
                 navArgument("mamay") { type = NavType.StringType; nullable = true }
@@ -351,25 +379,8 @@ fun NavgationGraph(
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
         ) { navBackStackEntry ->
             val magv = navBackStackEntry.arguments?.getString("magv") ?: ""
-            EditGiangVienScreen(magv)
+            EditGiangVienScreen(giangVienViewModel,magv)
         }
-//        composable(
-//            route = NavRoute.EDITGIANGVIEN.route,
-//            enterTransition = {
-//                slideIntoContainer(
-//                    AnimatedContentTransitionScope.SlideDirection.Up,
-//                    animationSpec = tween(200)
-//                )
-//            },
-//            exitTransition = {
-//                slideOutOfContainer(
-//                    AnimatedContentTransitionScope.SlideDirection.Down,
-//                    animationSpec = tween(200)
-//                )
-//            }
-//        ) {
-//            EditGiangVienScreen(magv = )
-//        }
 
         composable(
             route = NavRoute.QUANLYSINHVIEN.route,
@@ -413,21 +424,9 @@ fun NavgationGraph(
         }
 
         composable(
-            route = NavRoute.ADDTMAYTINH.route,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(300)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(300)
-                )
-            }
+            route = NavRoute.QUANLYLOPHOC.route,
         ) {
-            CreateMayTinhScreen(navController,mayTinhViewModel,phongMayViewModel)
+            QuanLyLopHoc(navController, lopHocViewModel)
         }
 
         composable(
