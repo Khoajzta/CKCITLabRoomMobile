@@ -49,7 +49,7 @@ fun EditGiangVienScreen(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(magv) {
-        giangVienViewModel.getGiangVienById(magv)
+        giangVienViewModel.getGiangVienByMaGV(magv)
     }
 
     LaunchedEffect(giangVien) {

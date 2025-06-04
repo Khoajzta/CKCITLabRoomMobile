@@ -1,15 +1,5 @@
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,31 +24,38 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
-import com.composables.icons.lucide.Building2
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
-import com.composables.icons.lucide.Hotel
-import com.composables.icons.lucide.LayoutTemplate
+import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Warehouse
+import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
 fun CardPhongMay(
-    phongmay: PhongMay, navController: NavHostController, phongMayViewModel: PhongMayViewModel
+    phongmay: PhongMay,
+    navController: NavHostController,
+    phongMayViewModel: PhongMayViewModel,
+    mayTinhViewModel: MayTinhViewModel
 ) {
+
+    var danhsachmaytinh = mayTinhViewModel.danhSachAllMayTinh
+    val soLuongMay = danhsachmaytinh?.count { it.MaPhong == phongmay.MaPhong } ?: 0
+
 
     var showDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        mayTinhViewModel.getAllMayTinh()
+    }
 
     Card(
         modifier = Modifier
@@ -89,7 +84,21 @@ fun CardPhongMay(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Tên Phòng: ${phongmay.TenPhong}", fontSize = 16.sp)
+                Text(text = "Phòng: ${phongmay.TenPhong}", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 2.dp)
+            ) {
+                Icon(
+                    imageVector = Lucide.Hash, // hoặc Icons.Default.RoomPreferences
+                    contentDescription = "Tên Phòng",
+                    tint = Color(0xFF3F51B5),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(text = "Số lượng máy: ${soLuongMay}", fontSize = 16.sp)
             }
 
             val (color, statusText, statusIcon) = when (phongmay.TrangThai) {

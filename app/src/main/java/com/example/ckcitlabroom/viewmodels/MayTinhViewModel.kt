@@ -17,19 +17,22 @@ import kotlinx.coroutines.withContext
 
 class MayTinhViewModel : ViewModel() {
 
+    var mt = MayTinh("","",""",""","","","","","","","","","","","",1)
+
     var danhSachAllMayTinh by mutableStateOf<List<MayTinh>>(emptyList())
         private set
 
     var danhSachAllMayTinhtheophong by mutableStateOf<List<MayTinh>>(emptyList())
         private set
 
-    private var pollingJob: Job? = null
+    private var pollingAllMayTinhJob: Job? = null
+    private var pollingMayTinhTheoPhongJob: Job? = null
 
     var maytinhCreateResult by mutableStateOf("")
     var maytinhUpdateResult by mutableStateOf("")
     var maytinhDeleteResult by mutableStateOf("")
 
-    var maytinh: MayTinh? by mutableStateOf(null)
+    var maytinh: MayTinh by mutableStateOf(mt)
         private set
 
     var isLoading by mutableStateOf(false)
@@ -39,29 +42,24 @@ class MayTinhViewModel : ViewModel() {
         private set
 
     fun getAllMayTinh() {
-        if (pollingJob != null) return
+        if (pollingAllMayTinhJob != null) return
 
-        pollingJob = viewModelScope.launch(Dispatchers.IO) {
+        pollingAllMayTinhJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
                     val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
-                    if (response.maytinh != null) {
-                        danhSachAllMayTinh = response.maytinh!!
-                    } else {
-                        danhSachAllMayTinh = emptyList()
-                    }
-
+                    danhSachAllMayTinh = response.maytinh ?: emptyList()
                 } catch (e: Exception) {
-                    Log.e("PhongMayViewModel", "Polling lỗi", e)
+                    Log.e("PhongMayViewModel", "Polling all máy lỗi", e)
                 }
                 delay(500)
             }
         }
     }
 
-    fun stopPollingMayTinh() {
-        pollingJob?.cancel()
-        pollingJob = null
+    fun stopPollingAllMayTinh() {
+        pollingAllMayTinhJob?.cancel()
+        pollingAllMayTinhJob = null
     }
 
     fun getMayTinhByMaMay(mamay: String) {
@@ -79,24 +77,24 @@ class MayTinhViewModel : ViewModel() {
     }
 
     fun getMayTinhByPhong(maphong: String) {
-        if (pollingJob != null) return
+        if (pollingMayTinhTheoPhongJob != null) return
 
-        pollingJob = viewModelScope.launch(Dispatchers.IO) {
+        pollingMayTinhTheoPhongJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
                     val response = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaPhong(maphong)
-                    if (response.maytinh != null) {
-                        danhSachAllMayTinhtheophong = response.maytinh!!
-                    } else {
-                        danhSachAllMayTinhtheophong = emptyList()
-                    }
-
+                    danhSachAllMayTinhtheophong = response.maytinh ?: emptyList()
                 } catch (e: Exception) {
-                    Log.e("PhongMayViewModel", "Polling lỗi", e)
+                    Log.e("PhongMayViewModel", "Polling theo phòng lỗi", e)
                 }
                 delay(500)
             }
         }
+    }
+
+    fun stopPollingMayTinhTheoPhong() {
+        pollingMayTinhTheoPhongJob?.cancel()
+        pollingMayTinhTheoPhongJob = null
     }
 
     fun createMayTinh(maytinh: MayTinh) {
@@ -158,7 +156,6 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
-
 }
 
 

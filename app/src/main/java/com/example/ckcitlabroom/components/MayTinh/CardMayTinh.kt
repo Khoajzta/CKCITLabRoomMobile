@@ -1,5 +1,5 @@
-import android.util.Log
-import android.widget.Toast
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -8,6 +8,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,19 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Computer
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.DisplaySettings
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.MeetingRoom
-import androidx.compose.material.icons.filled.Memory
-import androidx.compose.material.icons.filled.Mouse
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,7 +33,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,15 +42,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.composables.icons.lucide.Activity
 import com.composables.icons.lucide.Building2
-import com.composables.icons.lucide.Circle
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
@@ -77,18 +60,37 @@ import com.composables.icons.lucide.MemoryStick
 import com.composables.icons.lucide.Monitor
 import com.composables.icons.lucide.MousePointer2
 import com.example.lapstore.viewmodels.MayTinhViewModel
+import android.graphics.Paint
+
+
 
 
 @Composable
 fun CardMayTinh(
     maytinh: MayTinh,
     navController: NavHostController,
-    maytinhViewModel: MayTinhViewModel
+    maytinhViewModel: MayTinhViewModel,
+    phongMayViewModel: PhongMayViewModel
 ) {
-    Log.d("MaMay",maytinh.MaMay)
+
+
+//    val qrText = maytinh.QRCode
+//
+//    val qrBitmap = remember(qrText) {
+//        generateQRCode(qrText, 300)  // kích thước 300x300 px
+//    }
+
+
+
 
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
+
+    var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
+
+    LaunchedEffect(maytinh.MaPhong) {
+        phongMayCard = phongMayViewModel.fetchPhongMayByMaPhong(maytinh.MaPhong)
+    }
 
     Card(
         modifier = Modifier
@@ -108,6 +110,17 @@ fun CardMayTinh(
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.Center,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            QRCodeImage(base64Str = maytinh.QRCode, modifier = Modifier.size(100.dp))
+//
+//        }
+
+
+
         Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -121,7 +134,7 @@ fun CardMayTinh(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Tên Máy: ${maytinh.TenMay}", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
             }
 
             Row(
@@ -130,13 +143,13 @@ fun CardMayTinh(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Lucide.MapPin, // icon lucide: Monitor
+                    imageVector = Lucide.MapPin,
                     contentDescription = "Vị trí",
                     tint = Color.Black,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Vị Trí: ${maytinh.ViTri}", fontSize = 16.sp)
+                Text("Vị Trí: ${maytinh.ViTri}", fontSize = 16.sp,fontWeight = FontWeight.Bold)
             }
 
             Row(
@@ -145,13 +158,13 @@ fun CardMayTinh(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Lucide.Building2, // icon lucide: Monitor
+                    imageVector = Lucide.Building2,
                     contentDescription = "Mã Máy",
                     tint = Color.Black,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Phòng: ${maytinh.MaPhong}")
+                Text("Phòng: ${phongMayCard?.TenPhong ?: "Đang tải..."}")
             }
 
             val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
@@ -176,7 +189,7 @@ fun CardMayTinh(
                         .background(color)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color)
+                Text(statusText, color = color,fontWeight = FontWeight.Bold)
             }
 
 
@@ -200,7 +213,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Main: ${maytinh.Main}", fontSize = 16.sp)
+                        Text("Main: ${maytinh.Main}", fontSize = 16.sp,fontWeight = FontWeight.Bold)
                     }
 
 
@@ -216,7 +229,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("CPU: ${maytinh.CPU}", fontSize = 16.sp)
+                        Text("CPU: ${maytinh.CPU}", fontSize = 16.sp,fontWeight = FontWeight.Bold)
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -230,7 +243,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("RAM: ${maytinh.RAM}")
+                        Text("RAM: ${maytinh.RAM}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -245,7 +258,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("VGA: ${maytinh.VGA}")
+                        Text("VGA: ${maytinh.VGA}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -260,7 +273,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Màn Hình: ${maytinh.ManHinh}")
+                        Text("Màn Hình: ${maytinh.ManHinh}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -275,7 +288,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Bàn Phím: ${maytinh.BanPhim}")
+                        Text("Bàn Phím: ${maytinh.BanPhim}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -290,7 +303,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("Chuột: ${maytinh.Chuot}")
+                        Text("Chuột: ${maytinh.Chuot}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -305,7 +318,7 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("HDD: ${maytinh.HDD}")
+                        Text("HDD: ${maytinh.HDD}",fontWeight = FontWeight.Bold)
                     }
 
                     Row(
@@ -320,8 +333,9 @@ fun CardMayTinh(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text("SSD: ${maytinh.SSD}")
+                        Text("SSD: ${maytinh.SSD}",fontWeight = FontWeight.Bold)
                     }
+
 
                     Spacer(Modifier.height(8.dp))
 
@@ -335,16 +349,16 @@ fun CardMayTinh(
                     ) {
                         Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            showConfirmDialog = true
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
-                    }
+//                    Button(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        onClick = {
+//                            showConfirmDialog = true
+//                        },
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336)),
+//                        shape = RoundedCornerShape(12.dp)
+//                    ) {
+//                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
+//                    }
                 }
             }
         }
@@ -354,8 +368,8 @@ fun CardMayTinh(
     if (showConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },
-            title = { Text("Xác nhận") },
-            text = { Text("Bạn có chắc chắn muốn xóa máy tính này không?", fontWeight = FontWeight.Bold) },
+            title = { Text("Xác nhận", color = Color.Black, fontWeight = FontWeight.Bold) },
+            text = { Text("Bạn có chắc chắn muốn xóa máy tính này không?", fontWeight = FontWeight.Bold, color = Color.Black) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -371,7 +385,7 @@ fun CardMayTinh(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
                     onClick = { showConfirmDialog = false }
                 ) {
-                    Text("Hủy")
+                    Text("Hủy", color = Color.White)
                 }
             },
             containerColor = Color.White

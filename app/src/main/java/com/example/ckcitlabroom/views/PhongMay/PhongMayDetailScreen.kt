@@ -1,36 +1,23 @@
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -47,8 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.lapstore.viewmodels.MayTinhViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun PhongMayDetailScreen(
@@ -60,7 +45,11 @@ fun PhongMayDetailScreen(
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinhtheophong
     val phongmay = phongMayViewModel.phongmay
 
+    Log.d("ds",danhSachMayTinh.toString())
+
     var showDialog by remember { mutableStateOf(false) }
+    var showDeleteWarning by remember { mutableStateOf(false) }
+    var showConfirmDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         mayTinhViewModel.getMayTinhByPhong(maphong)
@@ -69,7 +58,7 @@ fun PhongMayDetailScreen(
 
     DisposableEffect(Unit) {
         onDispose {
-            mayTinhViewModel.stopPollingMayTinh()
+            mayTinhViewModel.stopPollingMayTinhTheoPhong()
         }
     }
 
@@ -89,18 +78,17 @@ fun PhongMayDetailScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Máy Tính Phòng ${phongmay.TenPhong}",
+                "Danh Sách Máy Tính",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 color = Color.White
             )
-
         }
 
-
         LazyColumn(
-            modifier = Modifier.height(550.dp)
+            modifier = Modifier.height(495.dp)
         ) {
+
             if (danhSachMayTinh == null || danhSachMayTinh.isEmpty()) {
                 item {
                     Row(
@@ -114,13 +102,15 @@ fun PhongMayDetailScreen(
                             modifier = Modifier.padding(16.dp)
                         )
                     }
-
                 }
             } else {
                 items(danhSachMayTinh) { maytinh ->
-                    CardMayTinh(maytinh, navController, mayTinhViewModel)
+                    CardMayTinh(maytinh, navController, mayTinhViewModel,phongMayViewModel)
                 }
             }
+
+
+
         }
 
         Row(
@@ -136,9 +126,101 @@ fun PhongMayDetailScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White)
             ) {
-                Text("Chỉnh sửa phòng máy", color = Color.Black, fontWeight = FontWeight.Bold)
+                Text("Chỉnh sửa phòng máy", color = Color.Black, fontWeight = FontWeight.ExtraBold)
             }
         }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(55.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    if (danhSachMayTinh.isNullOrEmpty()) {
+                        showConfirmDeleteDialog = true
+                    } else {
+                        showDeleteWarning = true
+                    }
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+            ) {
+                Text("Xóa phòng máy", color = Color.White, fontWeight = FontWeight.ExtraBold)
+            }
+        }
+
+        if (showConfirmDeleteDialog) {
+            AlertDialog(
+                containerColor = Color.White,
+                onDismissRequest = { showConfirmDeleteDialog = false },
+                title = {
+                    Text(
+                        text = "Xác nhận xóa",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Bạn có chắc muốn xóa phòng ${phongmay.MaPhong} không?",
+                        color = Color.Black
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            phongMayViewModel.deletePhongMay(maphong)
+                            navController.popBackStack()
+                            showConfirmDeleteDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                    ) {
+                        Text("Xóa", color = Color.White)
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { showConfirmDeleteDialog = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                    ) {
+                        Text("Hủy", color = Color.White)
+                    }
+                }
+            )
+        }
+
+        if (showDeleteWarning) {
+            AlertDialog(
+                containerColor = Color.White,
+                onDismissRequest = { showDeleteWarning = false },
+                title = {
+                    Text(
+                        text = "Không thể xóa phòng",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Phòng này hiện vẫn còn máy tính, hãy chuyển hết máy tính trước khi xóa phòng.",
+                        color = Color.Black
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { showDeleteWarning = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                    ) {
+                        Text("Đã hiểu", color = Color.White)
+                    }
+                }
+            )
+        }
+
 
         if (showDialog) {
             AlertDialog(
@@ -162,7 +244,7 @@ fun PhongMayDetailScreen(
 
                     ) {
                         Text(
-                            text = "Mã Phòng", color = Color.Black, fontWeight = FontWeight.Bold
+                            text = "Mã Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold
                         )
 
                         Box(
@@ -183,13 +265,13 @@ fun PhongMayDetailScreen(
                                     phongmay.MaPhong,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Black,
-                                    fontSize = 17.sp
+                                    fontSize = 15.sp
                                 )
                             }
                         }
 
                         Text(
-                            text = "Tên Phòng", color = Color.Black, fontWeight = FontWeight.Bold
+                            text = "Tên Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold
                         )
 
                         OutlinedTextField(
@@ -224,10 +306,10 @@ fun PhongMayDetailScreen(
                             showDialog = false
                         },
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                        colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
                     ) {
                         Text(
-                            text = "Lưu phòng máy", color = Color.White
+                            text = "Lưu phòng máy", color = Color.White, fontWeight = FontWeight.Bold
                         )
                     }
                 },

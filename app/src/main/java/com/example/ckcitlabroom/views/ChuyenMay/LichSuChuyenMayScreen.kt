@@ -1,5 +1,3 @@
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,17 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -33,20 +24,20 @@ import androidx.navigation.NavHostController
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun QuanLyPhongMay(
-    navController: NavHostController,
+fun LichSuChuyenMayScreen(
+    navController:NavHostController,
+    mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel
-) {
-
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
+){
+    val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
 
     LaunchedEffect(Unit) {
-        phongMayViewModel.getAllPhongMay()
+        mayTinhViewModel.getAllMayTinh()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            phongMayViewModel.stopPollingPhongMay()
+            mayTinhViewModel.stopPollingAllMayTinh()
         }
     }
 
@@ -62,28 +53,17 @@ fun QuanLyPhongMay(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Phòng Máy",
+                "Danh sách máy tính",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 color = Color.White
             )
-            IconButton(
-                onClick = {
-                    navController.navigate(NavRoute.ADDPHONGMAY.route)
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = "Thêm cấu hình",
-                    tint = Color.White
-                )
-            }
         }
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (danhSachPhongMay == null || danhSachPhongMay.isEmpty()) {
+            if (danhSachMayTinh == null || danhSachMayTinh.isEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -99,8 +79,8 @@ fun QuanLyPhongMay(
 
                 }
             } else {
-                items(danhSachPhongMay) { phongmay ->
-                    CardPhongMay(phongmay,navController,phongMayViewModel)
+                items(danhSachMayTinh) { maytinh ->
+                    CardMayTinhLichSuChuyen(maytinh, navController,phongMayViewModel)
                 }
             }
         }

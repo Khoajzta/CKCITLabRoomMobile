@@ -298,8 +298,13 @@ fun CreateGiangVienScreen(
                                 GioiTinh = gioiTinhState.value,
                                 Email = emailState.value,
                                 MatKhau = matKhauState.value,
+
                                 MaLoaiTaiKhoan = 2,
                                 TrangThai = 1
+
+                                MaLoaiTaiKhoan = 1,
+                                TrangThai = trangThaiState.value
+
                             )
                             giangVienViewModel.createGiangVien(giangVienMoi)
                             coroutineScope.launch {

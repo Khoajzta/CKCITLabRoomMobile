@@ -1,3 +1,8 @@
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,12 +12,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,76 +33,53 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 @Composable
-fun DotLoadingIndicator() {
+fun DotLoading() {
     val dotCount = 3
-    val delays = listOf(0L, 150L, 300L)
-    val maxOffset = 10.dp
+    val delays = listOf(0, 200, 400)
+    val offsets = List(dotCount) { remember { Animatable(0f) } }
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        repeat(dotCount) { index ->
-            var offsetY by remember { mutableStateOf(0.dp) }
-
-            LaunchedEffect(Unit) {
-                while (true) {
-                    delay(delays[index])
-                    animateDot(offsetY, maxOffset) { newValue ->
-                        offsetY = newValue
-                    }
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .size(14.dp)
-                    .offset(y = -offsetY)
-                    .background(Color.White, CircleShape)
+    offsets.forEachIndexed { index, animatable ->
+        LaunchedEffect(Unit) {
+            delay(delays[index].toLong())
+            animatable.animateTo(
+                targetValue = -20f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(300, easing = LinearOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse
+                )
             )
+        }
+    }
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxSize() // giữ nguyên layout chiếm màn hình
+            .background(Color.Transparent) // background trong suốt
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            offsets.forEach { animatable ->
+                Text(
+                    text = ".",
+                    fontSize = 200.sp,
+                    color = Color(0XFF1B8DDE),
+                    modifier = Modifier
+                        .offset(y = animatable.value.dp)
+                        .padding(8.dp)
+                )
+            }
         }
     }
 }
 
-suspend fun animateDot(
-    currentValue: Dp,
-    targetValue: Dp,
-    onValueChange: (Dp) -> Unit
-) {
-    val duration = 300
-    val step = 16L
 
-    // nhảy lên
-    for (time in 0..duration step step.toInt()) {
-        val fraction = time.toFloat() / duration
-        val value = lerp(0.dp, targetValue, fraction)
-        onValueChange(value)
-        delay(step)
-    }
-
-    // nhảy xuống
-    for (time in 0..duration step step.toInt()) {
-        val fraction = time.toFloat() / duration
-        val value = lerp(targetValue, 0.dp, fraction)
-        onValueChange(value)
-        delay(step)
-    }
-}
-
-@Composable
-fun DotLoadingOverlay() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0x80000000)),
-        contentAlignment = Alignment.Center
-    ) {
-        DotLoadingIndicator()
-    }
-}
 
 
 

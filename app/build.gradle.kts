@@ -56,7 +56,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended-android:1.7.5")
     implementation("com.composables:icons-lucide:1.0.0")
     implementation ("androidx.compose.material:material:1.8.2")
-    implementation("com.composables:icons-lucide:1.0.0")
 
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
@@ -80,6 +79,16 @@ dependencies {
 
     implementation("androidx.datastore:datastore:1.1.1")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    implementation ("com.google.zxing:core:3.5.0")
+    implementation ("androidx.camera:camera-core:1.4.2")
+    implementation ("androidx.camera:camera-camera2:1.4.2")
+    implementation ("androidx.camera:camera-lifecycle:1.4.2")
+    implementation ("androidx.camera:camera-view:1.4.2")
+    implementation ("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation ("androidx.activity:activity-compose:1.10.1")
+
+
     implementation(libs.play.services.maps)
     implementation(libs.common)
     implementation(libs.androidx.runtime.livedata)

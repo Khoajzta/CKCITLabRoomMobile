@@ -13,18 +13,6 @@ data class MayTinhResponse(
 )
 
 
-data class UpdateResponse(
-    val message: String
-)
-
-data class DeleteResponse(
-    val message: String
-)
-
-data class CreateResponse(
-    val message: String
-)
-
 interface MayTinhAPIService {
     @GET("MayTinh/read.php")
     suspend fun getAllMayTinh(): MayTinhResponse

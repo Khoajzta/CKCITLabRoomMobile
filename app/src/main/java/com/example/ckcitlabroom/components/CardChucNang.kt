@@ -1,6 +1,7 @@
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,8 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 data class ChucNang(
@@ -34,12 +37,16 @@ fun CardChucNang(chucnang:ChucNang){
                 width = 1.dp,
                 color = Color.White,
                 shape = RoundedCornerShape(12.dp)
-            ),
+            ).shadow(7.dp, shape = RoundedCornerShape(12.dp)),
         elevation = CardDefaults.cardElevation(7.dp),
         colors = CardDefaults.cardColors(Color.White),
         onClick = {chucnang.Click()}
     ) {
-        Box(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(start = 10.dp),
                 horizontalArrangement = Arrangement.Center,
@@ -47,9 +54,9 @@ fun CardChucNang(chucnang:ChucNang){
             ) {
                 Icon(imageVector = chucnang.icon,"",tint = Color.Black)
                 Text(
+                    modifier = Modifier.padding(16.dp),
                     text = chucnang.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(16.dp)
+                    fontWeight = FontWeight.Bold
                 )
             }
 
