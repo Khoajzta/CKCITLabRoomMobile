@@ -3,18 +3,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,15 +34,26 @@ import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
 import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuanLyDonNhap(
+fun PhongKhoChuyenScreen(
+    maphong:String,
     navController: NavHostController,
+    phongMayViewModel: PhongMayViewModel,
+    mayTinhViewModel: MayTinhViewModel,
     donNhapyViewModel: DonNhapViewModel,
-    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
-    mayTinhViewModel: MayTinhViewModel
-) {
+    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel
+){
     var danhsachdonnhap = donNhapyViewModel.danhSachDonNhap
+
+    LaunchedEffect(Unit) {
+        phongMayViewModel.getPhongMayByMaPhong(maphong)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mayTinhViewModel.stopPollingMayTinhTheoPhong()
+        }
+    }
 
     LaunchedEffect(Unit) {
         donNhapyViewModel.getAllDonNhap()
@@ -58,27 +77,16 @@ fun QuanLyDonNhap(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Đơn Nhập",
+                "Danh Sách Đơn Nhập",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 color = Color.White
             )
-            IconButton(
-                onClick = {
-                    navController.navigate(NavRoute.ADDDONNHAP.route)
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = "Thêm cấu hình",
-                    tint = Color.White
-                )
-            }
         }
 
         // Danh sách đơn nhập
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.height(600.dp)
         ) {
 
             if(danhsachdonnhap.isNullOrEmpty()){
@@ -98,7 +106,7 @@ fun QuanLyDonNhap(
                 }
             }else{
                 items(danhsachdonnhap) { donnhap ->
-                    CardDonNhap(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController)
+                    CardDonNhapChuyen(maphong,donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController)
                 }
             }
         }

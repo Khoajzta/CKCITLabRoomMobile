@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,10 +34,9 @@ fun ChiTietDonNhapScreen(
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel
 ) {
-    val danhsachchitietdonnhap = chiTietDonNhapyViewModel.danhSachChiTietDonNhapTheoMaDon
+    val danhsachchitietdonnhap = chiTietDonNhapyViewModel.danhSachChiTietDonNhaptheoMaDonNhap
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
 
-    // Lọc danh sách máy tính theo đơn nhập
     val danhSachMayTheoDon = remember(danhsachchitietdonnhap, danhSachMayTinh) {
         val maMayTheoDon = danhsachchitietdonnhap.map { it.MaMay }
         danhSachMayTinh.filter { it.MaMay in maMayTheoDon }

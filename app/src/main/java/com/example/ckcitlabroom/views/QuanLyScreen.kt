@@ -1,4 +1,3 @@
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,8 +8,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Class
-import androidx.compose.material.icons.outlined.DesktopWindows
 import androidx.compose.material.icons.outlined.MeetingRoom
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.SupervisorAccount
@@ -18,9 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-
 
 @Composable
 fun QuanLyScreen(
@@ -31,37 +26,32 @@ fun QuanLyScreen(
     val giangVien = giangVienViewModel.giangvienSet
     val sinhvien = sinhVienViewModel.sinhvienSet
 
-
-
-    val dsChucNang = listOf(
-        ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = {navController.navigate(NavRoute.QUANLYMAYTINH.route)}),
-        ChucNang("Quản Lý Đơn Nhập", iconComputer, Click = { navController.navigate(NavRoute.QUANLYCAUHINH.route) }),
-        ChucNang("Quản Lý Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
-        ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = {navController.navigate(NavRoute.QUANLYGIANGVIEN.route)}),
-        ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = {navController.navigate(NavRoute.QUANLYSINHVIEN.route)}),
-        ChucNang("Quản Lý Lịch", Icons.Outlined.CalendarMonth, {}),
-        ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = {navController.navigate(NavRoute.QUANLYLOPHOC.route)})
-    )
-
     val dsChucNang = when {
         giangVien?.MaLoaiTaiKhoan == 1 -> {
             listOf(
-                ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = { navController.navigate(NavRoute.QUANLYMAYTINH.route) }),
+//                ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = { navController.navigate(NavRoute.QUANLYMAYTINH.route) }),
                 ChucNang("Quản Lý Đơn Nhập", iconComputer, Click = { navController.navigate(NavRoute.QUANLYDONNHAP.route) }),
                 ChucNang("Quản Lý Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
                 ChucNang("Chuyển Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYCHUYENMAY.route) }),
                 ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = { navController.navigate(NavRoute.QUANLYGIANGVIEN.route) }),
-                ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = {navController.navigate(NavRoute.QUANLYSINHVIEN.route)}),
-                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {})
+                ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = { navController.navigate(NavRoute.QUANLYSINHVIEN.route) }),
+                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {  }),
+                ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLOPHOC.route) })
+            )
+        }
+        giangVien?.MaLoaiTaiKhoan == 2 -> {
+            listOf(
+                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {  })
             )
         }
         sinhvien != null -> {
             listOf(
-                ChucNang("Danh Sách Lịch Học", Icons.Outlined.CalendarMonth, Click = {})
+                ChucNang("Danh Sách Lịch Học", Icons.Outlined.CalendarMonth, Click = {  })
             )
         }
         else -> emptyList()
     }
+
 
 
     Column(

@@ -25,7 +25,6 @@ fun ChiTietLichSuChuyenMay(
     mamay:String,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel,
     phongMayViewModel: PhongMayViewModel,
-    mayTinhViewModel: MayTinhViewModel
 ){
 
     var danhsachlichsu = lichSuChuyenMayViewModel.danhSachLichSuTheoMay

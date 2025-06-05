@@ -56,7 +56,12 @@ fun CardPhongMayChuyen(
             .width(300.dp)
             .clickable(
             ) {
-                navController.navigate(NavRoute.PHONGMAYCHUYEN.route + "?maphong=${phongmay.MaPhong}")
+                val route = if (phongmay.MaPhong.contains("KHO", ignoreCase = true)) {
+                    NavRoute.PHONGKHOCHUYEN.route
+                } else {
+                    NavRoute.PHONGMAYCHUYEN.route
+                }
+                navController.navigate("$route?maphong=${phongmay.MaPhong}")
             }.shadow(7.dp, shape = RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(10.dp)

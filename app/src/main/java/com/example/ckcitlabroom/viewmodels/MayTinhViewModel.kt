@@ -19,8 +19,7 @@ class MayTinhViewModel : ViewModel() {
 
     var mt = MayTinh("","",""",""","","","","","","","","","","","",1)
 
-    var danhSachAllMayTinh by mutableStateOf<List<MayTinh>>(emptyList())
-        private set
+    var danhSachAllMayTinh by mutableStateOf(listOf<MayTinh>())
 
     var danhSachAllMayTinhtheophong by mutableStateOf<List<MayTinh>>(emptyList())
         private set
@@ -97,6 +96,20 @@ class MayTinhViewModel : ViewModel() {
         pollingMayTinhTheoPhongJob = null
     }
 
+    suspend fun getAllMayTinhOnce(): List<MayTinh> {
+        return try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
+            }
+            response.maytinh ?: emptyList()
+        } catch (e: Exception) {
+            Log.e("MayTinhViewModel", "Lỗi: ${e.message}")
+            emptyList()
+        }
+    }
+
+
+
     fun createMayTinh(maytinh: MayTinh) {
         viewModelScope.launch {
             isLoading = true
@@ -113,6 +126,19 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
+
+    suspend fun createMayTinhBlocking(maytinh: MayTinh): Boolean {
+        return try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.maytinhAPIService.createMayTinh(maytinh)
+            }
+            response.message.contains("thành công", ignoreCase = true)
+        } catch (e: Exception) {
+            Log.e("MayTinhViewModel", "Lỗi khi thêm máy tính: ${e.message}")
+            false
+        }
+    }
+
 
     fun updateMayTinh(maytinh: MayTinh) {
         viewModelScope.launch {
