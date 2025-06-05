@@ -110,14 +110,14 @@ fun CardMayTinh(
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
-//        Row(
-//            modifier = Modifier.fillMaxWidth(),
-//            horizontalArrangement = Arrangement.Center,
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            QRCodeImage(base64Str = maytinh.QRCode, modifier = Modifier.size(100.dp))
-//
-//        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            QRCodeImage(base64Str = maytinh.QRCode, modifier = Modifier.size(100.dp))
+
+        }
 
 
 

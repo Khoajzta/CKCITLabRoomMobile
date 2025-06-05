@@ -138,7 +138,9 @@ fun MainScreen() {
         ButtonData("Thông Báo", Icons.Default.Notifications) {},
         ButtonData("Thông Tin", Icons.Default.AccountCircle) {
             if (giangVien != null || sinhVien != null) {
-                navController.navigate(NavRoute.ACCOUNT.route)
+                navController.navigate(NavRoute.ACCOUNT.route){
+                    popUpTo(0) { inclusive = true }
+                }
             }
         }
     )

@@ -536,7 +536,7 @@ fun MayTinhDetailScreen(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
                 ) {
-                    Text("Cấu hình đúng", color = Color.White)
+                    Text("Điểm Danh", color = Color.White)
                 }
 
                 Button(
@@ -545,9 +545,9 @@ fun MayTinhDetailScreen(
                         navController.navigate(NavRoute.ADDPHIEUSUACHUA.route)
                     },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
+                    colors = ButtonDefaults.buttonColors(Color(0xFFF44336))
                 ) {
-                    Text("Cấu hình sai", color = Color.White)
+                    Text("Báo Hỏng", color = Color.White)
                 }
             }
         }
