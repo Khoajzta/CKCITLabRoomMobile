@@ -3,14 +3,14 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-data class ChiTietDonNhapResponse(
+data class NamHocResponse(
     val message: String? = null,
-    val chitietdonnhap: List<ChiTietDonNhap>? = null
+    val namhoc: List<NamHoc>? = null
 )
 
 
-interface ChiTietDonNhapAPIService {
-    @POST("ChiTietDonNhap/create.php")
+interface NamHocAPIService {
+    @POST("NamHoc/create.php")
     suspend fun createChiTietDonNhap(
         @Body chiTietDonNhap: ChiTietDonNhap
     ): CreateResponse
@@ -21,6 +21,6 @@ interface ChiTietDonNhapAPIService {
         @Query("MaDonNhap") MaDonNhap: String
     ): ChiTietDonNhapResponse
 
-    @GET("ChiTietdonnhap/read.php")
-    suspend fun getAllChiTietDonNhap(): ChiTietDonNhapResponse
+    @GET("NamHoc/read.php")
+    suspend fun getAllNamHoc(): NamHocResponse
 }

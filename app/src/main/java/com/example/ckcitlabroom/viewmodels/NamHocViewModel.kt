@@ -1,10 +1,3 @@
-package com.example.lapstore.viewmodels
-
-import ChiTietDonNhap
-import ChiTietDonNhapAPIService
-import DonNhap
-import LichSuChuyenMay
-import MayTinh
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,15 +12,13 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ChiTietDonNhapyViewModel : ViewModel() {
-
-
+class NamHocViewModel : ViewModel() {
     var danhSachChiTietDonNhaptheoMaDonNhap by mutableStateOf<List<ChiTietDonNhap>>(emptyList())
         private set
 
-    var danhSachAllChiTietDonNhap by mutableStateOf(listOf<ChiTietDonNhap>())
+    var danhSachAllNamHoc by mutableStateOf(listOf<NamHoc>())
 
-    private var pollingAllChiTietDonNhapJob: Job? = null
+    private var pollingAllNamHocJob: Job? = null
 
     var chitietdonnhapCreateResult by mutableStateOf("")
     var chitietdonnhapUpdateResult by mutableStateOf("")
@@ -39,25 +30,25 @@ class ChiTietDonNhapyViewModel : ViewModel() {
     private var pollingChiTietTheoMaDonNhapJob: Job? = null
 
 
-    fun getAllChiTietDonNhap() {
-        if (pollingAllChiTietDonNhapJob != null) return
+    fun getAllNamHoc() {
+        if (pollingAllNamHocJob != null) return
 
-        pollingAllChiTietDonNhapJob = viewModelScope.launch(Dispatchers.IO) {
+        pollingAllNamHocJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
-                    val response = ITLabRoomRetrofitClient.chitietdonnhapAPIService.getAllChiTietDonNhap()
-                    danhSachAllChiTietDonNhap = response.chitietdonnhap ?: emptyList()
+                    val response = ITLabRoomRetrofitClient.namhocAPIService.getAllNamHoc()
+                    danhSachAllNamHoc = response.namhoc ?: emptyList()
                 } catch (e: Exception) {
-                    Log.e("ChiTietDonNhapViewModel", "Polling all chi tiết lỗi", e)
+                    Log.e("NamHocViewModel", "Polling all năm học lỗi", e)
                 }
                 delay(500)
             }
         }
     }
 
-    fun stopPollingAllChiTietDonNhap() {
-        pollingAllChiTietDonNhapJob?.cancel()
-        pollingAllChiTietDonNhapJob = null
+    fun stopPollingAllNamHoc() {
+        pollingAllNamHocJob?.cancel()
+        pollingAllNamHocJob = null
     }
 
     fun createChiTietDonNhap(chiTietDonNhap: ChiTietDonNhap) {
@@ -112,9 +103,3 @@ class ChiTietDonNhapyViewModel : ViewModel() {
     }
 
 }
-
-
-
-
-
-

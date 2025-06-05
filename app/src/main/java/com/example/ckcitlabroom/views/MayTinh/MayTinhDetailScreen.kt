@@ -30,6 +30,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,19 +45,41 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
+import okhttp3.internal.format
 
 @Composable
 fun MayTinhDetailScreen(
     maMay: String,
     phongMayViewModel:PhongMayViewModel,
+    giangVienViewModel: GiangVienViewModel,
     navController: NavHostController
 ){
 
+    var donNhapViewModel: DonNhapViewModel = viewModel()
+    var chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel = viewModel()
     var mayTinhViewModel: MayTinhViewModel = viewModel()
-    var maytinh = mayTinhViewModel.maytinh
 
+
+    val giangVien = giangVienViewModel.giangvienSet
+
+    val maytinh = mayTinhViewModel.maytinh
+    val danhSachChiTietDonNhap = chiTietDonNhapyViewModel.danhSachAllChiTietDonNhap
+    val danhSachDonNhap = donNhapViewModel.danhSachDonNhap
+
+
+    val chiTiet = danhSachChiTietDonNhap.find { it.MaMay == maytinh?.MaMay }
+
+    val maDonNhap = chiTiet?.MaDonNhap
+
+    val donNhap = danhSachDonNhap.find { it.MaDonNhap == maDonNhap }
+
+    val ngayNhap = donNhap?.NgayNhap
+
+    Log.d("MaDonNhap",danhSachDonNhap.toString())
 
     val maMayState = remember { mutableStateOf("") }
     val tenMayState = remember { mutableStateOf("") }
@@ -79,6 +102,15 @@ fun MayTinhDetailScreen(
     LaunchedEffect(maMay) {
         mayTinhViewModel.getMayTinhByMaMay(maMay)
         phongMayViewModel.getAllPhongMay()
+        chiTietDonNhapyViewModel.getAllChiTietDonNhap()
+        donNhapViewModel.getAllDonNhap()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            chiTietDonNhapyViewModel.stopPollingAllChiTietDonNhap()
+            donNhapViewModel.stopPollingAllDonNhap()
+        }
     }
 
     LaunchedEffect(maytinh) {
@@ -484,6 +516,36 @@ fun MayTinhDetailScreen(
                             }
                         }
                     }
+
+                    item {
+                        Text(
+                            text = "Ngày Nhập",
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                                .background(Color.White)
+                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(start = 10.dp),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    formatNgay(ngayNhap.toString()),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 17.sp
+                                )
+                            }
+                        }
+                    }
                 }else{
                     item {
                         Text("Lỗi khi lấy API")
@@ -528,16 +590,32 @@ fun MayTinhDetailScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(
-                    modifier = Modifier.width(170.dp),
-                    onClick = {
 
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                ) {
-                    Text("Điểm Danh", color = Color.White)
+                if(giangVien!=null){
+                    Button(
+                        modifier = Modifier.width(170.dp),
+                        onClick = {
+                            navController.navigate(NavRoute.EDITMAYTINH.route + "?mamay=${maytinh.MaMay}")
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE))
+                    ) {
+                        Text("Cập nhật", color = Color.White)
+                    }
                 }
+                else{
+                    Button(
+                        modifier = Modifier.width(170.dp),
+                        onClick = {
+
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                    ) {
+                        Text("Điểm Danh", color = Color.White)
+                    }
+                }
+
 
                 Button(
                     modifier = Modifier.width(170.dp),

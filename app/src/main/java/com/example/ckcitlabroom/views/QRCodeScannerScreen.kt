@@ -69,7 +69,9 @@ fun RequestCameraPermission(onGranted: () -> Unit) {
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun QRCodeScannerScreen(onResult: (String) -> Unit) {
+fun QRCodeScannerScreen(
+    onResult: (String) -> Unit,
+) {
     var hasPermission by remember { mutableStateOf(false) }
 
     // Xin quyền camera

@@ -76,6 +76,12 @@ sealed class NavRoute(val route: String) {
     object ADDPHIEUSUACHUA : NavRoute("addphieusuachua_screen")
     object STARTSCREEN : NavRoute("start_screen")
 
+
+    //Năm học
+
+    object QUANLYNAMHOC : NavRoute("quanlynamhoc_screen")
+    object ADDNAMHOC : NavRoute("addnamhoc_screen")
+    object EDITNAMHOC : NavRoute("editnamhoc_screen")
 }
 
 @Composable
@@ -90,7 +96,7 @@ fun NavgationGraph(
     donNhapViewModel: DonNhapViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     sinhVienViewModel: SinhVienViewModel,
-
+    namHocViewModel: NamHocViewModel
 ) {
 
     val context = LocalContext.current.applicationContext
@@ -283,7 +289,7 @@ fun NavgationGraph(
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
-            MayTinhDetailScreen(mamay,phongMayViewModel,navController)
+            MayTinhDetailScreen(mamay,phongMayViewModel,giangVienViewModel,navController)
         }
 
         composable(
@@ -678,6 +684,24 @@ fun NavgationGraph(
             }
         ) {
             CreatePhieuSuaChua()
+        }
+
+        composable(
+            route = NavRoute.QUANLYNAMHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            QuanLyNamHocScreen(navController,namHocViewModel)
         }
 
     }

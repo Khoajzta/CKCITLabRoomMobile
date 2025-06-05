@@ -11,6 +11,7 @@ import LoaiTaiKhoanAPIService
 import LopHocAPIService
 import MayTinhAPIService
 import MonHocAPIService
+import NamHocAPIService
 import PhieuSuaChuaAPIService
 import PhongMayAPIService
 import SinhVienAPIService
@@ -134,5 +135,13 @@ object ITLabRoomRetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
             .build()
             .create(ChiTietDonNhapAPIService::class.java)
+    }
+
+    val namhocAPIService: NamHocAPIService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+            .create(NamHocAPIService::class.java)
     }
 }

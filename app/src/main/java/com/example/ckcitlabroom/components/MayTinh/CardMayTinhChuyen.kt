@@ -234,6 +234,7 @@ fun CardMayTinhChuyen(
 
                             val ngayChuyen = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                             val mayTinhMoi = maytinh.copy(
+                                TenMay = "MAY${maPhongState.value}",
                                 MaPhong = maPhongState.value,
                                 TrangThai = 1,
                                 ViTri = if (maPhongState.value == "KHO") "" else maytinh.ViTri

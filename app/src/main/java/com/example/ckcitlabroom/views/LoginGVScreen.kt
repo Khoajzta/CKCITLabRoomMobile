@@ -292,6 +292,7 @@ fun LoginGVScreen(
                             snackbarHostState.showSnackbar("Thông báo")
                         }
                         giangVienViewModel.getGiangVienByMaGOrEmail(emailState.value)
+                        giangVienViewModel.setGV(giangVien)
                     } else {
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(

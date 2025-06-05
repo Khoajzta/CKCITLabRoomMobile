@@ -346,8 +346,8 @@ fun EditGiangVienScreen(
                             NgaySinh = ngaySinhState.value,
                             GioiTinh = gioiTinhState.value,
                             Email = emailState.value,
-                            MatKhau = giangVien?.MatKhau ?: "", // lấy mật khẩu cũ
-                            MaLoaiTaiKhoan = giangVien?.MaLoaiTaiKhoan ?: 2, // lấy mã loại TK cũ
+                            MatKhau = giangVien?.MatKhau ?: "",
+                            MaLoaiTaiKhoan = giangVien?.MaLoaiTaiKhoan ?: 2,
                             TrangThai = trangThaiState.value
                         )
                         giangVienViewModel.updateGiangVien(giangVienMoi)
