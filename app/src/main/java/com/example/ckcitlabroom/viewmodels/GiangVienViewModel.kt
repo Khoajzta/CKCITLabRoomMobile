@@ -23,6 +23,8 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
     private val context = getApplication<Application>().applicationContext
     private val giangvienPreferences = GiangVienPreferences(context)
 
+    var giangvien by mutableStateOf<GiangVien?>(null)
+        private set
 
     var giangvienSet: GiangVien? by mutableStateOf(null)
         private set
