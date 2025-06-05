@@ -85,9 +85,6 @@ fun NavgationGraph(
     sinhVienViewModel: SinhVienViewModel,
     lopHocViewModel: LopHocViewModel,
 
-
-    lopHocViewModel: LopHocViewModel,
-
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel,
     donNhapyViewModel: DonNhapyViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
