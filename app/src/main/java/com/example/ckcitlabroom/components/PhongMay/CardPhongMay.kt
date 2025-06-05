@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -58,51 +59,23 @@ fun CardPhongMay(
 
     Card(
         modifier = Modifier
-            .padding(bottom = 8.dp)
+            .padding(bottom = 12.dp)
             .fillMaxWidth()
-            .width(300.dp)
-            .clickable(
-            ) {
-                if (phongmay.MaPhong.contains("KHO", ignoreCase = true)) {
-                    navController.navigate(NavRoute.PHONGMAYDONNHAP.route + "?maphong=${phongmay.MaPhong}")
+            .clickable {
+                val route = if (phongmay.MaPhong.contains("KHO", ignoreCase = true)) {
+                    NavRoute.PHONGMAYDONNHAP.route
                 } else {
-                    navController.navigate(NavRoute.PHONGMAYDETAIL.route + "?maphong=${phongmay.MaPhong}")
+                    NavRoute.PHONGMAYDETAIL.route
                 }
+                navController.navigate("$route?maphong=${phongmay.MaPhong}")
             },
         colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 2.dp)
-            ) {
-                Icon(
-                    imageVector = Lucide.Warehouse, // hoặc Icons.Default.RoomPreferences
-                    contentDescription = "Tên Phòng",
-                    tint = Color(0xFF3F51B5),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(text = "Phòng: ${phongmay.TenPhong}", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 2.dp)
-            ) {
-                Icon(
-                    imageVector = Lucide.Hash, // hoặc Icons.Default.RoomPreferences
-                    contentDescription = "Tên Phòng",
-                    tint = Color(0xFF3F51B5),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(text = "Số lượng máy: ${soLuongMay}", fontSize = 16.sp)
-            }
+        Column(modifier = Modifier.padding(16.dp)) {
+            InfoRow(icon = Lucide.Warehouse, label = "Phòng", value = phongmay.TenPhong)
+            InfoRow(icon = Lucide.Hash, label = "Số lượng máy", value = soLuongMay.toString())
 
             val (color, statusText, statusIcon) = when (phongmay.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
@@ -110,15 +83,13 @@ fun CardPhongMay(
                 else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = statusIcon,
-                    contentDescription = "Trạng thái",
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ")
+                Text("Trạng thái: ", fontWeight = FontWeight.Medium)
                 Box(
                     modifier = Modifier
                         .size(10.dp)
@@ -126,8 +97,10 @@ fun CardPhongMay(
                         .background(color)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color)
+                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
@@ -135,56 +108,58 @@ fun CardPhongMay(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
             ) {
-                Text("Cập Nhật Trạng Thái", color = Color.White)
+                Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
             }
 
             if (showDialog) {
                 AlertDialog(
                     containerColor = Color.White,
                     onDismissRequest = { showDialog = false },
-                    title = { Text(text = "Cập nhật", color = Color.Black) },
-                    text = { Text("Trạng thái phòng ${phongmay.TenPhong}", color = Color.Black) },
+                    title = {
+                        Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
+                    },
+                    text = {
+                        Text("Phòng: ${phongmay.TenPhong}", color = Color.Black)
+                    },
                     confirmButton = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Button(
-                                modifier = Modifier.width(130.dp),
+                                modifier = Modifier.weight(1f).padding(end = 8.dp),
                                 onClick = {
-                                    var phongmaynewTrangThai =
+                                    phongMayViewModel.updateTrangThaiPhongMay(
                                         PhongMay(phongmay.MaPhong, phongmay.TenPhong, 1)
-                                    phongMayViewModel.updateTrangThaiPhongMay(phongmaynewTrangThai)
+                                    )
                                     showDialog = false
                                 },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
                             ) {
-                                Text(
-                                    text = "Hoạt Động", color = Color.White
-                                )
+                                Text("Hoạt Động", color = Color.White)
                             }
+
                             Button(
-                                modifier = Modifier.width(130.dp),
+                                modifier = Modifier.weight(1f),
                                 onClick = {
-                                    var phongmaynewTrangThai = PhongMay(phongmay.MaPhong, phongmay.TenPhong, 0)
-                                    phongMayViewModel.updateTrangThaiPhongMay(phongmaynewTrangThai)
-                                    showDialog = false
+                                    phongMayViewModel.updateTrangThaiPhongMay(
+                                        PhongMay(phongmay.MaPhong, phongmay.TenPhong, 0)
+                                    )
                                     showDialog = false
                                 },
                                 shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xffE20C0C))
+                                colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
                             ) {
-                                Text(
-                                    text = "Bảo Trì", color = Color.White
-                                )
+                                Text("Bảo Trì", color = Color.White)
                             }
                         }
-                    },
+                    }
                 )
             }
         }
     }
+
 }
 
 

@@ -17,7 +17,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DonNhapyViewModel : ViewModel() {
+class DonNhapViewModel : ViewModel() {
 
 
     var danhSachDonNhap by mutableStateOf<List<DonNhap>>(emptyList())

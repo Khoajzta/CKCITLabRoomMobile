@@ -8,6 +8,7 @@ data class ChiTietDonNhapResponse(
     val chitietdonnhap: List<ChiTietDonNhap>? = null
 )
 
+
 interface ChiTietDonNhapAPIService {
     @POST("ChiTietDonNhap/create.php")
     suspend fun createChiTietDonNhap(

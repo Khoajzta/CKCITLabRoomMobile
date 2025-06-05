@@ -70,7 +70,7 @@ import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
-import com.example.lapstore.viewmodels.DonNhapyViewModel
+import com.example.lapstore.viewmodels.DonNhapViewModel
 
 import com.example.lapstore.viewmodels.LichHocViewModel
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
@@ -101,7 +101,7 @@ fun MainScreen() {
     val mayTinhViewModel: MayTinhViewModel = viewModel()
     val phongMayViewModel: PhongMayViewModel = viewModel()
     val lichSuChuyenMayViewModel: LichSuChuyenMayViewModel = viewModel()
-    val donNhapyViewModel: DonNhapyViewModel = viewModel()
+    val donNhapyViewModel: DonNhapViewModel = viewModel()
     val chitietdonNhapyViewModel: ChiTietDonNhapyViewModel = viewModel()
     val sinhVienViewModel: SinhVienViewModel = viewModel()
     val lopHocViewModel: LopHocViewModel = viewModel()
@@ -245,18 +245,25 @@ fun MainScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 NavgationGraph(
-
                     navController,
                     lichHocViewModel,
                     giangVienViewModel,
                     mayTinhViewModel,
                     phongMayViewModel,
+
                     sinhVienViewModel,
                     lopHocViewModel,
 
                     lichSuChuyenMayViewModel = lichSuChuyenMayViewModel,
                     donNhapyViewModel = donNhapyViewModel,
                     chiTietDonNhapyViewModel = chitietdonNhapyViewModel,
+
+                    lopHocViewModel,
+                    lichSuChuyenMayViewModel,
+                    donNhapyViewModel,
+                    chitietdonNhapyViewModel,
+                    sinhVienViewModel
+
                 )
             }
         }

@@ -1,6 +1,7 @@
 package com.example.lapstore.viewmodels
 
 import ChiTietDonNhap
+import ChiTietDonNhapAPIService
 import DonNhap
 import LichSuChuyenMay
 import MayTinh
@@ -21,7 +22,7 @@ import kotlinx.coroutines.withContext
 class ChiTietDonNhapyViewModel : ViewModel() {
 
 
-    var danhSachChiTietDonNhapTheoMaDon by mutableStateOf<List<ChiTietDonNhap>>(emptyList())
+    var danhSachChiTietDonNhaptheoMaDonNhap by mutableStateOf<List<ChiTietDonNhap>>(emptyList())
         private set
 
     var chitietdonnhapCreateResult by mutableStateOf("")
@@ -51,16 +52,16 @@ class ChiTietDonNhapyViewModel : ViewModel() {
     }
 
 
-    fun getChiTietDonNhapTheoMaDonNhap(madonnhap: String) {
+    fun getChiTietDonNhapTheoMaDonNhap(madon: String) {
         if (pollingChiTietTheoMaDonNhapJob != null) return
 
         pollingChiTietTheoMaDonNhapJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
-                    val response = ITLabRoomRetrofitClient.chitietdonnhapAPIService.getChiTietDonNhapTheoMaDon(madonnhap)
-                    danhSachChiTietDonNhapTheoMaDon = response.chitietdonnhap ?: emptyList()
+                    val response = ITLabRoomRetrofitClient.chitietdonnhapAPIService.getChiTietDonNhapTheoMaDon(madon)
+                    danhSachChiTietDonNhaptheoMaDonNhap = response.chitietdonnhap ?: emptyList()
                 } catch (e: Exception) {
-                    Log.e("ChiTietDonNhapViewModel", "Polling theo mã lỗi", e)
+                    Log.e("PhongMayViewModel", "Polling theo phòng lỗi", e)
                 }
                 delay(500)
             }
@@ -71,6 +72,19 @@ class ChiTietDonNhapyViewModel : ViewModel() {
         pollingChiTietTheoMaDonNhapJob?.cancel()
         pollingChiTietTheoMaDonNhapJob = null
     }
+
+    suspend fun getChiTietDonNhapListOnce(maDonNhap: String): List<ChiTietDonNhap> {
+        return try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.chitietdonnhapAPIService.getChiTietDonNhapTheoMaDon(maDonNhap)
+            }
+            response.chitietdonnhap ?: emptyList()
+        } catch (e: Exception) {
+            Log.e("ChiTietViewModel", "Lỗi: ${e.message}")
+            emptyList()
+        }
+    }
+
 }
 
 

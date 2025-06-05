@@ -25,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -105,56 +106,33 @@ fun CardMayTinhChuyen(
 
     val isSelected = selectedMayTinhs.contains(maytinh)
 
-    Card(modifier = Modifier
-        .padding(bottom = 8.dp)
-        .fillMaxWidth()
-        .pointerInput(Unit) {
-            detectTapGestures(onLongPress = {
-                if (selectedMayTinhs.any { it.MaMay == maytinh.MaMay }) {
-                    selectedMayTinhs.removeAll { it.MaMay == maytinh.MaMay }
-                } else {
-                    selectedMayTinhs.add(maytinh)
-                }
-                Log.d(
-                    "SelectedMachines", "Máy đã chọn: ${selectedMayTinhs.map { it.MaMay }}"
+    Card(
+        modifier = Modifier
+            .padding(bottom = 12.dp)
+            .fillMaxWidth()
+            .shadow(7.dp, shape = RoundedCornerShape(16.dp))
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        if (selectedMayTinhs.any { it.MaMay == maytinh.MaMay }) {
+                            selectedMayTinhs.removeAll { it.MaMay == maytinh.MaMay }
+                        } else {
+                            selectedMayTinhs.add(maytinh)
+                        }
+                        Log.d("SelectedMachines", "Máy đã chọn: ${selectedMayTinhs.map { it.MaMay }}")
+                    },
+                    onTap = { expanded = !expanded }
                 )
-            }, onTap = {
-                expanded = !expanded
-            })
-        }
-        .shadow(7.dp, shape = RoundedCornerShape(12.dp)), colors = CardDefaults.cardColors(
-        containerColor = if (isSelected) Color(0xFFBBDEFB) else Color.White
-    ), elevation = CardDefaults.cardElevation(10.dp)) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Lucide.Monitor,
-                    contentDescription = "Mã Máy",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Lucide.Building2,
-                    contentDescription = "Mã Máy",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Phòng hiện tại: ${phongMayCard?.TenPhong ?: "Đang tải..."}")
-            }
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color(0xFFBBDEFB) else Color.White
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            InfoRow(icon = Lucide.Monitor, label = "Mã Máy", value = maytinh.MaMay)
+            InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = maytinh.TenMay)
+            InfoRow(icon = Lucide.Building2, label = "Phòng hiện tại", value = phongMayCard?.TenPhong ?: "Đang tải...")
 
             val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
@@ -162,17 +140,10 @@ fun CardMayTinhChuyen(
                 else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = statusIcon,
-                    contentDescription = "Trạng thái",
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
+                Icon(statusIcon, contentDescription = "Trạng thái", tint = color, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ")
+                Text("Trạng thái: ", fontWeight = FontWeight.Medium)
                 Box(
                     modifier = Modifier
                         .size(10.dp)
@@ -180,115 +151,92 @@ fun CardMayTinhChuyen(
                         .background(color)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color)
+                Text(statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
+            // Chi tiết khi mở rộng
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-
+                    Spacer(Modifier.height(8.dp))
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.SwapHorizontalCircle,
-                            contentDescription = "Mã Máy",
+                            contentDescription = null,
                             tint = Color.Black,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text(
-                            text = "Chuyển đến phòng",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("Chuyển đến phòng", fontWeight = FontWeight.Bold)
                     }
 
-
-                    Column {
-                        ExposedDropdownMenuBox(
-                            expanded = isExpanded,
-                            onExpandedChange = { isExpanded = !isExpanded },
-                        ) {
-                            OutlinedTextField(modifier = Modifier
+                    // Dropdown chọn phòng
+                    ExposedDropdownMenuBox(
+                        expanded = isExpanded,
+                        onExpandedChange = { isExpanded = !isExpanded }
+                    ) {
+                        OutlinedTextField(
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .menuAnchor()
-                                .padding(bottom = 12.dp),
-                                value = selectedTenPhong,
-                                onValueChange = { },
-                                readOnly = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedContainerColor = Color.White,
-                                    focusedContainerColor = Color.White,
-                                    focusedBorderColor = Color.Black,
-                                    unfocusedBorderColor = Color.Black,
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black
-                                ),
-                                shape = RoundedCornerShape(12.dp),
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) })
+                                .padding(vertical = 8.dp),
+                            value = selectedTenPhong,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedContainerColor = Color.White,
+                                focusedContainerColor = Color.White,
+                                focusedBorderColor = Color.Black,
+                                unfocusedBorderColor = Color.Black,
+                                focusedTextColor = Color.Black,
+                                unfocusedTextColor = Color.Black
+                            )
+                        )
 
-                            ExposedDropdownMenu(
-                                modifier = Modifier
-                                    .background(Color.White)
-                                    .height(300.dp)
-                                    .padding(bottom = 8.dp),
-                                expanded = isExpanded,
-                                onDismissRequest = { isExpanded = false },
-                                shape = RoundedCornerShape(12.dp),
-                            ) {
-                                danhSachPhongMay.forEach { phongMay ->
-                                    androidx.compose.material3.DropdownMenuItem(text = {
-                                        Text(
-                                            text = phongMay.TenPhong,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Black
-                                        )
-                                    }, onClick = {
+                        ExposedDropdownMenu(
+                            expanded = isExpanded,
+                            onDismissRequest = { isExpanded = false },
+                            modifier = Modifier.background(Color.White)
+                        ) {
+                            danhSachPhongMay.forEach { phongMay ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(phongMay.TenPhong, fontWeight = FontWeight.SemiBold,color= Color.Black)
+                                    },
+                                    onClick = {
                                         selectdMaPhong = phongMay.MaPhong
                                         isExpanded = false
-                                    })
-                                }
+                                    }
+                                )
                             }
                         }
                     }
 
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
+                    // Nút chuyển máy
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(55.dp),
+                            .height(50.dp),
                         onClick = {
                             if (maPhongState.value == maytinh.MaPhong) {
                                 showDialog = true
                                 return@Button
                             }
 
-                            val ngayChuyen =
-                                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-
-                            val mayTinhMoi = MayTinh(
-                                MaMay = maytinh.MaMay,
-                                TenMay = maytinh.MaMay,
-                                ViTri = maytinh.TenMay,
-                                Main = maytinh.Main,
-                                CPU = maytinh.CPU,
-                                RAM = maytinh.RAM,
-                                VGA = maytinh.VGA,
-                                ManHinh = maytinh.ManHinh,
-                                BanPhim = maytinh.BanPhim,
-                                Chuot = maytinh.Chuot,
-                                HDD = maytinh.HDD,
-                                SSD = maytinh.SSD,
+                            val ngayChuyen = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                            val mayTinhMoi = maytinh.copy(
                                 MaPhong = maPhongState.value,
-                                QRCode = maytinh.QRCode,
-                                TrangThai = 1
+                                TrangThai = 1,
+                                ViTri = if (maPhongState.value == "KHO") "" else maytinh.ViTri
                             )
                             maytinhViewModel.updateMayTinh(mayTinhMoi)
 
@@ -299,9 +247,8 @@ fun CardMayTinhChuyen(
                                 NgayChuyen = ngayChuyen,
                                 MaMay = maytinh.MaMay
                             )
-
                             lichSuChuyenMayViewModel.createLichSuChuyenMay(lichSu)
-                            expanded = !expanded
+                            expanded = false
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
                         shape = RoundedCornerShape(12.dp)
@@ -309,23 +256,25 @@ fun CardMayTinhChuyen(
                         Text("Chuyển máy", fontWeight = FontWeight.ExtraBold, color = Color.White)
                     }
 
+                    // Dialog cảnh báo
                     if (showDialog) {
                         AlertDialog(
-                            containerColor = Color.White,
                             onDismissRequest = { showDialog = false },
                             confirmButton = {
                                 TextButton(onClick = { showDialog = false }) {
-                                    Text("OK", color = Color(0xff1B8DDE), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text("OK", color = Color(0xff1B8DDE), fontWeight = FontWeight.Bold)
                                 }
                             },
-                            title = { Text("Thông báo",fontWeight = FontWeight.ExtraBold, color = Color(0xff1B8DDE)) },
-                            text = { Text("Phòng mới phải khác phòng hiện tại!", fontSize = 16.sp, fontWeight = FontWeight.Bold ,color = Color.Black) }
+                            title = { Text("Thông báo", fontWeight = FontWeight.Bold, color = Color(0xff1B8DDE)) },
+                            text = { Text("Phòng mới phải khác phòng hiện tại!", fontWeight = FontWeight.SemiBold) },
+                            containerColor = Color.White
                         )
                     }
                 }
             }
         }
     }
+
 }
 
 

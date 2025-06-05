@@ -13,9 +13,11 @@ data class MayTinhResponse(
 )
 
 
+
 interface MayTinhAPIService {
     @GET("MayTinh/read.php")
     suspend fun getAllMayTinh(): MayTinhResponse
+
 
     @GET("MayTinh/show.php")
     suspend fun getMayTinhByMaMay(

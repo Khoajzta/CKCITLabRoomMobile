@@ -53,6 +53,8 @@ import com.composables.icons.lucide.Building2
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
+import com.composables.icons.lucide.ClipboardList
+import com.composables.icons.lucide.Cpu
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Monitor
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
@@ -94,61 +96,44 @@ fun CardMayTinhLichSuChuyen(
 
     Card(
         modifier = Modifier
-            .padding(bottom = 8.dp)
             .fillMaxWidth()
-            .clickable(){
+            .padding(bottom = 12.dp)
+            .clickable {
                 navController.navigate(NavRoute.CHITIETLICHSUCHUYENMAY.route + "?mamay=${maytinh.MaMay}")
             }
-            .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(Color.White),
-        elevation = CardDefaults.cardElevation(10.dp)
+            .shadow(6.dp, shape = RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Lucide.Monitor,
-                    contentDescription = "Mã Máy",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Mã Máy: ${maytinh.MaMay}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            }
+        Column(modifier = Modifier.padding(16.dp)) {
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Lucide.Building2,
-                    contentDescription = "Tên máy",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Tên Máy: ${maytinh?.TenMay ?: "Đang tải..."}")
-            }
+            // Header: chỉ còn Mã máy
+            InfoRow(
+                icon = Lucide.ClipboardList,
+                label = "Mã Máy",
+                value = maytinh?.MaMay ?: "Đang tải..."
+            )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Lucide.Building2,
-                    contentDescription = "Mã Máy",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Phòng hiện tại: ${phongMayCard?.TenPhong ?: "Đang tải..."}")
-            }
+            Spacer(Modifier.height(12.dp))
 
+            InfoRow(
+                icon = Lucide.Cpu,
+                label = "Tên Máy",
+                value = maytinh?.TenMay ?: "Đang tải..."
+            )
+
+            Spacer(Modifier.height(6.dp))
+
+            InfoRow(
+                icon = Lucide.Building2,
+                label = "Phòng hiện tại",
+                value = phongMayCard?.TenPhong ?: "Đang tải..."
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            // Trạng thái cuối cùng
             val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
                 0 -> Triple(Color(0xFFF44336), "Không hoạt động", Lucide.CircleX)
@@ -160,12 +145,16 @@ fun CardMayTinhLichSuChuyen(
             ) {
                 Icon(
                     imageVector = statusIcon,
-                    contentDescription = "Trạng thái",
+                    contentDescription = null,
                     tint = color,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ")
+                Text(
+                    text = "Trạng thái:",
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(Modifier.width(6.dp))
                 Box(
                     modifier = Modifier
                         .size(10.dp)
@@ -173,10 +162,17 @@ fun CardMayTinhLichSuChuyen(
                         .background(color)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color)
+                Text(
+                    text = statusText,
+                    color = color,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp
+                )
             }
         }
     }
+
+
 }
 
 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -79,12 +80,12 @@ fun PhongMayDetailScreen(
                 "Danh Sách Máy Tính",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
-                color = Color.White
+                color = Color(0xFF1B8DDE)
             )
         }
 
         LazyColumn(
-            modifier = Modifier.height(495.dp)
+            modifier = Modifier.height(550.dp)
         ) {
 
             if (danhSachMayTinh == null || danhSachMayTinh.isEmpty()) {
@@ -106,37 +107,24 @@ fun PhongMayDetailScreen(
                     CardMayTinh(maytinh, navController, mayTinhViewModel,phongMayViewModel)
                 }
             }
-
-
-
         }
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(55.dp),
-            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.width(180.dp),
                 onClick = { showDialog = true },
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
             ) {
-                Text("Chỉnh sửa phòng máy", color = Color.Black, fontWeight = FontWeight.ExtraBold)
+                Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
             }
-        }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(55.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.width(180.dp),
                 onClick = {
                     if (danhSachMayTinh.isNullOrEmpty()) {
                         showConfirmDeleteDialog = true
@@ -147,8 +135,9 @@ fun PhongMayDetailScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
             ) {
-                Text("Xóa phòng máy", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                Text("Xóa", color = Color.White, fontWeight = FontWeight.ExtraBold)
             }
+
         }
 
         if (showConfirmDeleteDialog) {
