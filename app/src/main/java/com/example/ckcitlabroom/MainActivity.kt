@@ -250,6 +250,7 @@ fun MainScreen() {
                     mayTinhViewModel,
                     phongMayViewModel,
                     sinhVienViewModel,
+
                     lopHocViewModel,
                     lichSuChuyenMayViewModel = lichSuChuyenMayViewModel,
                     donNhapyViewModel = donNhapyViewModel,

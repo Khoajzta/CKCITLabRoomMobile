@@ -30,6 +30,7 @@ fun QuanLyScreen(
 ) {
     val giangVien = giangVienViewModel.giangvienSet
     val sinhvien = sinhVienViewModel.sinhvienSet
+    
 
 
     val dsChucNang = when {
