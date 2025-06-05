@@ -21,23 +21,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
 fun LichSuChuyenMayScreen(
-    navController:NavHostController,
-    mayTinhViewModel: MayTinhViewModel,
-    phongMayViewModel: PhongMayViewModel
+    navController: NavHostController,
+    donNhapyViewModel: DonNhapViewModel,
+    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
+    mayTinhViewModel: MayTinhViewModel
 ){
-    val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
+    var danhsachdonnhap = donNhapyViewModel.danhSachDonNhap
 
     LaunchedEffect(Unit) {
-        mayTinhViewModel.getAllMayTinh()
+        donNhapyViewModel.getAllDonNhap()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            mayTinhViewModel.stopPollingAllMayTinh()
+            donNhapyViewModel.stopPollingAllDonNhap()
         }
     }
 
@@ -53,17 +56,19 @@ fun LichSuChuyenMayScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh sách máy tính",
+                "Danh Sách Đơn Nhập",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 color = Color.White
             )
         }
 
+        // Danh sách đơn nhập
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (danhSachMayTinh == null || danhSachMayTinh.isEmpty()) {
+
+            if(danhsachdonnhap.isNullOrEmpty()){
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -71,16 +76,16 @@ fun LichSuChuyenMayScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Chưa có máy tính nào",
+                            text = "Chưa có đơn nhập nào",
                             color = Color.White,
-                            modifier = Modifier.padding(16.dp)
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp
                         )
                     }
-
                 }
-            } else {
-                items(danhSachMayTinh) { maytinh ->
-                    CardMayTinhLichSuChuyen(maytinh, navController,phongMayViewModel)
+            }else{
+                items(danhsachdonnhap) { donnhap ->
+                    CardDonNhapLichSuChuyen(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController)
                 }
             }
         }

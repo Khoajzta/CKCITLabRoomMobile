@@ -20,9 +20,6 @@ import kotlinx.coroutines.withContext
 
 class GiangVienViewModel(application: Application) : AndroidViewModel(application) {
 
-    var giangvien: GiangVien? by mutableStateOf(null)
-    private set
-
     private val context = getApplication<Application>().applicationContext
     private val giangvienPreferences = GiangVienPreferences(context)
 

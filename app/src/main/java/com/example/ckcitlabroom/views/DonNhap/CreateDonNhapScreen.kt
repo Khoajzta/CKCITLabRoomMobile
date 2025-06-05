@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
-import com.example.lapstore.viewmodels.DonNhapyViewModel
+import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -66,7 +66,7 @@ fun CreateDonNhapScreen(
     navController: NavHostController,
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
-    donNhapyViewModel: DonNhapyViewModel,
+    donNhapyViewModel: DonNhapViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel
 ) {
     val hideButtonNhap = remember { mutableStateOf(false) }
@@ -596,15 +596,17 @@ fun CreateDonNhapScreen(
                                         QRCode = qrBase64,
                                         TrangThai = 1
                                     )
-                                    mayTinhViewModel.createMayTinh(mayTinh)
-                                    delay(200)
+                                    val created = mayTinhViewModel.createMayTinhBlocking(mayTinh)
+                                    if (created) {
+                                        val chiTiet = ChiTietDonNhap(
+                                            MaDonNhap = maDonNhap,
+                                            MaMay = maMay
+                                        )
+                                        chiTietDonNhapyViewModel.createChiTietDonNhap(chiTiet)
+                                    } else {
+                                        Log.e("CREATE", "Không thể thêm máy: $maMay — bỏ qua chi tiết đơn nhập")
+                                    }
 
-                                    val chitietdonnhap = ChiTietDonNhap(
-                                        MaDonNhap = maDonNhap,
-                                        MaMay = maMay
-                                    )
-
-                                    chiTietDonNhapyViewModel.createChiTietDonNhap(chitietdonnhap)
                                 }
 
                                 loadingState.value = false

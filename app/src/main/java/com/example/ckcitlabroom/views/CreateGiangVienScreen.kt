@@ -298,12 +298,11 @@ fun CreateGiangVienScreen(
                                 GioiTinh = gioiTinhState.value,
                                 Email = emailState.value,
                                 MatKhau = matKhauState.value,
-
                                 MaLoaiTaiKhoan = 2,
                                 TrangThai = 1
-
                             )
                             giangVienViewModel.createGiangVien(giangVienMoi)
+
                             coroutineScope.launch {
                                 snackbarData.value = CustomSnackbarData(
                                     message = "Thêm giảng viên thành công",

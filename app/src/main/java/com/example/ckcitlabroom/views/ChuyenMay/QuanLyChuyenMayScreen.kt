@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.History
 import com.composables.icons.lucide.Lucide
+import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,7 +31,8 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 fun QuanLyChuyenMayScreen(
     navController: NavHostController,
     mayTinhViewModel: MayTinhViewModel,
-    phongMayViewModel: PhongMayViewModel
+    phongMayViewModel: PhongMayViewModel,
+    donNhapViewModel: DonNhapViewModel
 ) {
     val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
 
