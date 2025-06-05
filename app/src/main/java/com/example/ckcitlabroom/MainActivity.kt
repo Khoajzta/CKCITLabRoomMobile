@@ -11,6 +11,7 @@ import NavgationGraph
 import PhongMayViewModel
 import SinhVienViewModel
 import SinhVienPreferences
+import TuanViewModel
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -107,6 +108,7 @@ fun MainScreen() {
     val sinhVienViewModel: SinhVienViewModel = viewModel()
     val lopHocViewModel: LopHocViewModel = viewModel()
     val namHocViewModel: NamHocViewModel = viewModel()
+    val tuanViewModel: TuanViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -257,7 +259,8 @@ fun MainScreen() {
                     donNhapyViewModel,
                     chitietdonNhapyViewModel,
                     sinhVienViewModel,
-                    namHocViewModel
+                    namHocViewModel,
+                    tuanViewModel
                 )
             }
         }

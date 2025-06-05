@@ -124,7 +124,7 @@ fun ChiTietDonNhapChuyenScreen(
                 "Danh Sách Máy Tính Chưa chuyển Theo Đơn",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
-                color = Color.White
+                color = Color(0xFF1B8DDE)
             )
 
         }

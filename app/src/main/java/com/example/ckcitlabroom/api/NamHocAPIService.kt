@@ -11,12 +11,12 @@ data class NamHocResponse(
 
 interface NamHocAPIService {
     @POST("NamHoc/create.php")
-    suspend fun createChiTietDonNhap(
-        @Body chiTietDonNhap: ChiTietDonNhap
+    suspend fun createNamHoc(
+        @Body namhoc: NamHoc
     ): CreateResponse
 
 
-    @GET("ChiTietDonNhap/getChiTietDonNhapTheoMaDon.php")
+    @GET("NamHoc/show.php")
     suspend fun getChiTietDonNhapTheoMaDon(
         @Query("MaDonNhap") MaDonNhap: String
     ): ChiTietDonNhapResponse

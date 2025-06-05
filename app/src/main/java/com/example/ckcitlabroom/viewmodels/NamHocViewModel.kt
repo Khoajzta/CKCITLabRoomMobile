@@ -13,21 +13,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class NamHocViewModel : ViewModel() {
-    var danhSachChiTietDonNhaptheoMaDonNhap by mutableStateOf<List<ChiTietDonNhap>>(emptyList())
-        private set
 
     var danhSachAllNamHoc by mutableStateOf(listOf<NamHoc>())
 
     private var pollingAllNamHocJob: Job? = null
 
-    var chitietdonnhapCreateResult by mutableStateOf("")
-    var chitietdonnhapUpdateResult by mutableStateOf("")
-    var chitietdonnhapDeleteResult by mutableStateOf("")
+    var namhocCreateResult by mutableStateOf("")
+    var namhocUpdateResult by mutableStateOf("")
+    var namhocDeleteResult by mutableStateOf("")
 
     var isLoading by mutableStateOf(false)
         private set
-
-    private var pollingChiTietTheoMaDonNhapJob: Job? = null
 
 
     fun getAllNamHoc() {
@@ -51,55 +47,20 @@ class NamHocViewModel : ViewModel() {
         pollingAllNamHocJob = null
     }
 
-    fun createChiTietDonNhap(chiTietDonNhap: ChiTietDonNhap) {
+    fun createNamHoc(namhoc: NamHoc) {
         viewModelScope.launch {
             isLoading = true
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.chitietdonnhapAPIService.createChiTietDonNhap(chiTietDonNhap)
+                    ITLabRoomRetrofitClient.namhocAPIService.createNamHoc(namhoc)
                 }
-                chitietdonnhapCreateResult = response.message
+                namhocCreateResult = response.message
             } catch (e: Exception) {
-                chitietdonnhapCreateResult = "Lỗi khi thêm máy tính: ${e.message}"
-                Log.e("ChiTietDonNhapViewModel", "Lỗi khi thêm máy tính: ${e.message}")
+                namhocCreateResult = "Lỗi khi thêm năm học: ${e.message}"
+                Log.e("NamHocViewModel", "Lỗi khi thêm năm học: ${e.message}")
             } finally {
                 isLoading = false
             }
         }
     }
-
-
-    fun getChiTietDonNhapTheoMaDonNhap(madon: String) {
-        if (pollingChiTietTheoMaDonNhapJob != null) return
-
-        pollingChiTietTheoMaDonNhapJob = viewModelScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                try {
-                    val response = ITLabRoomRetrofitClient.chitietdonnhapAPIService.getChiTietDonNhapTheoMaDon(madon)
-                    danhSachChiTietDonNhaptheoMaDonNhap = response.chitietdonnhap ?: emptyList()
-                } catch (e: Exception) {
-                    Log.e("PhongMayViewModel", "Polling theo phòng lỗi", e)
-                }
-                delay(500)
-            }
-        }
-    }
-
-    fun stopPollingChiTietTheoMaDonNhap() {
-        pollingChiTietTheoMaDonNhapJob?.cancel()
-        pollingChiTietTheoMaDonNhapJob = null
-    }
-
-    suspend fun getChiTietDonNhapListOnce(maDonNhap: String): List<ChiTietDonNhap> {
-        return try {
-            val response = withContext(Dispatchers.IO) {
-                ITLabRoomRetrofitClient.chitietdonnhapAPIService.getChiTietDonNhapTheoMaDon(maDonNhap)
-            }
-            response.chitietdonnhap ?: emptyList()
-        } catch (e: Exception) {
-            Log.e("ChiTietViewModel", "Lỗi: ${e.message}")
-            emptyList()
-        }
-    }
-
 }

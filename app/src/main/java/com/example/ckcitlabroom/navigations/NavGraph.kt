@@ -78,10 +78,10 @@ sealed class NavRoute(val route: String) {
 
 
     //Năm học
-
     object QUANLYNAMHOC : NavRoute("quanlynamhoc_screen")
     object ADDNAMHOC : NavRoute("addnamhoc_screen")
     object EDITNAMHOC : NavRoute("editnamhoc_screen")
+    object NAMHOCDETAIL : NavRoute("namhocdetail_screen")
 }
 
 @Composable
@@ -96,7 +96,8 @@ fun NavgationGraph(
     donNhapViewModel: DonNhapViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     sinhVienViewModel: SinhVienViewModel,
-    namHocViewModel: NamHocViewModel
+    namHocViewModel: NamHocViewModel,
+    tuanViewModel: TuanViewModel
 ) {
 
     val context = LocalContext.current.applicationContext
@@ -685,7 +686,7 @@ fun NavgationGraph(
         ) {
             CreatePhieuSuaChua()
         }
-
+        //Năm Học
         composable(
             route = NavRoute.QUANLYNAMHOC.route,
             enterTransition = {
@@ -702,6 +703,36 @@ fun NavgationGraph(
             }
         ) {
             QuanLyNamHocScreen(navController,namHocViewModel)
+        }
+
+        composable(
+            route = NavRoute.ADDNAMHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            CreateNamHocScreen(navController,namHocViewModel)
+        }
+
+        composable(
+            NavRoute.NAMHOCDETAIL.route + "?manam={manam}",
+            arguments = listOf(
+                navArgument("manam") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val manam = navBackStackEntry.arguments?.getString("manam") ?: ""
+            NamHocDetailScreen(manam,tuanViewModel)
         }
 
     }

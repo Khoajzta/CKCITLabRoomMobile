@@ -114,7 +114,7 @@ fun PhongMayChuyenScreen(
                 "Danh Sách Máy Tính Phòng ${phongmay.TenPhong}",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
-                color = Color.White
+                color = Color(0xFF1B8DDE)
             )
 
         }

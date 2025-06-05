@@ -15,13 +15,14 @@ import NamHocAPIService
 import PhieuSuaChuaAPIService
 import PhongMayAPIService
 import SinhVienAPIService
+import TuanAPIService
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object Constants {
 //    const val BASE_URL = "http://chillcup.io.vn/ITLabRoomAPI/api/"
-    const val BASE_URL = "http://192.168.1.243/ITLabRoomAPI/api/"
+    const val BASE_URL = "http://192.168.1.60/ITLabRoomAPI/api/"
 }
 
 object ITLabRoomRetrofitClient {
@@ -143,5 +144,13 @@ object ITLabRoomRetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
             .build()
             .create(NamHocAPIService::class.java)
+    }
+
+    val tuanAPIService: TuanAPIService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+            .create(TuanAPIService::class.java)
     }
 }

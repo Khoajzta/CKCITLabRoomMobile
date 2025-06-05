@@ -533,7 +533,11 @@ fun EditMayTinhScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {
-                Text("Lưu Cấu Hình")
+                Text(
+                    text = "Lưu Cấu Hình",
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
     }

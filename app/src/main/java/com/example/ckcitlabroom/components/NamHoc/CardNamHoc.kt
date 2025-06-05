@@ -1,4 +1,5 @@
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -28,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -57,30 +61,32 @@ fun CardNamHoc(
             .padding(bottom = 12.dp)
             .fillMaxWidth()
             .clickable {
-
+                navController.navigate(NavRoute.NAMHOCDETAIL.route + "?manam=${namHoc.MaNam}")
             },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(12.dp), // Bo góc 12.dp
+        elevation = CardDefaults.cardElevation(defaultElevation = 7.dp), // Bóng đổ
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             InfoRow(icon = Lucide.Tag, label = "Mã Năm Học", value = namHoc.MaNam)
+            Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.BookOpen, label = "Tên Năm Học", value = namHoc.TenNam)
-
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Default.CalendarToday, label = "Ngày Bắt Đầu", value = formatNgay(namHoc.NgayBatDau))
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Default.CalendarToday, label = "Ngày Kết Thúc", value = formatNgay(namHoc.NgayKetThuc))
             val (color, statusText, statusIcon) = when (namHoc.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Đã Hoàn Thành", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFF1B8DDE), "Đang Hoàn Thành", Lucide.Clock) // đổi icon thành Clock
+                0 -> Triple(Color(0xFF1B8DDE), "Đang Thực Hiện", Lucide.Clock)
                 else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
             }
-
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(vertical = 8.dp)
             ) {
                 Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ", fontWeight = FontWeight.Medium)
+                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold)
                 Box(
                     modifier = Modifier
                         .size(10.dp)
@@ -91,16 +97,15 @@ fun CardNamHoc(
                 Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { showDialog = true },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
-            ) {
-                Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
-            }
+//            Button(
+//                modifier = Modifier.fillMaxWidth(),
+//                onClick = { showDialog = true },
+//                shape = RoundedCornerShape(12.dp),
+//                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
+//            ) {
+//                Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
+//            }
 
 //            if (showDialog) {
 //                AlertDialog(

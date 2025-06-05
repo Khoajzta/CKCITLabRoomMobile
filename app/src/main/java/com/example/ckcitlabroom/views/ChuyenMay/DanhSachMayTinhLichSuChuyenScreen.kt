@@ -62,8 +62,8 @@ fun ListMayTinhTrongDonNhapScreen(
             Text(
                 "Danh sách máy tính theo đơn",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
-                color = Color.White
+                fontSize = 20.sp,
+                color = Color(0xFF1B8DDE)
             )
         }
 

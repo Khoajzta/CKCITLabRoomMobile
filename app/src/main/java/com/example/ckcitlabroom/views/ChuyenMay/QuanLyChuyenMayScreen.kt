@@ -61,9 +61,9 @@ fun QuanLyChuyenMayScreen(
         ) {
             Text(
                 text = "Chuyển máy",
-                color = Color.White,
+                color = Color(0xFF1B8DDE),
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 25.sp
+                fontSize = 20.sp
             )
 
             IconButton(
@@ -75,7 +75,7 @@ fun QuanLyChuyenMayScreen(
                     modifier = Modifier.size(30.dp),
                     imageVector = Lucide.History,
                     contentDescription = null,
-                    tint = Color.White
+                    tint = Color(0xFF1B8DDE)
                 )
             }
         }

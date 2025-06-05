@@ -49,9 +49,9 @@ fun ChiTietLichSuChuyenMay(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Lịch sử chuyển phòng" , fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+            Text("Lịch sử chuyển phòng" , fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1B8DDE))
 
-            Text("Số lần: ${danhsachlichsu.count()}" , fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+            Text("Số lần: ${danhsachlichsu.count()}" , fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1B8DDE))
         }
 
 
@@ -63,7 +63,7 @@ fun ChiTietLichSuChuyenMay(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Chưa có lịch sử chuyển máy", color = Color.White, fontSize = 20.sp)
+                        Text("Chưa có lịch sử chuyển máy", color = Color.Black, fontSize = 20.sp)
                     }
                 }
             }

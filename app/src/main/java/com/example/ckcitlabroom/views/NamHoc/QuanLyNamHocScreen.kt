@@ -47,19 +47,19 @@ fun QuanLyNamHocScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 "Quản Lý Năm Học ",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
+                fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
             IconButton(
                 onClick = {
-
+                    navController.navigate(NavRoute.ADDNAMHOC.route)
                 }
             ) {
                 Icon(

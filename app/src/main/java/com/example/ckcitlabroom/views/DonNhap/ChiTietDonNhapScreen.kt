@@ -55,20 +55,21 @@ fun ChiTietDonNhapScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 16.dp),
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 "Danh sách máy tính theo đơn",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
-                color = Color.White
+                fontSize = 20.sp,
+                color = Color(0xFF1B8DDE)
             )
         }
 
