@@ -317,6 +317,8 @@ fun LoginSVScreen(
                             )
                             snackbarHostState.showSnackbar("Thông báo")
                         }
+
+                        Log.d("SV",sinhvien.toString())
                         sinhVienViewModel.resetLoginResult()
                     }
                 }

@@ -1,6 +1,7 @@
 package com.example.lapstore.viewmodels
 
 import MayTinh
+import MayTinhTrangThaiUpdateRequest
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -156,6 +157,26 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
+
+    fun updateTrangThaiMayTinh(request: MayTinhTrangThaiUpdateRequest) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.maytinhAPIService.updateTrangThaiMay(request)
+                }
+                maytinhUpdateResult = response.message
+            } catch (e: Exception) {
+                maytinhUpdateResult = "Lỗi khi cập nhật máy tính: ${e.message}"
+                Log.e("MayTinhViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+
+
 
     fun deleteMayTinh(mamay: String) {
         viewModelScope.launch {

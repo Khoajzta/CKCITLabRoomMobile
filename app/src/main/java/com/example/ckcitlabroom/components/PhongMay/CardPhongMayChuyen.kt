@@ -1,5 +1,6 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,15 +39,19 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 fun CardPhongMayChuyen(
     phongmay: PhongMay,
     navController: NavHostController,
-    phongMayViewModel: PhongMayViewModel,
     mayTinhViewModel: MayTinhViewModel
 ) {
-
-    var danhsachmaytinh = mayTinhViewModel.danhSachAllMayTinh
+    val danhsachmaytinh = mayTinhViewModel.danhSachAllMayTinh
     val soLuongMay = danhsachmaytinh?.count { it.MaPhong == phongmay.MaPhong } ?: 0
 
     LaunchedEffect(Unit) {
         mayTinhViewModel.getAllMayTinh()
+    }
+
+    val (color, statusText, statusIcon) = when (phongmay.TrangThai) {
+        1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
+        0 -> Triple(Color(0xFFF44336), "Bảo trì", Lucide.CircleX)
+        else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
     }
 
     Card(
@@ -54,56 +59,35 @@ fun CardPhongMayChuyen(
             .padding(bottom = 8.dp)
             .fillMaxWidth()
             .width(300.dp)
-            .clickable(
-            ) {
+            .clickable {
                 val route = if (phongmay.MaPhong.contains("KHO", ignoreCase = true)) {
                     NavRoute.PHONGKHOCHUYEN.route
                 } else {
                     NavRoute.PHONGMAYCHUYEN.route
                 }
                 navController.navigate("$route?maphong=${phongmay.MaPhong}")
-            }.shadow(7.dp, shape = RoundedCornerShape(12.dp)),
+            }
+            .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(10.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 2.dp)
-            ) {
-                Icon(
-                    imageVector = Lucide.Warehouse, // hoặc Icons.Default.RoomPreferences
-                    contentDescription = "Tên Phòng",
-                    tint = Color(0xFF3F51B5),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(text = "Phòng: ${phongmay.TenPhong}", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
-            }
+            InfoRow(
+                icon = Lucide.Warehouse,
+                label = "Phòng",
+                value = phongmay.TenPhong
+            )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 2.dp)
-            ) {
-                Icon(
-                    imageVector = Lucide.Hash, // hoặc Icons.Default.RoomPreferences
-                    contentDescription = "Tên Phòng",
-                    tint = Color(0xFF3F51B5),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(text = "Số lượng máy: ${soLuongMay}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
-
-            val (color, statusText, statusIcon) = when (phongmay.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFFF44336), "Bảo trì", Lucide.CircleX)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
+            InfoRow(
+                icon = Lucide.Hash,
+                label = "Số lượng máy",
+                value = soLuongMay.toString()
+            )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -112,19 +96,29 @@ fun CardPhongMayChuyen(
                     tint = color,
                     modifier = Modifier.size(20.dp)
                 )
-                Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ")
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "Trạng thái: ",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 16.sp
+                )
                 Box(
                     modifier = Modifier
                         .size(10.dp)
                         .clip(CircleShape)
                         .background(color)
                 )
-                Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = statusText,
+                    color = color,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
             }
         }
     }
 }
+
 
 

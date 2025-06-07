@@ -1,8 +1,4 @@
-import android.transition.Transition
-import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.*
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -15,11 +11,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
 import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.LichHocViewModel
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
-import com.google.ai.client.generativeai.common.server.Segment
 
 
 sealed class NavRoute(val route: String) {
@@ -74,14 +70,20 @@ sealed class NavRoute(val route: String) {
 
 
     object ADDPHIEUSUACHUA : NavRoute("addphieusuachua_screen")
-    object STARTSCREEN : NavRoute("start_screen")
+    object QUANLYPHIEUSUACHUA : NavRoute("quanlyphieusuachua_screen")
 
+
+    object STARTSCREEN : NavRoute("start_screen")
 
     //Năm học
     object QUANLYNAMHOC : NavRoute("quanlynamhoc_screen")
     object ADDNAMHOC : NavRoute("addnamhoc_screen")
     object EDITNAMHOC : NavRoute("editnamhoc_screen")
     object NAMHOCDETAIL : NavRoute("namhocdetail_screen")
+
+    //DiemDanh
+    object ADDDIEMDANH : NavRoute("adddiemdanh_screen")
+
 }
 
 @Composable
@@ -97,7 +99,9 @@ fun NavgationGraph(
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     sinhVienViewModel: SinhVienViewModel,
     namHocViewModel: NamHocViewModel,
-    tuanViewModel: TuanViewModel
+    tuanViewModel: TuanViewModel,
+    phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
+    chiTietSuDungMayViewModel: ChiTietSuDungMayViewModel
 ) {
 
     val context = LocalContext.current.applicationContext
@@ -670,7 +674,19 @@ fun NavgationGraph(
         }
 
         composable(
-            route = NavRoute.ADDPHIEUSUACHUA.route,
+            NavRoute.ADDPHIEUSUACHUA.route + "?mamay={mamay}",
+            arguments = listOf(
+                navArgument("mamay") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
+            CreatePhieuSuaChuaScreen(mamay,phieuSuaChuaViewModel,giangVienViewModel,sinhVienViewModel,navController)
+        }
+
+        composable(
+            route = NavRoute.QUANLYPHIEUSUACHUA.route,
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Start,
@@ -684,8 +700,9 @@ fun NavgationGraph(
                 )
             }
         ) {
-            CreatePhieuSuaChua()
+            QuanLyPhieuSuaChuaScreen(navController,phieuSuaChuaViewModel,mayTinhViewModel)
         }
+
         //Năm Học
         composable(
             route = NavRoute.QUANLYNAMHOC.route,
@@ -733,6 +750,20 @@ fun NavgationGraph(
         ) { navBackStackEntry ->
             val manam = navBackStackEntry.arguments?.getString("manam") ?: ""
             NamHocDetailScreen(manam,tuanViewModel)
+        }
+
+        //DiemDanh
+
+        composable(
+            NavRoute.ADDDIEMDANH.route + "?mamay={mamay}",
+            arguments = listOf(
+                navArgument("mamay") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
+            DiemDanhScreen(mamay,namHocViewModel,tuanViewModel,chiTietSuDungMayViewModel)
         }
 
     }

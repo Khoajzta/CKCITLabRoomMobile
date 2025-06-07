@@ -38,6 +38,7 @@ fun QuanLyScreen(
                 ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {  }),
                 ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLOPHOC.route) }),
                 ChucNang("Quản Lý Năm Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYNAMHOC.route) }),
+                ChucNang("Quản Lý Phiếu Sửa Chữa", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYPHIEUSUACHUA.route) }),
 //                ChucNang("Quản Lý Tuần Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLTUANHOC.route) })
             )
         }

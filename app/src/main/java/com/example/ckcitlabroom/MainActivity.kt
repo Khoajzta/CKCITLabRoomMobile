@@ -8,6 +8,7 @@ import LoginSinhVienState
 import NamHocViewModel
 import NavRoute
 import NavgationGraph
+import PhieuSuaChuaViewModel
 import PhongMayViewModel
 import SinhVienViewModel
 import SinhVienPreferences
@@ -72,6 +73,7 @@ import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
 import com.example.lapstore.viewmodels.DonNhapViewModel
 
 import com.example.lapstore.viewmodels.LichHocViewModel
@@ -109,6 +111,8 @@ fun MainScreen() {
     val lopHocViewModel: LopHocViewModel = viewModel()
     val namHocViewModel: NamHocViewModel = viewModel()
     val tuanViewModel: TuanViewModel = viewModel()
+    val phieuSuaChuaViewModel: PhieuSuaChuaViewModel = viewModel()
+    val chiTietSuDungMayViewModel: ChiTietSuDungMayViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -260,7 +264,9 @@ fun MainScreen() {
                     chitietdonNhapyViewModel,
                     sinhVienViewModel,
                     namHocViewModel,
-                    tuanViewModel
+                    tuanViewModel,
+                    phieuSuaChuaViewModel,
+                    chiTietSuDungMayViewModel
                 )
             }
         }

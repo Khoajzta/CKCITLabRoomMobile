@@ -230,4 +230,14 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
             TrangThai = 0
         )
     }
+
+    suspend fun getGiangVienByMaGOrEmailSync(key: String): GiangVien? {
+        return try {
+            ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByEmailOrMaGV(key)
+        } catch (e: Exception) {
+            Log.e("GiangVienViewModel", "Lỗi khi lấy giảng viên (sync): ${e.localizedMessage}", e)
+            null
+        }
+    }
+
 }

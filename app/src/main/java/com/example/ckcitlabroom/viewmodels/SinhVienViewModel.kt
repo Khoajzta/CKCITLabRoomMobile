@@ -89,7 +89,6 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-
     fun logout() {
         viewModelScope.launch {
             sinhvienPreferences.logout()
@@ -97,7 +96,6 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
             _loginResult.value = null
         }
     }
-
 
     fun getAllSinhVien() {
         if (pollingJob != null) return
@@ -182,5 +180,6 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
         }
     }
 }
+
 
 

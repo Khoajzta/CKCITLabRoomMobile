@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
 import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
@@ -65,7 +66,6 @@ fun MayTinhDetailScreen(
 
 
     val giangVien = giangVienViewModel.giangvienSet
-
     val maytinh = mayTinhViewModel.maytinh
     val danhSachChiTietDonNhap = chiTietDonNhapyViewModel.danhSachAllChiTietDonNhap
     val danhSachDonNhap = donNhapViewModel.danhSachDonNhap
@@ -607,7 +607,7 @@ fun MayTinhDetailScreen(
                     Button(
                         modifier = Modifier.width(170.dp),
                         onClick = {
-
+                            navController.navigate(NavRoute.ADDDIEMDANH.route + "?mamay=${maytinh.MaMay}")
                         },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
@@ -620,7 +620,7 @@ fun MayTinhDetailScreen(
                 Button(
                     modifier = Modifier.width(170.dp),
                     onClick = {
-                        navController.navigate(NavRoute.ADDPHIEUSUACHUA.route)
+                        navController.navigate(NavRoute.ADDPHIEUSUACHUA.route + "?mamay=${maytinh.MaMay}")
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFFF44336))

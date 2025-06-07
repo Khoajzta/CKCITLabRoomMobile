@@ -7,7 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -21,69 +22,49 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.composables.icons.lucide.History
-import com.composables.icons.lucide.Lucide
-import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuanLyChuyenMayScreen(
+fun QuanLyPhieuSuaChuaScreen(
     navController: NavHostController,
-    mayTinhViewModel: MayTinhViewModel,
-    phongMayViewModel: PhongMayViewModel,
-    donNhapViewModel: DonNhapViewModel
-) {
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
-
-
+    phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
+    mayTinhViewModel: MayTinhViewModel
+){
+    var danhsachAllPhieuSuaChua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChua
 
     LaunchedEffect(Unit) {
-        phongMayViewModel.getAllPhongMay()
-        mayTinhViewModel.getAllMayTinh()
+        phieuSuaChuaViewModel.getAllPhieuSuaChua()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            mayTinhViewModel.stopPollingAllMayTinh()
+            phieuSuaChuaViewModel.stopPollingPhieuSuaChua()
         }
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Chuyển máy",
-                color = Color(0xFF1B8DDE),
+                "Quản Lý Phiếu Sửa Chữa ",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                color = Color(0xFF1B8DDE)
             )
-
-            IconButton(
-                onClick = {
-                    navController.navigate(NavRoute.LICHSUCHUYENMAY.route)
-                }
-            ) {
-                Icon(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = Lucide.History,
-                    contentDescription = null,
-                    tint = Color(0xFF1B8DDE)
-                )
-            }
         }
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (danhSachPhongMay.isNullOrEmpty()) {
+            if (danhsachAllPhieuSuaChua == null || danhsachAllPhieuSuaChua.isEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -91,19 +72,19 @@ fun QuanLyChuyenMayScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Chưa có phòng máy",
+                            "Chưa có phiếu sửa chữa nào",
                             color = Color.White,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
+
                 }
             } else {
-                items(danhSachPhongMay) { phongmay ->
-                    CardPhongMayChuyen(phongmay, navController, mayTinhViewModel)
+                items(danhsachAllPhieuSuaChua) { phieusuachua ->
+                    CardPhieuSuaChua(phieusuachua, navController, phieuSuaChuaViewModel,mayTinhViewModel)
                 }
             }
         }
-
 
     }
 }

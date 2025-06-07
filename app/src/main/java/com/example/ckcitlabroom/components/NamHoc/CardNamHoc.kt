@@ -1,7 +1,5 @@
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,15 +13,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,13 +32,9 @@ import androidx.navigation.NavHostController
 import com.composables.icons.lucide.BookOpen
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
-import com.composables.icons.lucide.CircleX
 import com.composables.icons.lucide.Clock
-import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Tag
-import com.composables.icons.lucide.Warehouse
-import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
 fun CardNamHoc(
@@ -76,7 +65,7 @@ fun CardNamHoc(
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Icons.Default.CalendarToday, label = "Ngày Kết Thúc", value = formatNgay(namHoc.NgayKetThuc))
             val (color, statusText, statusIcon) = when (namHoc.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Đã Hoàn Thành", Lucide.CircleCheck)
+                1 -> Triple(Color(0xFF4CAF50), "Đã Kết Thúc", Lucide.CircleCheck)
                 0 -> Triple(Color(0xFF1B8DDE), "Đang Thực Hiện", Lucide.Clock)
                 else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
             }

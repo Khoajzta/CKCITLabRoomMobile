@@ -1,3 +1,4 @@
+import androidx.camera.core.ImageProcessor.Response
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -12,6 +13,10 @@ data class MayTinhResponse(
     val maytinh: List<MayTinh>? = null
 )
 
+data class MayTinhTrangThaiUpdateRequest(
+    val MaMay: String,
+    val TrangThai: Int
+)
 
 
 interface MayTinhAPIService {
@@ -38,6 +43,12 @@ interface MayTinhAPIService {
     suspend fun updateMayTinh(
         @Body maytiinh: MayTinh
     ): UpdateResponse
+
+    @PUT("maytinh/updateTrangThai.php")
+    suspend fun updateTrangThaiMay(
+        @Body may: MayTinhTrangThaiUpdateRequest
+    ): UpdateResponse
+
 
     @HTTP(method = "DELETE", path = "MayTinh/delete.php", hasBody = true)
     suspend fun deleteMayTinh(

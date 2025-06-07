@@ -16,13 +16,13 @@ class PhieuSuaChuaViewModel : ViewModel() {
 
     var mt = MayTinh("","",""",""","","","","","","","","","","","",1)
 
-    var danhSachAllMayTinh by mutableStateOf<List<MayTinh>>(emptyList())
+    var danhSachAllPhieuSuaChua by mutableStateOf<List<PhieuSuaChuaRp>>(emptyList())
         private set
 
     var danhSachAllMayTinhtheophong by mutableStateOf<List<MayTinh>>(emptyList())
         private set
 
-    private var pollingAllMayTinhJob: Job? = null
+    private var pollingAllPhieuSuaChuaJob: Job? = null
     private var pollingMayTinhTheoPhongJob: Job? = null
 
     var phieusuachuaCreateResult by mutableStateOf("")
@@ -38,25 +38,25 @@ class PhieuSuaChuaViewModel : ViewModel() {
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
-    fun getAllMayTinh() {
-        if (pollingAllMayTinhJob != null) return
+    fun getAllPhieuSuaChua() {
+        if (pollingAllPhieuSuaChuaJob != null) return
 
-        pollingAllMayTinhJob = viewModelScope.launch(Dispatchers.IO) {
+        pollingAllPhieuSuaChuaJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
-                    val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
-                    danhSachAllMayTinh = response.maytinh ?: emptyList()
+                    val response = ITLabRoomRetrofitClient.phieusuachuaAPIService.getAllPhieuSuaChua()
+                    danhSachAllPhieuSuaChua = response.phieusuachua ?: emptyList()
                 } catch (e: Exception) {
-                    Log.e("PhongMayViewModel", "Polling all máy lỗi", e)
+                    Log.e("PhieuSuaChuaViewModel", "Polling all máy lỗi", e)
                 }
                 delay(500)
             }
         }
     }
 
-    fun stopPollingAllMayTinh() {
-        pollingAllMayTinhJob?.cancel()
-        pollingAllMayTinhJob = null
+    fun stopPollingPhieuSuaChua() {
+        pollingAllPhieuSuaChuaJob?.cancel()
+        pollingAllPhieuSuaChuaJob = null
     }
 
     fun getMayTinhByMaMay(mamay: String) {
@@ -111,46 +111,21 @@ class PhieuSuaChuaViewModel : ViewModel() {
         }
     }
 
-    fun updateMayTinh(maytinh: MayTinh) {
+    fun updatePhieuSuaChua(phieuSuaChua: PhieuSuaChua) {
         viewModelScope.launch {
             isLoading = true
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.maytinhAPIService.updateMayTinh(maytinh)
+                    ITLabRoomRetrofitClient.phieusuachuaAPIService.updatePhieuSuaChua(phieuSuaChua)
                 }
                 maytinhUpdateResult = response.message
             } catch (e: Exception) {
-                maytinhUpdateResult = "Lỗi khi cập nhật máy tính: ${e.message}"
-                Log.e("MayTinhViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
+                maytinhUpdateResult = "Lỗi khi cập nhật phieu sua chua: ${e.message}"
+                Log.e("PhieuSuaChuaViewModel", "Lỗi khi cập nhật phieu sua chua: ${e.message}")
             } finally {
                 isLoading = false
             }
         }
     }
 
-    fun deleteMayTinh(mamay: String) {
-        viewModelScope.launch {
-            isLoading = true
-            try {
-                val body = mapOf("MaMay" to mamay)
-                val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.maytinhAPIService.deleteMayTinh(body)
-                }
-                maytinhDeleteResult = response.message
-
-                if (response.message == "MayTinh deleted") {
-                    // Cập nhật lại danh sách máy tính sau khi xóa thành công
-                    val allResponse = withContext(Dispatchers.IO) {
-                        ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
-                    }
-                    danhSachAllMayTinh = allResponse.maytinh ?: emptyList()
-                }
-            } catch (e: Exception) {
-                maytinhDeleteResult = "Lỗi khi xóa máy tính: ${e.localizedMessage ?: e.message}"
-                Log.e("MayTinhViewModel", "Lỗi khi xóa máy tính", e)
-            } finally {
-                isLoading = false
-            }
-        }
-    }
 }
