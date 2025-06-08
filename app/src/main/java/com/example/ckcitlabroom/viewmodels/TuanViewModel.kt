@@ -2,7 +2,7 @@ import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lapstore.api.ITLabRoomRetrofitClient
+import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.*
 
 class TuanViewModel : ViewModel() {
