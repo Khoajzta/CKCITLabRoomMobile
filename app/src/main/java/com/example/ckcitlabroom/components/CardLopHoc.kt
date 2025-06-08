@@ -1,5 +1,6 @@
 package com.example.ckcitlabroom.components
 
+import InfoRow
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -11,6 +12,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,12 +24,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +51,7 @@ import com.composables.icons.lucide.CircleX
 import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.School
+import com.composables.icons.lucide.Warehouse
 import com.example.ckcitlabroom.models.LopHoc
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 
@@ -59,12 +64,8 @@ fun CardLopHoc(
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
 
-    // Chọn màu trạng thái dựa trên giangVien.TrangThai (1: hoạt động, 0: không hoạt động)
-    val (color, statusText) = when (lopHoc.TrangThai) {
-        1 -> Color(0xFF4CAF50) to "Hoạt động"
-        0 -> Color(0xFFF44336) to "Không hoạt động"
-        else -> Color.Gray to "Không xác định"
-    }
+    var showDialog by remember { mutableStateOf(false) }
+
 
     Card(
         modifier = Modifier
@@ -81,43 +82,23 @@ fun CardLopHoc(
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Lucide.Hash,
-                    contentDescription = "Mã Lớp",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Mã Lớp: ${lopHoc.MaLopHoc}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Lucide.School,
-                    contentDescription = "Tên Lớp",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Lớp: ${lopHoc.TenLopHoc}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            }
+        Column(modifier = Modifier.padding(16.dp)) {
+            InfoRow(icon = Lucide.Hash, label = "Mã lớp", value = lopHoc.MaLopHoc)
+            InfoRow(icon = Lucide.School, label = "Lớp", value = lopHoc.TenLopHoc)
 
             val (color, statusText, statusIcon) = when (lopHoc.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
                 0 -> Triple(Color(0xFFF44336), "Không hoạt động", Lucide.CircleX)
                 else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = statusIcon,
-                    contentDescription = "Trạng thái",
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ")
+                Text("Trạng thái: ", fontWeight = FontWeight.Medium)
                 Box(
                     modifier = Modifier
                         .size(10.dp)
@@ -125,10 +106,11 @@ fun CardLopHoc(
                         .background(color)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color)
+                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
 
             AnimatedVisibility(
                 visible = expanded,
@@ -147,7 +129,7 @@ fun CardLopHoc(
 
                     Button(
                         onClick = {
-//                            navController.navigate(NavRoute.EDITGIANGVIEN.route + "?magv=${giangVien.MaGV}")
+                            navController.navigate(NavRoute.EDITLOPHOC.route + "?malop=${lopHoc.MaLopHoc}")
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
@@ -158,12 +140,86 @@ fun CardLopHoc(
 
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { showConfirmDialog = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                        shape = RoundedCornerShape(12.dp)
+                        onClick = { showDialog = true },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
                     ) {
-                        Text("Cập Nhật Trạng Thái", fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
                     }
+                    if (showDialog) {
+                        AlertDialog(
+                            containerColor = Color.White,
+                            onDismissRequest = { showDialog = false },
+                            title = {
+                                Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
+                            },
+                            text = {
+                                Text("Lớp: ${lopHoc.TenLopHoc}", color = Color.Black)
+                            },
+                            confirmButton = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Button(
+                                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                                        onClick = {
+                                            lopHocViewModel.updateTrangThaiLopHoc(
+                                                LopHoc(lopHoc.MaLopHoc, lopHoc.TenLopHoc, 1)
+                                            )
+                                            showDialog = false
+                                        },
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                                    ) {
+                                        Text("Hoạt Động", color = Color.White)
+                                    }
+
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            lopHocViewModel.updateTrangThaiLopHoc(
+                                                LopHoc(lopHoc.MaLopHoc, lopHoc.TenLopHoc, 0)
+                                            )
+                                            showDialog = false
+                                        },
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
+                                    ) {
+                                        Text("Không Hoạt Động", color = Color.White)
+                                    }
+                                }
+                            }
+                        )
+                    }
+
+                    if (showConfirmDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showConfirmDialog = false },
+                            title = { Text("Xác nhận") },
+                            text = { Text("Bạn có chắc chắn muốn xóa lớp này không?", fontWeight = FontWeight.Bold) },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        lopHocViewModel.deleteLopHoc(lopHoc.MaLopHoc)
+                                        showConfirmDialog = false
+                                    }
+                                ) {
+                                    Text("Xóa", color = Color.Red)
+                                }
+                            },
+                            dismissButton = {
+                                Button(
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                                    onClick = { showConfirmDialog = false }
+                                ) {
+                                    Text("Hủy")
+                                }
+                            },
+                            containerColor = Color.White
+                        )
+                    }
+
                 }
             }
         }

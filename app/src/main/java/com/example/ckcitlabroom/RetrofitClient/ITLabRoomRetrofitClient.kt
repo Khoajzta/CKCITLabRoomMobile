@@ -23,7 +23,7 @@ object Constants {
 
     const val BASE_URL = "http://10.0.2.2/ITLabRoomAPI/api/"
 
-    const val BASE_URL = "http://192.168.1.243/ITLabRoomAPI/api/"
+//    const val BASE_URL = "http://192.168.1.243/ITLabRoomAPI/api/"
 
 }
 

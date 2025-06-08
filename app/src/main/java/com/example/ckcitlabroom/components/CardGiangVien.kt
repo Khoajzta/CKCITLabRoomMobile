@@ -11,6 +11,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,6 +57,7 @@ import com.composables.icons.lucide.Mail
 import com.composables.icons.lucide.PersonStanding
 import com.composables.icons.lucide.User
 import com.composables.icons.lucide.Users
+import com.example.ckcitlabroom.models.LopHoc
 
 @Composable
 fun CardGiangVien(
@@ -65,6 +67,7 @@ fun CardGiangVien(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     // Chọn màu trạng thái dựa trên giangVien.TrangThai (1: hoạt động, 0: không hoạt động)
     val (color, statusText) = when (giangVien.TrangThai) {
@@ -151,7 +154,62 @@ fun CardGiangVien(
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-                    // Nếu bạn muốn show thêm thông tin khác, có thể thêm ở đây
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { showDialog = true },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
+                    ) {
+                        Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                    if (showDialog) {
+                        AlertDialog(
+                            containerColor = Color.White,
+                            onDismissRequest = { showDialog = false },
+                            title = {
+                                Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
+                            },
+                            text = {
+                                Text("Giảng viên: ${giangVien.TenGiangVien}", color = Color.Black)
+                            },
+                            confirmButton = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Button(
+                                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                                        onClick = {
+                                            giangVienViewModel.updateTrangThaiGiangVien(
+                                                GiangVien(giangVien.MaGV, giangVien.TenGiangVien, giangVien.NgaySinh, giangVien.GioiTinh,
+                                                    giangVien.Email, giangVien.MatKhau, giangVien.MaLoaiTaiKhoan, 1)
+                                            )
+                                            showDialog = false
+                                        },
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                                    ) {
+                                        Text("Hoạt Động", color = Color.White)
+                                    }
+
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            giangVienViewModel.updateTrangThaiGiangVien(
+                                                GiangVien(giangVien.MaGV, giangVien.TenGiangVien, giangVien.NgaySinh, giangVien.GioiTinh,
+                                                    giangVien.Email, giangVien.MatKhau, giangVien.MaLoaiTaiKhoan, 0)
+                                            )
+                                            showDialog = false
+                                        },
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
+                                    ) {
+                                        Text("Không Hoạt Động", color = Color.White)
+                                    }
+                                }
+                            }
+                        )
+                    }
 
                     Button(
                         onClick = {

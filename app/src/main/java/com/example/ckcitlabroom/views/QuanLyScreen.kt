@@ -36,14 +36,6 @@ fun QuanLyScreen(
                 ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = { navController.navigate(NavRoute.QUANLYGIANGVIEN.route) }),
 
 
-                ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = {}),
-                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {}),
-                ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = {navController.navigate(NavRoute.QUANLYLOPHOC.route)}),
-
-                ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = {navController.navigate(NavRoute.QUANLYSINHVIEN.route)}),
-                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {})
-
-
                 ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = { navController.navigate(NavRoute.QUANLYSINHVIEN.route) }),
                 ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {  }),
                 ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLOPHOC.route) })

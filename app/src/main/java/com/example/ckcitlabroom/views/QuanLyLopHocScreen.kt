@@ -60,7 +60,7 @@ fun QuanLyLopHoc(
             )
             IconButton(
                 onClick = {
-                    navController.navigate(NavRoute.ADDGIANGVIEN.route)
+                    navController.navigate(NavRoute.ADDLOPHOC.route)
                 }
             ) {
                 Icon(

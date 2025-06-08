@@ -1,3 +1,4 @@
+import com.example.ckcitlabroom.models.LopHoc
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.HTTP
@@ -54,6 +55,11 @@ interface GiangVienAPIService {
 
     @PUT("GiangVien/update.php")
     suspend fun updateGiangVien(
+        @Body giangVien: GiangVien
+    ): UpdateResponse
+
+    @PUT("GiangVien/update.php")
+    suspend fun updateTrangThaiGiangVien(
         @Body giangVien: GiangVien
     ): UpdateResponse
 

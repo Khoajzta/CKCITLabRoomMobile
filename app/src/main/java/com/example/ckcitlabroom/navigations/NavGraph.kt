@@ -361,6 +361,18 @@ fun NavgationGraph(
 
         composable(
             route = NavRoute.QUANLYGIANGVIEN.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
         ) {
             QuanLyGiangVien(navController, giangVienViewModel)
         }
@@ -397,6 +409,18 @@ fun NavgationGraph(
 
         composable(
             route = NavRoute.QUANLYSINHVIEN.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
         ) {
             QuanLySinhVien(navController, sinhVienViewModel)
         }
@@ -438,9 +462,52 @@ fun NavgationGraph(
 
         composable(
             route = NavRoute.QUANLYLOPHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
         ) {
             QuanLyLopHoc(navController, lopHocViewModel)
         }
+
+        composable(
+            route = NavRoute.ADDLOPHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            CreateLopHocScreen(navController,lopHocViewModel)
+        }
+
+        composable(
+            NavRoute.EDITLOPHOC.route + "?malop={malop}",
+            arguments = listOf(
+                navArgument("malop") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val malop = navBackStackEntry.arguments?.getString("malop") ?: ""
+            EditLopHocScreen(lopHocViewModel,malop)
+        }
+
 
         composable(
             route = NavRoute.QUANLYPHONGMAY.route,

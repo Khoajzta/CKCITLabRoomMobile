@@ -35,7 +35,6 @@ fun EditGiangVienScreen(
     val ngaySinhState = remember { mutableStateOf("") }
     val gioiTinhState = remember { mutableStateOf("") }
     val emailState = remember { mutableStateOf("") }
-    val trangThaiState = remember { mutableStateOf(0) } // Mặc định hoạt động
 
     var gioiTinhExpanded by remember { mutableStateOf(false) }
     val gioiTinhOptions = listOf("Nam", "Nữ", "Khác")
@@ -59,7 +58,6 @@ fun EditGiangVienScreen(
             ngaySinhState.value = it.NgaySinh
             gioiTinhState.value = it.GioiTinh
             emailState.value = it.Email
-            trangThaiState.value = it.TrangThai
         }
     }
 
@@ -266,31 +264,6 @@ fun EditGiangVienScreen(
                         )
                     }
 
-                    item {
-                        Text(
-                            text = "Trạng Thái",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = trangThaiState.value == 1,
-                                    onClick = { trangThaiState.value = 1 }
-                                )
-                                Text("Hoạt động")
-                            }
-                            Spacer(modifier = Modifier.width(24.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = trangThaiState.value == 0,
-                                    onClick = { trangThaiState.value = 0 }
-                                )
-                                Text("Ngưng hoạt động")
-                            }
-                        }
-                    }
                 } else {
                     item {
                         Text("Lỗi khi lấy API")
@@ -348,7 +321,7 @@ fun EditGiangVienScreen(
                             Email = emailState.value,
                             MatKhau = giangVien?.MatKhau ?: "", // lấy mật khẩu cũ
                             MaLoaiTaiKhoan = giangVien?.MaLoaiTaiKhoan ?: 2, // lấy mã loại TK cũ
-                            TrangThai = trangThaiState.value
+                            TrangThai = giangVien?.TrangThai ?: 1
                         )
                         giangVienViewModel.updateGiangVien(giangVienMoi)
                         coroutineScope.launch {
