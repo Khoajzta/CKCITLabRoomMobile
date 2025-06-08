@@ -3,6 +3,7 @@ package com.example.ckcitlabroom
 import AnimatedNavigationBar
 import ButtonData
 import GiangVienViewModel
+import LichSuSuaMayViewModel
 import LoginSVScreen
 import LoginSinhVienState
 import NamHocViewModel
@@ -113,6 +114,7 @@ fun MainScreen() {
     val tuanViewModel: TuanViewModel = viewModel()
     val phieuSuaChuaViewModel: PhieuSuaChuaViewModel = viewModel()
     val chiTietSuDungMayViewModel: ChiTietSuDungMayViewModel = viewModel()
+    val lichSuSuaMayViewModel: LichSuSuaMayViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -266,7 +268,8 @@ fun MainScreen() {
                     namHocViewModel,
                     tuanViewModel,
                     phieuSuaChuaViewModel,
-                    chiTietSuDungMayViewModel
+                    chiTietSuDungMayViewModel,
+                    lichSuSuaMayViewModel
                 )
             }
         }

@@ -118,7 +118,7 @@ fun PhongMayDetailScreen(
                 modifier = Modifier.width(180.dp),
                 onClick = { showDialog = true },
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
             ) {
                 Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
             }

@@ -4,10 +4,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -21,54 +20,49 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+import com.composables.icons.lucide.History
+import com.composables.icons.lucide.Lucide
 import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun LichSuChuyenMayScreen(
+fun ListPhongMayChuyenScreen(
     navController: NavHostController,
-    donNhapyViewModel: DonNhapViewModel,
-    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
-    mayTinhViewModel: MayTinhViewModel
+    mayTinhViewModel: MayTinhViewModel,
+    phongMayViewModel: PhongMayViewModel,
 ){
-    var danhsachdonnhap = donNhapyViewModel.danhSachDonNhap
+    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
+
+
 
     LaunchedEffect(Unit) {
-        donNhapyViewModel.getAllDonNhap()
+        phongMayViewModel.getAllPhongMay()
+        mayTinhViewModel.getAllMayTinh()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            donNhapyViewModel.stopPollingAllDonNhap()
+            mayTinhViewModel.stopPollingAllMayTinh()
         }
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Danh Sách Đơn Nhập",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-        }
+        Text(
+            modifier = Modifier.padding(bottom = 16.dp),
+            text = "Danh Sách Phòng Máy",
+            color = Color(0xFF1B8DDE),
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 20.sp
+        )
 
-        // Danh sách đơn nhập
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-
-            if(danhsachdonnhap.isNullOrEmpty()){
+            if (danhSachPhongMay.isNullOrEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -76,16 +70,15 @@ fun LichSuChuyenMayScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Chưa có đơn nhập nào",
+                            "Chưa có phòng máy",
                             color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp
+                            modifier = Modifier.padding(16.dp)
                         )
                     }
                 }
-            }else{
-                items(danhsachdonnhap) { donnhap ->
-                    CardDonNhapLichSuChuyen(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController)
+            } else {
+                items(danhSachPhongMay) { phongmay ->
+                    CardPhongMayChuyen(phongmay, navController, mayTinhViewModel)
                 }
             }
         }

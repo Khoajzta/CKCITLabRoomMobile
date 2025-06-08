@@ -44,7 +44,7 @@ interface MayTinhAPIService {
         @Body maytiinh: MayTinh
     ): UpdateResponse
 
-    @PUT("maytinh/updateTrangThai.php")
+    @PUT("MayTinh/updateTrangThai.php")
     suspend fun updateTrangThaiMay(
         @Body may: MayTinhTrangThaiUpdateRequest
     ): UpdateResponse

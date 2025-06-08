@@ -66,6 +66,7 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
                 val response = ITLabRoomRetrofitClient.sinhvienAPIService.CheckLogin(request)
                 _loginResult.value = response
             } catch (e: Exception) {
+                Log.e("LoginError", "Exception khi gọi API", e)
                 _loginResult.value = LoginResponse(
                     result = false, message = "Lỗi kết nối: ${e.message}"
                 )

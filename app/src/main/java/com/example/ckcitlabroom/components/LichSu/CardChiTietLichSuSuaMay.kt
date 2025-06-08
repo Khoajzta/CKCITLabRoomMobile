@@ -53,13 +53,24 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun CardPhieuSuaChua(
+fun CardChiTietLichSuSuaMay(
     phieuSuaChuarp: PhieuSuaChuaRp,
-    phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
     lichSuSuaMayViewModel: LichSuSuaMayViewModel,
-    mayTinhViewModel: MayTinhViewModel
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    val lichSuSuaMay = lichSuSuaMayViewModel.lichSuSuaMayMap[phieuSuaChuarp.MaPhieuSuaChua.toString()]
+
+    LaunchedEffect(phieuSuaChuarp.MaPhieuSuaChua) {
+        lichSuSuaMayViewModel.getLichSuTheoMaPhieu(phieuSuaChuarp.MaPhieuSuaChua.toString())
+    }
+
+    val ngaysuaxong = remember(lichSuSuaMay) {
+        if (lichSuSuaMay == null || lichSuSuaMay.NgaySuaXong.isNullOrBlank()) {
+            "Chưa sửa xong"
+        } else {
+            formatNgay(lichSuSuaMay.NgaySuaXong)
+        }
+    }
+
 
     val nguoiBaoHongLabel = when (phieuSuaChuarp.MaLoaiTaiKhoan) {
         1 -> "MaGV"     // Admin
@@ -107,7 +118,9 @@ fun CardPhieuSuaChua(
             Spacer(modifier = Modifier.height(8.dp))
 
             InfoRow(icon = Lucide.BadgeInfo, label = nguoiBaoHongLabel, value = phieuSuaChuarp.MaNguoiBaoHong)
+            Spacer(modifier = Modifier.height(8.dp))
 
+            InfoRow(icon = Lucide.CalendarDays, label = "Ngày Sửa Xong", value = ngaysuaxong)
 
             val (color, statusText, statusIcon) = when (phieuSuaChuarp.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Đã Sửa Chữa", Lucide.CircleCheck)
@@ -136,75 +149,7 @@ fun CardPhieuSuaChua(
                 Spacer(Modifier.width(4.dp))
                 Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
-
-            if(phieuSuaChuarp.TrangThai == 0){
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { showDialog = true },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff0b9adc))
-                ) {
-                    Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
-                }
-            }
-
-            if (showDialog) {
-                AlertDialog(
-                    containerColor = Color.White,
-                    onDismissRequest = { showDialog = false },
-                    title = {
-                        Row (
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ){
-                            Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
-                        }
-                    },
-                    confirmButton = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Button(
-                                modifier = Modifier.weight(1f).padding(end = 8.dp),
-                                onClick = {
-
-                                    var phieuSuaChua = PhieuSuaChua(
-                                        MaPhieuSuaChua = phieuSuaChuarp.MaPhieuSuaChua,
-                                        MaMay = phieuSuaChuarp.MaMay,
-                                        NgayBaoHong = phieuSuaChuarp.NgayBaoHong,
-                                        MoTaLoi = phieuSuaChuarp.MoTaLoi,
-                                        MaPhong = phieuSuaChuarp.MaPhong,
-                                        MaNguoiBaoHong = phieuSuaChuarp.MaNguoiBaoHong,
-                                        TrangThai = 1
-                                    )
-                                    phieuSuaChuaViewModel.updatePhieuSuaChua(phieuSuaChua)
-
-                                    val today = LocalDate.now()
-                                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                                    val formattedDate = today.format(formatter)
-
-                                    var lichsusuamay = LichSuSuaMay(
-                                        phieuSuaChuarp.MaPhieuSuaChua,
-                                        today.toString(),
-                                        phieuSuaChuarp.MaMay,
-                                    )
-                                    lichSuSuaMayViewModel.createLichSuSuaMay(lichsusuamay)
-
-                                    var MayTinhTrangThaiUpdateRequest = MayTinhTrangThaiUpdateRequest(phieuSuaChuarp.MaMay,1)
-                                    mayTinhViewModel.updateTrangThaiMayTinh(MayTinhTrangThaiUpdateRequest)
-
-                                    showDialog = false
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                            ) {
-                                Text("Đã Sửa Chữa", color = Color.White)
-                            }
-                        }
-                    }
-                )
-            }
         }
     }
 }
+

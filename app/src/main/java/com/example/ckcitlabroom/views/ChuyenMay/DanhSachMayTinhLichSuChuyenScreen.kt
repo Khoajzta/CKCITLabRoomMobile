@@ -86,7 +86,7 @@ fun ListMayTinhTrongDonNhapScreen(
                 }
             } else {
                 items(danhSachMayTheoDon) { maytinh ->
-                    CardMayTinhLichSuChuyen(maytinh, navController, phongMayViewModel)
+                    CardMayTinhLichSu(maytinh, phongMayViewModel, click = {navController.navigate(NavRoute.CHITIETLICHSUCHUYENMAY.route + "?mamay=${maytinh.MaMay}")})
                 }
             }
         }

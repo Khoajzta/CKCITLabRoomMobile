@@ -21,6 +21,6 @@ interface ChiTietDonNhapAPIService {
         @Query("MaDonNhap") MaDonNhap: String
     ): ChiTietDonNhapResponse
 
-    @GET("ChiTietdonnhap/read.php")
+    @GET("ChiTietDonNhap/read.php")
     suspend fun getAllChiTietDonNhap(): ChiTietDonNhapResponse
 }

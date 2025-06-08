@@ -14,23 +14,17 @@ import kotlinx.coroutines.withContext
 
 class PhieuSuaChuaViewModel : ViewModel() {
 
-    var mt = MayTinh("","",""",""","","","","","","","","","","","",1)
-
     var danhSachAllPhieuSuaChua by mutableStateOf<List<PhieuSuaChuaRp>>(emptyList())
         private set
 
-    var danhSachAllMayTinhtheophong by mutableStateOf<List<MayTinh>>(emptyList())
+    var danhSachAllPhieuSuaChuaTheoMa by mutableStateOf<List<PhieuSuaChuaRp>>(emptyList())
         private set
 
     private var pollingAllPhieuSuaChuaJob: Job? = null
-    private var pollingMayTinhTheoPhongJob: Job? = null
 
     var phieusuachuaCreateResult by mutableStateOf("")
-    var maytinhUpdateResult by mutableStateOf("")
-    var maytinhDeleteResult by mutableStateOf("")
+    var phieuSuaChuaUpdateResult by mutableStateOf("")
 
-    var maytinh: MayTinh by mutableStateOf(mt)
-        private set
 
     var isLoading by mutableStateOf(false)
         private set
@@ -59,40 +53,26 @@ class PhieuSuaChuaViewModel : ViewModel() {
         pollingAllPhieuSuaChuaJob = null
     }
 
-    fun getMayTinhByMaMay(mamay: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun getPhieuSuaChuaTheoMaMay(maMay: String) {
+        viewModelScope.launch {
             isLoading = true
             try {
-                maytinh = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaMay(mamay)
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.phieusuachuaAPIService.getPhieuSuaChuaByMaMay(maMay)
+                }
+                danhSachAllPhieuSuaChuaTheoMa = response.phieusuachua ?: emptyList()
+                errorMessage = null
             } catch (e: Exception) {
-                errorMessage = e.message
-                Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
+                danhSachAllPhieuSuaChuaTheoMa = emptyList()
+                errorMessage = "Lỗi khi lấy phiếu sửa chữa theo mã máy: ${e.message}"
+                Log.e("PhieuSuaChuaViewModel", "Lỗi khi lấy phiếu sửa chữa theo mã máy", e)
             } finally {
                 isLoading = false
             }
         }
     }
 
-    fun getMayTinhByPhong(maphong: String) {
-        if (pollingMayTinhTheoPhongJob != null) return
 
-        pollingMayTinhTheoPhongJob = viewModelScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                try {
-                    val response = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaPhong(maphong)
-                    danhSachAllMayTinhtheophong = response.maytinh ?: emptyList()
-                } catch (e: Exception) {
-                    Log.e("PhongMayViewModel", "Polling theo phòng lỗi", e)
-                }
-                delay(500)
-            }
-        }
-    }
-
-    fun stopPollingMayTinhTheoPhong() {
-        pollingMayTinhTheoPhongJob?.cancel()
-        pollingMayTinhTheoPhongJob = null
-    }
 
     fun createPhieuSuaChua(phieuSuaChua: PhieuSuaChua) {
         viewModelScope.launch {
@@ -118,9 +98,9 @@ class PhieuSuaChuaViewModel : ViewModel() {
                 val response = withContext(Dispatchers.IO) {
                     ITLabRoomRetrofitClient.phieusuachuaAPIService.updatePhieuSuaChua(phieuSuaChua)
                 }
-                maytinhUpdateResult = response.message
+                phieuSuaChuaUpdateResult = response.message
             } catch (e: Exception) {
-                maytinhUpdateResult = "Lỗi khi cập nhật phieu sua chua: ${e.message}"
+                phieuSuaChuaUpdateResult = "Lỗi khi cập nhật phieu sua chua: ${e.message}"
                 Log.e("PhieuSuaChuaViewModel", "Lỗi khi cập nhật phieu sua chua: ${e.message}")
             } finally {
                 isLoading = false

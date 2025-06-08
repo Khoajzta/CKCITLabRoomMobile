@@ -69,7 +69,7 @@ fun ChiTietLichSuChuyenMay(
             }
 
             items(danhsachlichsu){lichsu ->
-                CardLichSu(lichsu,phongMayViewModel)
+                CardLichSuChuyenMay(lichsu,phongMayViewModel)
             }
         }
     }

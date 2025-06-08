@@ -16,6 +16,11 @@ interface PhieuSuaChuaAPIService {
     @GET("PhieuSuaChua/read.php")
     suspend fun getAllPhieuSuaChua(): PhieuSuaChuaResponse
 
+    @GET("PhieuSuaChua/getPhieuSuaChuaTheoMa.php")
+    suspend fun getPhieuSuaChuaByMaMay(
+        @Query("MaMay") maMay: String
+    ): PhieuSuaChuaResponse
+
     @POST("PhieuSuaChua/create.php")
     suspend fun createPhieuSuaChua(
         @Body phieusuachua: PhieuSuaChua

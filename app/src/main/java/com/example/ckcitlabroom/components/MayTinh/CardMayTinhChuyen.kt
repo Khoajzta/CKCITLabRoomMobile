@@ -136,7 +136,7 @@ fun CardMayTinhChuyen(
 
             val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFFF44336), "Không hoạt động", Lucide.CircleX)
+                0 -> Triple(Color(0xFFF44336), "Đang bảo trì", Lucide.CircleX)
                 else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
             }
 

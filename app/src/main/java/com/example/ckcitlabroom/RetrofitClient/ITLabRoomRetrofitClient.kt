@@ -8,6 +8,7 @@ import DonNhapAPIService
 import GiangVienAPIService
 import LichHocAPIService
 import LichSuChuyenMayAPIService
+import LichSuSuaMayAPIService
 import LoaiTaiKhoanAPIService
 import LopHocAPIService
 import MayTinhAPIService
@@ -22,8 +23,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object Constants {
-//    const val BASE_URL = "http://chillcup.io.vn/ITLabRoomAPI/api/"
-    const val BASE_URL = "http://192.168.1.113/ITLabRoomAPI/api/"
+    const val BASE_URL = "http://chillcup.io.vn/ITLabRoomAPI/api/"
+//    const val BASE_URL = "http://192.168.1.113/ITLabRoomAPI/api/"
 }
 
 object ITLabRoomRetrofitClient {
@@ -161,5 +162,13 @@ object ITLabRoomRetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
             .build()
             .create(ChiTietSuDungMayAPIService::class.java)
+    }
+
+    val lichSuSuaMayAPIService: LichSuSuaMayAPIService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+            .create(LichSuSuaMayAPIService::class.java)
     }
 }

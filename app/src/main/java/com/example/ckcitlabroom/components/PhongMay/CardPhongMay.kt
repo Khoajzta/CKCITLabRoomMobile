@@ -106,7 +106,7 @@ fun CardPhongMay(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { showDialog = true },
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE))
             ) {
                 Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
             }

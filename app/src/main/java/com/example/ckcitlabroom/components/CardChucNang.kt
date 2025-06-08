@@ -60,7 +60,7 @@ fun CardChucNang(chucnang: ChucNang) {
         ) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(60.dp)
                     .background(Color(0xFF1B8DDE).copy(alpha = 0.15f), shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -68,14 +68,14 @@ fun CardChucNang(chucnang: ChucNang) {
                     imageVector = chucnang.icon,
                     contentDescription = null,
                     tint = Color(0xFF1B8DDE),
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(30.dp)
                 )
             }
 
             Text(
                 text = chucnang.name,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
                 color = Color.Black,
                 maxLines = 2,

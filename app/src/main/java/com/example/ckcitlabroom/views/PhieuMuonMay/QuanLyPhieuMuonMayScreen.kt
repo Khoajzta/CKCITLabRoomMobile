@@ -12,8 +12,14 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.MeetingRoom
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.ReceiptLong
+import androidx.compose.material.icons.outlined.SupervisorAccount
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -29,18 +35,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.History
 import com.composables.icons.lucide.Lucide
-import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuanLyChuyenMayScreen(
+fun QuanLyPhieuMuonMayScreen(
     navController: NavHostController,
 ) {
+
     val dsChucNang =
         listOf(
-            ChucNang("Danh Sách Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.LISTPHONGMAYCHUYEN.route) }),
-            ChucNang("Lịch Sử Chuyển Máy", Icons.Filled.History, Click = { navController.navigate(NavRoute.LICHSUCHUYENMAY.route) }),
+            ChucNang("Phiếu Mươn Đã Trả", Icons.Outlined.Build, Click = {navController.navigate(NavRoute.LISTPHIEUCHUASUA.route) }),
+            ChucNang("Phiếu Mươn Chưa Trả", Icons.Outlined.Build, Click = { navController.navigate(NavRoute.LISTPHIEUDASUA.route) }),
         )
 
     Column(
@@ -49,8 +54,7 @@ fun QuanLyChuyenMayScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            modifier = Modifier.padding(bottom = 16.dp),
-            text = "Quản Lý Chuyển Máy",
+            text = "Quản Lý Phiếu Sửa Chữa",
             color = Color(0xFF1B8DDE),
             fontWeight = FontWeight.ExtraBold,
             fontSize = 20.sp

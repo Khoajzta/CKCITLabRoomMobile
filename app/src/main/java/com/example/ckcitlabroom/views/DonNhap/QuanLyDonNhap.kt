@@ -102,7 +102,7 @@ fun QuanLyDonNhap(
                 }
             }else{
                 items(danhsachdonnhap) { donnhap ->
-                    CardDonNhap(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController)
+                    CardDonNhap(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController, click = {navController.navigate(NavRoute.CHITIETDONNHAP.route + "?madonnhap=${donnhap.MaDonNhap}")})
                 }
             }
         }

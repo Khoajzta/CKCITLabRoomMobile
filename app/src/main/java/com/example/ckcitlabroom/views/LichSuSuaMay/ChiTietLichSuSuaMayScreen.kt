@@ -4,15 +4,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,55 +20,46 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
-import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun LichSuChuyenMayScreen(
-    navController: NavHostController,
-    donNhapyViewModel: DonNhapViewModel,
-    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
-    mayTinhViewModel: MayTinhViewModel
+fun ChiTietLichSuSuaMayScreen(
+    mamay:String,
+    phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
+    lichSuSuaMayViewModel: LichSuSuaMayViewModel,
 ){
-    var danhsachdonnhap = donNhapyViewModel.danhSachDonNhap
+    var danhsachphieusuachua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChuaTheoMa
 
-    LaunchedEffect(Unit) {
-        donNhapyViewModel.getAllDonNhap()
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            donNhapyViewModel.stopPollingAllDonNhap()
-        }
+    LaunchedEffect(mamay) {
+        phieuSuaChuaViewModel.getPhieuSuaChuaTheoMaMay(mamay)
+        lichSuSuaMayViewModel.getLichSuTheoMaMay(mamay)
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(bottom = 16.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Center,
+                .padding(bottom = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Đơn Nhập",
+                "Lịch sử sửa máy",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
+
         }
 
-        // Danh sách đơn nhập
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-
-            if(danhsachdonnhap.isNullOrEmpty()){
+            if (danhsachphieusuachua == null || danhsachphieusuachua.isEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -76,16 +67,17 @@ fun LichSuChuyenMayScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Chưa có đơn nhập nào",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp
+                            "Chưa có lịch sử sửa máy",
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(16.dp)
                         )
                     }
+
                 }
-            }else{
-                items(danhsachdonnhap) { donnhap ->
-                    CardDonNhapLichSuChuyen(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController)
+            } else {
+                items(danhsachphieusuachua) { phieusuachua ->
+                    CardChiTietLichSuSuaMay(phieusuachua,lichSuSuaMayViewModel)
                 }
             }
         }

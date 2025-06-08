@@ -63,9 +63,7 @@ fun CardDonNhapChuyen(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = {
-            navController.navigate(
-                NavRoute.CHITIETDONNHAPCHUYEN.route + "?madonnhap=${donNhap.MaDonNhap}&maphong=${maphong}"
-            )
+            navController.navigate(NavRoute.CHITIETDONNHAPCHUYEN.route + "?madonnhap=${donNhap.MaDonNhap}&maphong=${maphong}")
 
         }) {
         Column(
