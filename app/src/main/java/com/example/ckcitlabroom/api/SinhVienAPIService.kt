@@ -38,7 +38,12 @@ interface SinhVienAPIService {
     ): CreateResponse
 
     @PUT("SinhVien/update.php")
-    suspend fun updateGiangVien(
+    suspend fun updateSinhVien(
+        @Body sinhVien: SinhVien
+    ): UpdateResponse
+
+    @PUT("SinhVien/updateTrangThaiSinhVien.php")
+    suspend fun updateTrangThaiSinhVien(
         @Body sinhVien: SinhVien
     ): UpdateResponse
 

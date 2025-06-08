@@ -55,7 +55,10 @@ fun EditGiangVienScreen(
         giangVien?.let {
             maGVState.value = it.MaGV
             tenGVState.value = it.TenGiangVien
-            ngaySinhState.value = it.NgaySinh
+            val parts = it.NgaySinh.split("-") // yyyy-MM-dd
+            if (parts.size == 3) {
+                ngaySinhState.value = "${parts[2]}-${parts[1]}-${parts[0]}" // dd-MM-yyyy
+            }
             gioiTinhState.value = it.GioiTinh
             emailState.value = it.Email
         }
@@ -68,23 +71,30 @@ fun EditGiangVienScreen(
     }
 
     if (showDatePicker) {
+        val parts = ngaySinhState.value.split("_")
+        val day = parts.getOrNull(0)?.toIntOrNull() ?: calendar.get(Calendar.DAY_OF_MONTH)
+        val month = parts.getOrNull(1)?.toIntOrNull()?.minus(1) ?: calendar.get(Calendar.MONTH) // tháng 0-based
+        val year = parts.getOrNull(2)?.toIntOrNull() ?: calendar.get(Calendar.YEAR)
+
         DatePickerDialog(
             context,
-            { _, year, month, dayOfMonth ->
-                ngaySinhState.value = "$year-${month + 1}-${dayOfMonth.toString().padStart(2, '0')}"
+            { _, selectedYear, selectedMonth, selectedDayOfMonth ->
+                ngaySinhState.value = "${selectedDayOfMonth.toString().padStart(2, '0')}-${(selectedMonth + 1).toString()
+                    .padStart(2, '0')}-$selectedYear"
                 showDatePicker = false
             },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
+            year,
+            month,
+            day
         ).show()
     }
+
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
-            .height(700.dp),
+            .height(630.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(
@@ -313,14 +323,17 @@ fun EditGiangVienScreen(
                             snackbarHostState.showSnackbar("Thông báo")
                         }
                     } else {
+                        val parts = ngaySinhState.value.split("-") // dd-MM-yyyy
+                        val ngaySinhDB = if (parts.size == 3) "${parts[2]}-${parts[1]}-${parts[0]}" else ""
+
                         val giangVienMoi = GiangVien(
                             MaGV = maGVState.value,
                             TenGiangVien = tenGVState.value,
-                            NgaySinh = ngaySinhState.value,
+                            NgaySinh = ngaySinhDB, // chuẩn định dạng yyyy-MM-dd để gửi lên API
                             GioiTinh = gioiTinhState.value,
                             Email = emailState.value,
-                            MatKhau = giangVien?.MatKhau ?: "", // lấy mật khẩu cũ
-                            MaLoaiTaiKhoan = giangVien?.MaLoaiTaiKhoan ?: 2, // lấy mã loại TK cũ
+                            MatKhau = giangVien?.MatKhau ?: "",
+                            MaLoaiTaiKhoan = giangVien?.MaLoaiTaiKhoan ?: 2,
                             TrangThai = giangVien?.TrangThai ?: 1
                         )
                         giangVienViewModel.updateGiangVien(giangVienMoi)

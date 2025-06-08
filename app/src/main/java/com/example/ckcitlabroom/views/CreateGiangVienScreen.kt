@@ -1,3 +1,4 @@
+import android.icu.util.Calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,7 +41,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,6 +63,11 @@ fun CreateGiangVienScreen(
     val emailState = remember { mutableStateOf("") }
     val matKhauState = remember { mutableStateOf("") }
 
+    // Trong Composable:
+    val ngaySinhHienThi = remember { mutableStateOf("") } // hiển thị "dd-MM-yyyy"
+    val ngaySinhDb = remember { mutableStateOf("") }       // gửi về DB "yyyy-MM-dd"
+
+
     var gioiTinhExpanded by remember { mutableStateOf(false) }
     val gioiTinhOptions = listOf("Nam", "Nữ", "Khác")
 
@@ -73,11 +80,40 @@ fun CreateGiangVienScreen(
         }
     }
 
+    var showDatePicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val calendar = remember { Calendar.getInstance() }
+
+    if (showDatePicker) {
+        val datePickerDialog = android.app.DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                calendar.set(year, month, dayOfMonth)
+
+                // Format hiển thị: dd-MM-yyyy
+                val sdfHienThi = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                ngaySinhHienThi.value = sdfHienThi.format(calendar.time)
+
+                // Format lưu DB: yyyy-MM-dd
+                val sdfDb = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                ngaySinhDb.value = sdfDb.format(calendar.time)
+
+                showDatePicker = false
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        datePickerDialog.setOnDismissListener { showDatePicker = false }
+        datePickerDialog.show()
+    }
+
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
-            .height(700.dp),
+            .height(630.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(
@@ -138,11 +174,17 @@ fun CreateGiangVienScreen(
                         )
                     )
 
-                    Text("Ngày Sinh (yyyy-MM-dd)", fontWeight = FontWeight.Bold, color = Color.Black)
+                    Text("Ngày Sinh", fontWeight = FontWeight.Bold, color = Color.Black)
                     OutlinedTextField(
-                        value = ngaySinhState.value,
-                        onValueChange = { ngaySinhState.value = it },
-                        placeholder = { Text("Nhập ngày sinh") },
+                        value = ngaySinhHienThi.value,
+                        onValueChange = {},
+                        readOnly = true,
+                        placeholder = { Text("Chọn ngày sinh") },
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(Icons.Default.DateRange, contentDescription = "Chọn ngày sinh")
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 12.dp),
@@ -156,6 +198,7 @@ fun CreateGiangVienScreen(
                             unfocusedTextColor = Color.Black
                         )
                     )
+
 
                     Text("Giới Tính", fontWeight = FontWeight.Bold, color = Color.Black)
                     ExposedDropdownMenuBox(
@@ -272,7 +315,7 @@ fun CreateGiangVienScreen(
             Button(
                 onClick = {
                     if (maGVState.value.isBlank() || tenGVState.value.isBlank() ||
-                        ngaySinhState.value.isBlank() || gioiTinhState.value.isBlank() ||
+                        ngaySinhDb.value.isBlank() || gioiTinhState.value.isBlank() ||
                         emailState.value.isBlank() || matKhauState.value.isBlank()
                     ) {
                         coroutineScope.launch {
@@ -294,7 +337,7 @@ fun CreateGiangVienScreen(
                             val giangVienMoi = GiangVien(
                                 MaGV = maGVState.value,
                                 TenGiangVien = tenGVState.value,
-                                NgaySinh = ngaySinhState.value,
+                                NgaySinh = ngaySinhDb.value,
                                 GioiTinh = gioiTinhState.value,
                                 Email = emailState.value,
                                 MatKhau = matKhauState.value,
