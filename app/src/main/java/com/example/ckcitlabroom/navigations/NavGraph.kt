@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
 import com.example.lapstore.viewmodels.DonNhapViewModel
@@ -72,6 +73,9 @@ sealed class NavRoute(val route: String) {
     object ADDLOPHOC : NavRoute("addlophoc_screen")
     object EDITLOPHOC : NavRoute("editlophoc_screen")
 
+    object QUANLYCAHOC : NavRoute("quanlycahoc_screen")
+    object ADDCAHOC : NavRoute("addcahoc_screen")
+    object EDITCAHOC : NavRoute("editcahoc_screen")
 
     object ADDPHIEUSUACHUA : NavRoute("addphieusuachua_screen")
     object STARTSCREEN : NavRoute("start_screen")
@@ -90,6 +94,7 @@ fun NavgationGraph(
     donNhapViewModel: DonNhapViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     sinhVienViewModel: SinhVienViewModel,
+    caHocViewModel: CaHocViewModel
 
 ) {
 
@@ -507,6 +512,59 @@ fun NavgationGraph(
             val malop = navBackStackEntry.arguments?.getString("malop") ?: ""
             EditLopHocScreen(lopHocViewModel,malop)
         }
+
+        composable(
+            route = NavRoute.QUANLYCAHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            QuanLyCaHoc(navController, caHocViewModel)
+        }
+
+        composable(
+            route = NavRoute.ADDCAHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            CreateCaHocScreen(navController, caHocViewModel)
+        }
+
+        composable(
+            NavRoute.EDITCAHOC.route + "?maca={maca}",
+            arguments = listOf(
+                navArgument("maca") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = {
+                slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300))
+            },
+            exitTransition = {
+                slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300))
+            }
+        ) { navBackStackEntry ->
+            val maca = navBackStackEntry.arguments?.getString("maca") ?: ""
+            EditCaHocScreen(caHocViewModel, maca)
+        }
+
 
 
         composable(

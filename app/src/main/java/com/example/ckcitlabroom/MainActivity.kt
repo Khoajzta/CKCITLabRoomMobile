@@ -66,6 +66,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
+import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 
@@ -105,6 +106,7 @@ fun MainScreen() {
     val chitietdonNhapyViewModel: ChiTietDonNhapyViewModel = viewModel()
     val sinhVienViewModel: SinhVienViewModel = viewModel()
     val lopHocViewModel: LopHocViewModel = viewModel()
+    val caHocViewModel: CaHocViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -254,7 +256,8 @@ fun MainScreen() {
                     lichSuChuyenMayViewModel,
                     donNhapyViewModel,
                     chitietdonNhapyViewModel,
-                    sinhVienViewModel
+                    sinhVienViewModel,
+                    caHocViewModel
 
                 )
             }

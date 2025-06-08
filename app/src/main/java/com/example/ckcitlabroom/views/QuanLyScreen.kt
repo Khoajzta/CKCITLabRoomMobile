@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccessAlarm
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.MeetingRoom
 import androidx.compose.material.icons.outlined.Person
@@ -38,7 +39,8 @@ fun QuanLyScreen(
 
                 ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = { navController.navigate(NavRoute.QUANLYSINHVIEN.route) }),
                 ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {  }),
-                ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLOPHOC.route) })
+                ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLOPHOC.route) }),
+                ChucNang("Quản Lý Ca Học", Icons.Outlined.AccessAlarm, Click = { navController.navigate(NavRoute.QUANLYCAHOC.route) })
             )
         }
         giangVien?.MaLoaiTaiKhoan == 2 -> {
