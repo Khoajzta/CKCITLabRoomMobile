@@ -38,6 +38,11 @@ interface LopHocAPIService {
         @Body lopHoc: LopHoc
     ): UpdateResponse
 
+    @PUT("LopHoc/update.php")
+    suspend fun updateTrangThaiLopHoc(
+        @Body lopHoc: LopHoc
+    ): UpdateResponse
+
     @HTTP(method = "DELETE", path = "LopHoc/delete.php", hasBody = true)
     suspend fun deleteLopHoc(
         @Body body: Map<String, String>

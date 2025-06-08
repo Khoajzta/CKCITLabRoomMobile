@@ -19,6 +19,7 @@ data class MayTinhTrangThaiUpdateRequest(
 )
 
 
+
 interface MayTinhAPIService {
     @GET("MayTinh/read.php")
     suspend fun getAllMayTinh(): MayTinhResponse

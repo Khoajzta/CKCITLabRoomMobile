@@ -22,6 +22,7 @@ class LopHocViewModel: ViewModel() {
     var danhSachAllLopHoc by mutableStateOf<List<LopHoc>>(emptyList())
         private set
     var lophocCreateResult by mutableStateOf("")
+    var lophocUpdateTrangThaiResult by mutableStateOf("")
     var lophocUpdateResult by mutableStateOf("")
     var lophocDeleteResult by mutableStateOf("")
 
@@ -56,22 +57,20 @@ class LopHocViewModel: ViewModel() {
             }
         }
     }
-//
-//    fun getGiangVienById(magv: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            isLoading = true
-//            try {
-//                giangvien = ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByByID(magv)
-//            } catch (e: Exception) {
-//                errorMessage = e.message
-//                Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
-//            } finally {
-//                isLoading = false
-//            }
-//        }
-//    }
 
-
+    fun getLopHocById(malop: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                lophoc = ITLabRoomRetrofitClient.lophocAPIService.getLopHocByByID(malop)
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("LopHocViewModel", "Lỗi khi lấy thông tin lớp học", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 
     fun createLopHoc(lopHoc: LopHoc) {
         viewModelScope.launch {
@@ -90,46 +89,64 @@ class LopHocViewModel: ViewModel() {
         }
     }
 
-//    fun updateGiangVien(giangVien: GiangVien) {
-//        viewModelScope.launch {
-//            isLoading = true
-//            try {
-//                val response = withContext(Dispatchers.IO) {
-//                    ITLabRoomRetrofitClient.giangVienAPIService.updateGiangVien(giangVien)
-//                }
-//                giangvienUpdateResult = response.message
-//            } catch (e: Exception) {
-//                giangvienUpdateResult = "Lỗi khi cập nhật máy tính: ${e.message}"
-//                Log.e("GiangVienViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
-//            } finally {
-//                isLoading = false
-//            }
-//        }
-//    }
-//
-//    fun deleteGiangVien(magv: String) {
-//        viewModelScope.launch {
-//            isLoading = true
-//            try {
-//                val body = mapOf("MaGV" to magv)
-//                val response = withContext(Dispatchers.IO) {
-//                    ITLabRoomRetrofitClient.giangVienAPIService.deleteGiangVien(body)
-//                }
-//                giangvienDeleteResult = response.message
-//
-//                if (response.message == "GiangVien deleted") {
-//                    // Cập nhật lại danh sách sau khi xóa thành công
-//                    val allResponse = withContext(Dispatchers.IO) {
-//                        ITLabRoomRetrofitClient.giangVienAPIService.getAllGiangVien()
-//                    }
-//                    danhSachAllGiangVien = allResponse.giangvien ?: emptyList()
-//                }
-//            } catch (e: Exception) {
-//                giangvienDeleteResult = "Lỗi khi xóa Giảng viên: ${e.localizedMessage ?: e.message}"
-//                Log.e("GiangVienViewModel", "Lỗi khi xóa giảng viên", e)
-//            } finally {
-//                isLoading = false
-//            }
-//        }
-//    }
+    fun updateTrangThaiLopHoc(lopHoc: LopHoc) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.lophocAPIService.updateTrangThaiLopHoc(lopHoc)
+                }
+                lophocUpdateTrangThaiResult = response.message
+            } catch (e: Exception) {
+                lophocUpdateTrangThaiResult = "Lỗi khi cập nhật trạng thái lớp: ${e.message}"
+                Log.e("LopHocViewModel", "Lỗi khi cập nhật trạng thái lớp: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun updateLopHoc(lopHoc: LopHoc) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.lophocAPIService.updateLopHoc(lopHoc)
+                }
+                lophocUpdateResult = response.message
+            } catch (e: Exception) {
+                lophocUpdateResult = "Lỗi khi cập nhật lớp học: ${e.message}"
+                Log.e("LopHocViewModel", "Lỗi khi cập nhật lớp học: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+
+    fun deleteLopHoc(malop: String) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val body = mapOf("MaLopHoc" to malop)
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.lophocAPIService.deleteLopHoc(body)
+                }
+                lophocDeleteResult = response.message
+
+                if (response.message == "LopHoc deleted") {
+                    // Cập nhật lại danh sách sau khi xóa thành công
+                    val allResponse = withContext(Dispatchers.IO) {
+                        ITLabRoomRetrofitClient.lophocAPIService.getAllLopHoc()
+                    }
+                    danhSachAllLopHoc = allResponse.lophoc ?: emptyList()
+                }
+            } catch (e: Exception) {
+                lophocDeleteResult = "Lỗi khi xóa Lớp Học: ${e.localizedMessage ?: e.message}"
+                Log.e("LopHocViewModel", "Lỗi khi xóa Lớp Học", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 }

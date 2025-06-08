@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ckcitlabroom.models.LopHoc
 import com.example.lapstore.api.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -35,6 +36,7 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
     var giangvienCreateResult by mutableStateOf("")
     var giangvienUpdateResult by mutableStateOf("")
     var giangvienDeleteResult by mutableStateOf("")
+    var giangVienUpdateTrangThaiResult by mutableStateOf("")
 
     private var pollingJob: Job? = null
     var isLoading by mutableStateOf(false)
@@ -189,6 +191,24 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
             }
         }
     }
+
+    fun updateTrangThaiGiangVien(giangVien: GiangVien) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.giangVienAPIService.updateTrangThaiGiangVien(giangVien)
+                }
+                giangVienUpdateTrangThaiResult = response.message
+            } catch (e: Exception) {
+                giangVienUpdateTrangThaiResult = "Lỗi khi cập nhật trạng thái giảng viên: ${e.message}"
+                Log.e("GiangVienViewModel", "Lỗi khi cập nhật trạng thái giảng viên: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
 
     fun deleteGiangVien(magv: String) {
         viewModelScope.launch {

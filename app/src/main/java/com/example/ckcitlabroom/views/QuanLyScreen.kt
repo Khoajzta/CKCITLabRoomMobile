@@ -51,12 +51,27 @@ fun QuanLyScreen(
         }
         giangVien?.MaLoaiTaiKhoan == 2 -> {
             listOf(
-                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = { /* TODO: Navigate */ })
+                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = { /* TODO: Navigate */ }),
+                ChucNang("Quản Lý Đơn Nhập", iconComputer, Click = { navController.navigate(NavRoute.QUANLYDONNHAP.route) }),
+                ChucNang("Quản Lý Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
+                ChucNang("Chuyển Máy", iconComputer, Click = { navController.navigate(NavRoute.QUANLYCHUYENMAY.route) }),
+                ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = { navController.navigate(NavRoute.QUANLYGIANGVIEN.route) }),
+
+
+                ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = { navController.navigate(NavRoute.QUANLYSINHVIEN.route) }),
+                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {  }),
+                ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLOPHOC.route) })
             )
+        }
+        giangVien?.MaLoaiTaiKhoan == 2 -> {
+            listOf(
+                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {  })
+         )
         }
         sinhvien != null -> {
             listOf(
-                ChucNang("Danh Sách Lịch Học", Icons.Outlined.CalendarMonth, Click = { /* TODO: Navigate */ })
+                ChucNang("Danh Sách Lịch Học", Icons.Outlined.CalendarMonth, Click = {  })
+
             )
         }
         else -> emptyList()
