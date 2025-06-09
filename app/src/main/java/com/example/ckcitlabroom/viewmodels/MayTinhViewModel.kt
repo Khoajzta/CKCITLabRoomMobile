@@ -128,6 +128,36 @@ class MayTinhViewModel : ViewModel() {
         }
     }
 
+    suspend fun createNhieuMayTinh(danhSach: List<MayTinh>) {
+        isLoading = true
+        try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.maytinhAPIService.createListMayTinh(danhSach)
+            }
+            maytinhCreateResult = response.message
+        } catch (e: Exception) {
+            maytinhCreateResult = "Lỗi khi thêm danh sách máy: ${e.message}"
+            Log.e("MayTinhViewModel", "Lỗi thêm nhiều máy: ${e.message}")
+        } finally {
+            isLoading = false
+        }
+    }
+
+    suspend fun createNhieuMayTinhAsync(danhSach: List<MayTinh>): Boolean {
+        return try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.maytinhAPIService.createListMayTinh(danhSach)
+            }
+            response.message.contains("thành công", ignoreCase = true)
+        } catch (e: Exception) {
+            Log.e("MayTinhViewModel", "Lỗi khi tạo nhiều máy tính: ${e.message}")
+            false
+        }
+    }
+
+
+
+
     suspend fun createMayTinhBlocking(maytinh: MayTinh): Boolean {
         return try {
             val response = withContext(Dispatchers.IO) {

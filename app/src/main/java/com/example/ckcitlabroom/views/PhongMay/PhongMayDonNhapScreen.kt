@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -141,28 +143,39 @@ fun PhongMayDonNhapScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
-                modifier = Modifier.width(180.dp),
-                onClick = {
-                    if (danhSachMayTinh.isNullOrEmpty()) {
-                        showConfirmDeleteDialog = true
-                    } else {
-                        showDeleteWarning = true
-                    }
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
-            ) {
-                Text("Xóa phòng máy", color = Color.White, fontWeight = FontWeight.ExtraBold)
-            }
+            if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)){
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { showDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                ) {
+                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
+            }else{
+                Button(
+                    modifier = Modifier.width(180.dp),
+                    onClick = { showDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                ) {
+                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
 
-            Button(
-                modifier = Modifier.width(180.dp),
-                onClick = { showDialog = true },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
-            ) {
-                Text("Chỉnh sửa ", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                Button(
+                    modifier = Modifier.width(180.dp),
+                    onClick = {
+                        if (danhSachMayTinh.isNullOrEmpty()) {
+                            showConfirmDeleteDialog = true
+                        } else {
+                            showDeleteWarning = true
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                ) {
+                    Text("Xóa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
             }
         }
 
@@ -300,6 +313,7 @@ fun PhongMayDonNhapScreen(
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black
                             ),
+                            textStyle = TextStyle(fontSize = 16.sp),
                             placeholder = { Text("Nhập thông tin") },
                             shape = RoundedCornerShape(12.dp),
                         )

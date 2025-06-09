@@ -15,6 +15,10 @@ interface ChiTietDonNhapAPIService {
         @Body chiTietDonNhap: ChiTietDonNhap
     ): CreateResponse
 
+    @POST("ChiTietDonNhap/createListChiTietDonNhap.php")
+    suspend fun createListChiTietDonNhap(
+        @Body chiTietDonNhapList: List<ChiTietDonNhap>
+    ): CreateResponse
 
     @GET("ChiTietDonNhap/getChiTietDonNhapTheoMaDon.php")
     suspend fun getChiTietDonNhapTheoMaDon(

@@ -40,6 +40,11 @@ interface MayTinhAPIService {
         @Body maytiinh: MayTinh
     ): CreateResponse
 
+    @POST("MayTinh/createListMayTinh.php")
+    suspend fun createListMayTinh(
+        @Body list: List<MayTinh>
+    ): CreateResponse
+
     @PUT("MayTinh/update.php")
     suspend fun updateMayTinh(
         @Body maytiinh: MayTinh

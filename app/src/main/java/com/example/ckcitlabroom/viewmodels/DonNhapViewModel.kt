@@ -54,22 +54,30 @@ class DonNhapViewModel : ViewModel() {
         pollingAllDonNhapJob = null
     }
 
+    // 1. Hàm suspend thực hiện tạo đơn nhập và trả về kết quả
+    suspend fun createDonNhapAsync(donNhap: DonNhap): Boolean {
+        return try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.donnhapAPIService.createDonNhap(donNhap)
+            }
+            // Giả sử response có trường 'success' hoặc kiểm tra message
+            response.message.contains("thành công", ignoreCase = true)
+        } catch (e: Exception) {
+            Log.e("DonNhapViewModel", "Lỗi khi thêm don nhap: ${e.message}")
+            false
+        }
+    }
+
+    // 2. Hàm gọi launch để cập nhật UI
     fun createDonNhap(donNhap: DonNhap) {
         viewModelScope.launch {
             isLoading = true
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.donnhapAPIService.createDonNhap(donNhap)
-                }
-                donnhapCreateResult = response.message
-            } catch (e: Exception) {
-                donnhapCreateResult = "Lỗi khi thêm don nhap: ${e.message}"
-                Log.e("DonNhapViewModel", "Lỗi khi thêm don nhap: ${e.message}")
-            } finally {
-                isLoading = false
-            }
+            val success = createDonNhapAsync(donNhap)
+            donnhapCreateResult = if(success) "Thêm đơn nhập thành công" else "Thêm đơn nhập thất bại"
+            isLoading = false
         }
     }
+
 }
 
 

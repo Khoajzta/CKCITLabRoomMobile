@@ -60,22 +60,46 @@ class ChiTietDonNhapyViewModel : ViewModel() {
         pollingAllChiTietDonNhapJob = null
     }
 
-    fun createChiTietDonNhap(chiTietDonNhap: ChiTietDonNhap) {
-        viewModelScope.launch {
-            isLoading = true
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.chitietdonnhapAPIService.createChiTietDonNhap(chiTietDonNhap)
-                }
-                chitietdonnhapCreateResult = response.message
-            } catch (e: Exception) {
-                chitietdonnhapCreateResult = "Lỗi khi thêm máy tính: ${e.message}"
-                Log.e("ChiTietDonNhapViewModel", "Lỗi khi thêm máy tính: ${e.message}")
-            } finally {
-                isLoading = false
+    suspend fun createChiTietDonNhap(chiTietDonNhap: ChiTietDonNhap) {
+        isLoading = true
+        try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.chitietdonnhapAPIService.createChiTietDonNhap(chiTietDonNhap)
             }
+            chitietdonnhapCreateResult = response.message
+        } catch (e: Exception) {
+            chitietdonnhapCreateResult = "Lỗi khi thêm chi tiết đơn nhập: ${e.message}"
+            Log.e("ChiTietDonNhapViewModel", "Lỗi khi thêm chi tiết đơn nhập: ${e.message}")
+        } finally {
+            isLoading = false
         }
     }
+
+    suspend fun createNhieuChiTietDonNhap(danhSach: List<ChiTietDonNhap>) {
+        isLoading = true
+        try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.chitietdonnhapAPIService.createListChiTietDonNhap(danhSach)
+            }
+            chitietdonnhapCreateResult = response.message
+        } catch (e: Exception) {
+            chitietdonnhapCreateResult = "Lỗi khi thêm danh sách chi tiết đơn nhập: ${e.message}"
+            Log.e("ChiTietDonNhapViewModel", "Lỗi thêm nhiều chi tiết đơn nhập: ${e.message}")
+        } finally {
+            isLoading = false
+        }
+    }
+
+    suspend fun createNhieuChiTietDonNhapAsync(ds: List<ChiTietDonNhap>): Boolean {
+        return try {
+            val response = ITLabRoomRetrofitClient.chitietdonnhapAPIService.createListChiTietDonNhap(ds)
+            response.message.contains("thành công", ignoreCase = true)
+        } catch (e: Exception) {
+            Log.e("ChiTietDonNhapVM", "Lỗi khi tạo chi tiết đơn nhập: ${e.message}")
+            false
+        }
+    }
+
 
 
     fun getChiTietDonNhapTheoMaDonNhap(madon: String) {

@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.History
@@ -44,8 +46,10 @@ fun QuanLyPhieuMuonMayScreen(
 
     val dsChucNang =
         listOf(
-            ChucNang("Phiếu Mươn Đã Trả", Icons.Outlined.Build, Click = {navController.navigate(NavRoute.LISTPHIEUCHUASUA.route) }),
-            ChucNang("Phiếu Mươn Chưa Trả", Icons.Outlined.Build, Click = { navController.navigate(NavRoute.LISTPHIEUDASUA.route) }),
+            ChucNang("Phiếu Mươn Đã Trả", Icons.Outlined.Article, Click = {}),
+            ChucNang("Phiếu Mươn Chưa Trả", Icons.Outlined.Article, Click = {navController.navigate(NavRoute.LISTPHIEUMUONMAYCHUATRA.route)}),
+            ChucNang("Phiếu Mươn Chưa Chuyển", Icons.Outlined.Article, Click = {navController.navigate(NavRoute.LISTPHIEUMUONMAYCHUACHUYEN.route)}),
+            ChucNang("Tạo Phiếu Mượn May", Icons.Outlined.AddCircle, Click = {navController.navigate(NavRoute.ADDPHIEUMUONMAY.route)}),
         )
 
     Column(
@@ -54,7 +58,7 @@ fun QuanLyPhieuMuonMayScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Quản Lý Phiếu Sửa Chữa",
+            text = "Quản Lý Phiếu Mượn Máy",
             color = Color(0xFF1B8DDE),
             fontWeight = FontWeight.ExtraBold,
             fontSize = 20.sp

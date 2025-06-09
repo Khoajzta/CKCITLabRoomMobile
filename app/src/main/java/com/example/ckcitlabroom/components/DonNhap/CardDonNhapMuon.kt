@@ -29,17 +29,18 @@ import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun CardDonNhapLichSuChuyen(
+fun CardDonNhapMuon(
+    maphong: String,
     donNhap: DonNhap,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     mayTinhViewModel: MayTinhViewModel,
     navController: NavHostController
 ) {
 
-    // Lấy chi tiết đơn nhập riêng theo Mã đơn
-    val chiTietState = produceState<List<ChiTietDonNhap>>(initialValue = emptyList(), donNhap.MaDonNhap) {
-        value = chiTietDonNhapyViewModel.getChiTietDonNhapListOnce(donNhap.MaDonNhap)
-    }
+    val chiTietState =
+        produceState<List<ChiTietDonNhap>>(initialValue = emptyList(), donNhap.MaDonNhap) {
+            value = chiTietDonNhapyViewModel.getChiTietDonNhapListOnce(donNhap.MaDonNhap)
+        }
 
     val mayTinhState = produceState<List<MayTinh>>(initialValue = emptyList()) {
         value = mayTinhViewModel.getAllMayTinhOnce()
@@ -53,19 +54,18 @@ fun CardDonNhapLichSuChuyen(
         danhSachMayTinh.filter { it.MaMay in maMayTheoDon }
     }
 
-    val soLuongMayTrongKho = danhSachMayTheoDon.count { it.MaPhong == "KHOLUUTRU" }
+        val soLuongMayTrongKho = danhSachMayTheoDon.count { it.MaPhong == "KHOLUUTRU" }
 
-    Card(
-        modifier = Modifier
-            .padding(bottom = 12.dp)
-            .fillMaxWidth(),
+    Card(modifier = Modifier
+        .padding(bottom = 12.dp)
+        .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = {
-            navController.navigate(NavRoute.LISTMAYTINHTHEODONCHUYEN.route + "?madonnhap=${donNhap.MaDonNhap}")
-        }
-    ) {
+            navController.navigate(NavRoute.CHITIETDONNHAPCHUYEN.route + "?madonnhap=${donNhap.MaDonNhap}&maphong=${maphong}")
+
+        }) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,10 +82,16 @@ fun CardDonNhapLichSuChuyen(
             Divider(color = Color(0xFFDDDDDD), thickness = 1.dp)
 
             InfoRow(icon = Lucide.ClipboardList, label = "Mã đơn", value = donNhap.MaDonNhap)
-            InfoRow(icon = Lucide.CalendarDays, label = "Ngày nhập", value = formatNgay(donNhap.NgayNhap))
+            InfoRow(
+                icon = Lucide.CalendarDays,
+                label = "Ngày nhập",
+                value = formatNgay(donNhap.NgayNhap)
+            )
             InfoRow(icon = Lucide.Truck, label = "Nhà cung cấp", value = donNhap.NhaCungCap)
             InfoRow(icon = Lucide.PackagePlus, label = "Đã nhập", value = "${donNhap.SoLuong} máy")
-            InfoRow(icon = Lucide.Warehouse, label = "Còn trong kho", value = "$soLuongMayTrongKho máy")
+            InfoRow(
+                icon = Lucide.Warehouse, label = "Còn trong kho", value = "$soLuongMayTrongKho máy"
+            )
             InfoRow(
                 icon = Lucide.ArrowRightLeft,
                 label = "Đã chuyển đi",

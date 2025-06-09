@@ -6,9 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import java.text.SimpleDateFormat
@@ -53,21 +53,38 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhongMayChuyenScreen(
-    maphong: String,
+fun ChiTietDonNhapMuonScreen(
+    maphong:String,
+    maDonNhap: String,
     navController: NavHostController,
+    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     phongMayViewModel: PhongMayViewModel,
     mayTinhViewModel: MayTinhViewModel,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
 ) {
-    val danhSachMayTinhtheophong = mayTinhViewModel.danhSachAllMayTinhtheophong
+    val danhSachChiTiet by produceState(initialValue = emptyList<ChiTietDonNhap>(), maDonNhap) {
+        value = chiTietDonNhapyViewModel.getChiTietDonNhapListOnce(maDonNhap)
+    }
+
+    val danhSachMayTinh by produceState(initialValue = emptyList<MayTinh>()) {
+        value = mayTinhViewModel.getAllMayTinhOnce()
+    }
+
     val phongmay = phongMayViewModel.phongmay
 
-    Log.d("maphong", danhSachMayTinhtheophong.toString())
+    val danhSachMayTinhTheoDon = remember(danhSachChiTiet, danhSachMayTinh) {
+        val maMayTheoDon = danhSachChiTiet.map { it.MaMay }
+        danhSachMayTinh.filter { it.MaMay in maMayTheoDon }
+    }
 
-    LaunchedEffect(maphong) {
-        mayTinhViewModel.getMayTinhByPhong(maphong)
-        phongMayViewModel.getPhongMayByMaPhong(maphong)
+    val danhSachMayTinhTrongKhoTheoDon = remember(danhSachMayTinhTheoDon) {
+        danhSachMayTinhTheoDon.filter { it.MaPhong.equals(maphong, ignoreCase = true) }
+    }
+
+
+    LaunchedEffect(maDonNhap) {
+        chiTietDonNhapyViewModel.getChiTietDonNhapTheoMaDonNhap(maDonNhap)
+        mayTinhViewModel.getAllMayTinh()
     }
 
     DisposableEffect(Unit) {
@@ -111,7 +128,7 @@ fun PhongMayChuyenScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Máy Tính Phòng ${phongmay.TenPhong}",
+                "Danh Sách Máy Tính Chưa chuyển Theo Đơn",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
@@ -122,7 +139,7 @@ fun PhongMayChuyenScreen(
         LazyColumn(
             modifier = Modifier.height(550.dp)
         ) {
-            if (danhSachMayTinhtheophong == null || danhSachMayTinhtheophong.isEmpty()) {
+            if (danhSachMayTinhTrongKhoTheoDon == null || danhSachMayTinhTrongKhoTheoDon.isEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -138,7 +155,7 @@ fun PhongMayChuyenScreen(
 
                 }
             } else {
-                items(danhSachMayTinhtheophong) { maytinh ->
+                items(danhSachMayTinhTrongKhoTheoDon) { maytinh ->
                     CardMayTinhChuyen(
                         maytinh,
                         mayTinhViewModel,
@@ -157,6 +174,7 @@ fun PhongMayChuyenScreen(
         ) {
             Button(
                 modifier = Modifier
+                    .padding(top = 12.dp)
                     .fillMaxWidth()
                     .height(55.dp),
                 onClick = {

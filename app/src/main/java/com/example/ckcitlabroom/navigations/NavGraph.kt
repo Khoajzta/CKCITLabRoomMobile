@@ -57,14 +57,11 @@ sealed class NavRoute(val route: String) {
     object LISTMAYTINHTHEODONCHUYEN : NavRoute("danhsachmaytinhtheodonchuyen_screen")
     object LISTPHONGMAYCHUYEN : NavRoute("danhsachphongmaychuyen_screen")
 
-
-
     object QUETQRCODE : NavRoute("quetqrcode_screen")
 
     object QUANLYSINHVIEN : NavRoute("quanlysinhvien_screen")
     object ADDSINHVIEN : NavRoute("addsinhvien_screen")
     object EDITSINHVIEN : NavRoute("editsinhvien_screen")
-
 
     object QUANLYLOPHOC : NavRoute("quanlylophoc_screen")
     object ADDLOPHOC : NavRoute("addlophoc_screen")
@@ -91,6 +88,13 @@ sealed class NavRoute(val route: String) {
     //DiemDanh
     object ADDDIEMDANH : NavRoute("adddiemdanh_screen")
 
+    //Mượn Máy
+    object QUANLYPHIEUMUONMAY : NavRoute("quanlyphieumuonmay_screen")
+    object ADDPHIEUMUONMAY : NavRoute("addphieumuonmay_screen")
+    object LISTPHIEUMUONMAYCHUATRA : NavRoute("danhsachphieumuonmaychuatra_screen")
+    object LISTPHIEUMUONMAYCHUACHUYEN : NavRoute("danhsachphieumuonmaychuachuyen_screen")
+    object CHUYENMAYPHIEUMUON : NavRoute("chuyenmayphieumuon_screen")
+
 }
 
 @Composable
@@ -109,7 +113,8 @@ fun NavgationGraph(
     tuanViewModel: TuanViewModel,
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
     chiTietSuDungMayViewModel: ChiTietSuDungMayViewModel,
-    lichSuSuaMayViewModel: LichSuSuaMayViewModel
+    lichSuSuaMayViewModel: LichSuSuaMayViewModel,
+    phieuMuonMayViewModel: PhieuMuonMayViewModel
 ) {
 
     val context = LocalContext.current.applicationContext
@@ -939,5 +944,95 @@ fun NavgationGraph(
             DiemDanhScreen(mamay,namHocViewModel,tuanViewModel,chiTietSuDungMayViewModel)
         }
 
+        //Mượn Máy
+        composable(
+            route = NavRoute.QUANLYPHIEUMUONMAY.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            QuanLyPhieuMuonMayScreen(navController)
+        }
+
+        composable(
+            route = NavRoute.ADDPHIEUMUONMAY.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            CreatePhieuMuonMayScreen(phongMayViewModel,phieuMuonMayViewModel)
+        }
+
+        composable(
+            route = NavRoute.LISTPHIEUMUONMAYCHUATRA.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ListPhieuMuonChuaTra(navController,phieuMuonMayViewModel)
+        }
+
+        composable(
+            route = NavRoute.LISTPHIEUMUONMAYCHUACHUYEN.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ListPhieuMuonChuaChuyen(navController,phieuMuonMayViewModel)
+        }
+
+        composable(
+            route = NavRoute.CHUYENMAYPHIEUMUON.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ChuyenMayPhieuMuonScreen(navController,mayTinhViewModel,phongMayViewModel)
+        }
     }
 }

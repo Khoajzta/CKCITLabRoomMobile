@@ -14,6 +14,7 @@ import LopHocAPIService
 import MayTinhAPIService
 import MonHocAPIService
 import NamHocAPIService
+import PhieuMuonMayAPIService
 import PhieuSuaChuaAPIService
 import PhongMayAPIService
 import SinhVienAPIService
@@ -170,6 +171,14 @@ object Constants {
                 .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
                 .build()
                 .create(LichSuSuaMayAPIService::class.java)
+        }
+
+        val phieuMuonMayAPIService: PhieuMuonMayAPIService by lazy {
+            Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+                .build()
+                .create(PhieuMuonMayAPIService::class.java)
         }
     }
 }
