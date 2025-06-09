@@ -52,7 +52,7 @@ interface GiangVienAPIService {
         @Body giangVien: GiangVien
     ): UpdateResponse
 
-    @PUT("GiangVien/update.php")
+    @PUT("GiangVien/updateTrangThaiGiangVien.php")
     suspend fun updateTrangThaiGiangVien(
         @Body giangVien: GiangVien
     ): UpdateResponse

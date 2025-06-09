@@ -1,3 +1,4 @@
+import android.icu.util.Calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,9 +39,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +51,7 @@ import kotlinx.coroutines.launch
 fun CreateSinhVienScreen(
     navController: NavHostController,
     sinhVienViewModel: SinhVienViewModel,
+    lopHocViewModel: LopHocViewModel
 ) {
     val danhSachSinhVien = sinhVienViewModel.danhSachAllSinhVien
     val snackbarHostState = remember { SnackbarHostState() }
@@ -56,19 +60,22 @@ fun CreateSinhVienScreen(
 
     val maSVState = remember { mutableStateOf("") }
     val tenSVState = remember { mutableStateOf("") }
-    val ngaySinhState = remember { mutableStateOf("") }
+    val ngaySinhHienThi = remember { mutableStateOf("") } // hiển thị "dd-MM-yyyy"
+    val ngaySinhDb = remember { mutableStateOf("") }
     val gioiTinhState = remember { mutableStateOf("") }
     val emailState = remember { mutableStateOf("") }
     val matKhauState = remember { mutableStateOf("") }
-    val maLopState = remember { mutableStateOf("LOP01") }
-    val maLoaiTKState = remember { mutableStateOf(2) } // mặc định 1
-    val trangThaiState = remember { mutableStateOf(1) } // mặc định active
+    val maLopState = remember { mutableStateOf("") }
+
+    var lopExpanded by remember { mutableStateOf(false) }
+    val lopOptions = lopHocViewModel.danhSachAllLopHoc.map { it.MaLopHoc }
 
     var gioiTinhExpanded by remember { mutableStateOf(false) }
     val gioiTinhOptions = listOf("Nam", "Nữ", "Khác")
 
     LaunchedEffect(Unit) {
         sinhVienViewModel.getAllSinhVien()
+        lopHocViewModel.getAllLopHoc()
     }
     DisposableEffect(Unit) {
         onDispose {
@@ -76,11 +83,39 @@ fun CreateSinhVienScreen(
         }
     }
 
+    var showDatePicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val calendar = remember { Calendar.getInstance() }
+
+    if (showDatePicker) {
+        val datePickerDialog = android.app.DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                calendar.set(year, month, dayOfMonth)
+
+                // Format hiển thị: dd-MM-yyyy
+                val sdfHienThi = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                ngaySinhHienThi.value = sdfHienThi.format(calendar.time)
+
+                // Format lưu DB: yyyy-MM-dd
+                val sdfDb = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                ngaySinhDb.value = sdfDb.format(calendar.time)
+
+                showDatePicker = false
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        datePickerDialog.setOnDismissListener { showDatePicker = false }
+        datePickerDialog.show()
+    }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
-            .height(700.dp),
+            .height(630.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(
@@ -141,11 +176,17 @@ fun CreateSinhVienScreen(
                         )
                     )
 
-                    Text("Ngày Sinh (yyyy-MM-dd)", fontWeight = FontWeight.Bold, color = Color.Black)
+                    Text("Ngày Sinh", fontWeight = FontWeight.Bold, color = Color.Black)
                     OutlinedTextField(
-                        value = ngaySinhState.value,
-                        onValueChange = { ngaySinhState.value = it },
-                        placeholder = { Text("Nhập ngày sinh") },
+                        value = ngaySinhHienThi.value,
+                        onValueChange = {},
+                        readOnly = true,
+                        placeholder = { Text("Chọn ngày sinh") },
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(Icons.Default.DateRange, contentDescription = "Chọn ngày sinh")
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 12.dp),
@@ -202,6 +243,48 @@ fun CreateSinhVienScreen(
                         }
                     }
 
+                    Text("Mã Lớp", fontWeight = FontWeight.Bold, color = Color.Black)
+                    ExposedDropdownMenuBox(
+                        expanded = lopExpanded,
+                        onExpandedChange = { lopExpanded = !lopExpanded }
+                    ) {
+                        OutlinedTextField(
+                            value = maLopState.value,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = lopExpanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            placeholder = { Text("Chọn mã lớp") },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedContainerColor = Color.White,
+                                focusedContainerColor = Color.White,
+                                focusedBorderColor = Color.Black,
+                                unfocusedBorderColor = Color.Black,
+                                focusedTextColor = Color.Black,
+                                unfocusedTextColor = Color.Black
+                            )
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = lopExpanded,
+                            onDismissRequest = { lopExpanded = false }
+                        ) {
+                            lopOptions.forEach { maLop ->
+                                DropdownMenuItem(
+                                    text = { Text(maLop) },
+                                    onClick = {
+                                        maLopState.value = maLop
+                                        lopExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+
                     Text("Email", fontWeight = FontWeight.Bold, color = Color.Black)
                     OutlinedTextField(
                         value = emailState.value,
@@ -240,28 +323,6 @@ fun CreateSinhVienScreen(
                         )
                     )
                 }
-                item {
-                    Text("Trạng Thái:", fontWeight = FontWeight.Bold, color = Color.Black)
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = trangThaiState.value == 1,
-                                onClick = { trangThaiState.value = 1 }
-                            )
-                            Text("Đang học")
-                        }
-                        Spacer(modifier = Modifier.width(24.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = trangThaiState.value == 0,
-                                onClick = { trangThaiState.value = 0 }
-                            )
-                            Text("Đình chỉ")
-                        }
-                    }
-                }
             }
 
 
@@ -297,7 +358,7 @@ fun CreateSinhVienScreen(
             Button(
                 onClick = {
                     if (maSVState.value.isBlank() || tenSVState.value.isBlank() ||
-                        ngaySinhState.value.isBlank() || gioiTinhState.value.isBlank() ||
+                        ngaySinhDb.value.isBlank() || gioiTinhState.value.isBlank() ||
                         emailState.value.isBlank() || matKhauState.value.isBlank()
                     ) {
                         coroutineScope.launch {
@@ -319,13 +380,13 @@ fun CreateSinhVienScreen(
                             val sinhVienMoi = SinhVien(
                                 MaSinhVien = maSVState.value,
                                 TenSinhVien = tenSVState.value,
-                                NgaySinh = ngaySinhState.value,
+                                NgaySinh = ngaySinhDb.value,
                                 GioiTinh = gioiTinhState.value,
                                 Email = emailState.value,
                                 MatKhau = matKhauState.value,
                                 MaLop = maLopState.value,
-                                MaLoaiTaiKhoan = 2,  // mặc định 1
-                                TrangThai = trangThaiState.value
+                                MaLoaiTaiKhoan = 3,  // mặc định 1
+                                TrangThai = 1
                             )
                             sinhVienViewModel.createSinhVien(sinhVienMoi)
                             coroutineScope.launch {

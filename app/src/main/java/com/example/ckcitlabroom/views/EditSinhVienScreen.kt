@@ -1,43 +1,66 @@
-import android.app.DatePickerDialog
+import android.icu.util.Calendar
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
+import android.app.DatePickerDialog
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
-import kotlinx.coroutines.launch
+import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditGiangVienScreen(
-    giangVienViewModel: GiangVienViewModel,
-    magv: String
+fun EditSinhVienScreen(
+    sinhVienViewModel: SinhVienViewModel,
+    lopHocViewModel: LopHocViewModel,
+    masv: String
 ) {
-    var giangVien = giangVienViewModel.giangvien
+    val sinhVien = sinhVienViewModel.sinhvien
 
-    val maGVState = remember { mutableStateOf("") }
-    val tenGVState = remember { mutableStateOf("") }
+    val maSVState = remember { mutableStateOf("") }
+    val tenSVState = remember { mutableStateOf("") }
     val ngaySinhState = remember { mutableStateOf("") }
     val gioiTinhState = remember { mutableStateOf("") }
     val emailState = remember { mutableStateOf("") }
+    val maLopState = remember { mutableStateOf("") }  // Thêm mã lớp
 
     var gioiTinhExpanded by remember { mutableStateOf(false) }
     val gioiTinhOptions = listOf("Nam", "Nữ", "Khác")
+
+    var lopExpanded by remember { mutableStateOf(false) }
+    val lopOptions = lopHocViewModel.danhSachAllLopHoc.map { it.MaLopHoc } // Danh sách mã lớp
 
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -47,40 +70,40 @@ fun EditGiangVienScreen(
     val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(magv) {
-        giangVienViewModel.getGiangVienByMaGV(magv)
+    LaunchedEffect(masv) {
+        sinhVienViewModel.getSinhVienByMaSV(masv)
     }
 
-    LaunchedEffect(giangVien) {
-        giangVien?.let {
-            maGVState.value = it.MaGV
-            tenGVState.value = it.TenGiangVien
-            val parts = it.NgaySinh.split("-") // yyyy-MM-dd
+    LaunchedEffect(sinhVien) {
+        sinhVien?.let {
+            maSVState.value = it.MaSinhVien
+            tenSVState.value = it.TenSinhVien
+            val parts = it.NgaySinh.split("-")
             if (parts.size == 3) {
-                ngaySinhState.value = "${parts[2]}-${parts[1]}-${parts[0]}" // dd-MM-yyyy
+                ngaySinhState.value = "${parts[2]}-${parts[1]}-${parts[0]}"
             }
             gioiTinhState.value = it.GioiTinh
             emailState.value = it.Email
+            maLopState.value = it.MaLop ?: ""  // Khởi tạo mã lớp
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            giangVienViewModel.stopPollingGiangVien()
+            sinhVienViewModel.stopPollingSinhVien()
         }
     }
 
     if (showDatePicker) {
-        val parts = ngaySinhState.value.split("_")
+        val parts = ngaySinhState.value.split("-")
         val day = parts.getOrNull(0)?.toIntOrNull() ?: calendar.get(Calendar.DAY_OF_MONTH)
-        val month = parts.getOrNull(1)?.toIntOrNull()?.minus(1) ?: calendar.get(Calendar.MONTH) // tháng 0-based
+        val month = parts.getOrNull(1)?.toIntOrNull()?.minus(1) ?: calendar.get(Calendar.MONTH)
         val year = parts.getOrNull(2)?.toIntOrNull() ?: calendar.get(Calendar.YEAR)
 
         DatePickerDialog(
             context,
-            { _, selectedYear, selectedMonth, selectedDayOfMonth ->
-                ngaySinhState.value = "${selectedDayOfMonth.toString().padStart(2, '0')}-${(selectedMonth + 1).toString()
-                    .padStart(2, '0')}-$selectedYear"
+            { _, selectedYear, selectedMonth, selectedDay ->
+                ngaySinhState.value = "${selectedDay.toString().padStart(2, '0')}-${(selectedMonth + 1).toString().padStart(2, '0')}-$selectedYear"
                 showDatePicker = false
             },
             year,
@@ -89,12 +112,11 @@ fun EditGiangVienScreen(
         ).show()
     }
 
-
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
-            .height(630.dp),
+            .height(650.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(
@@ -106,7 +128,7 @@ fun EditGiangVienScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text("Chỉnh Sửa Thông Tin Giảng Viên", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                Text("Chỉnh Sửa Thông Tin Sinh Viên", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             }
 
             LazyColumn(
@@ -114,48 +136,37 @@ fun EditGiangVienScreen(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                if (giangVien != null) {
+                if (sinhVien != null) {
                     item {
-                        Text(
-                            text = "Mã Giảng Viên",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("Mã Sinh Viên", color = Color.Black, fontWeight = FontWeight.Bold)
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(1.dp, Color.Black, shape = RoundedCornerShape(12.dp)),
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(start = 10.dp),
-                                horizontalArrangement = Arrangement.Start,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    giangVien.MaGV,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 17.sp
-                                )
+                                Text(maSVState.value, fontWeight = FontWeight.Bold, fontSize = 17.sp)
                             }
                         }
                     }
 
                     item {
-                        Text(
-                            text = "Tên Giảng Viên",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("Tên Sinh Viên", color = Color.Black, fontWeight = FontWeight.Bold)
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp),
-                            value = tenGVState.value,
-                            onValueChange = { tenGVState.value = it },
+                            value = tenSVState.value,
+                            onValueChange = { tenSVState.value = it },
+                            shape = RoundedCornerShape(12.dp),
+                            placeholder = { Text("Nhập tên sinh viên") },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedContainerColor = Color.White,
                                 focusedContainerColor = Color.White,
@@ -163,30 +174,26 @@ fun EditGiangVienScreen(
                                 unfocusedBorderColor = Color.Black,
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black
-                            ),
-                            placeholder = { Text("Nhập tên giảng viên") },
-                            shape = RoundedCornerShape(12.dp),
+                            )
                         )
                     }
 
                     item {
-                        Text(
-                            text = "Ngày Sinh (YYYY-MM-DD)",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("Ngày Sinh", color = Color.Black, fontWeight = FontWeight.Bold)
                         OutlinedTextField(
+                            value = ngaySinhState.value,
+                            onValueChange = {},
+                            readOnly = true,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp),
-                            value = ngaySinhState.value,
-                            onValueChange = { ngaySinhState.value = it },
-                            readOnly = true,
                             trailingIcon = {
                                 IconButton(onClick = { showDatePicker = true }) {
                                     Icon(Icons.Default.DateRange, contentDescription = "Chọn ngày")
                                 }
                             },
+                            placeholder = { Text("Chọn ngày sinh") },
+                            shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedContainerColor = Color.White,
                                 focusedContainerColor = Color.White,
@@ -194,18 +201,12 @@ fun EditGiangVienScreen(
                                 unfocusedBorderColor = Color.Black,
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black
-                            ),
-                            placeholder = { Text("Nhập ngày sinh") },
-                            shape = RoundedCornerShape(12.dp),
+                            )
                         )
                     }
 
                     item {
-                        Text(
-                            text = "Giới Tính",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("Giới Tính", color = Color.Black, fontWeight = FontWeight.Bold)
                         ExposedDropdownMenuBox(
                             expanded = gioiTinhExpanded,
                             onExpandedChange = { gioiTinhExpanded = !gioiTinhExpanded }
@@ -236,11 +237,11 @@ fun EditGiangVienScreen(
                                 expanded = gioiTinhExpanded,
                                 onDismissRequest = { gioiTinhExpanded = false }
                             ) {
-                                gioiTinhOptions.forEach { selectionOption ->
+                                gioiTinhOptions.forEach { option ->
                                     DropdownMenuItem(
-                                        text = { Text(selectionOption) },
+                                        text = { Text(option) },
                                         onClick = {
-                                            gioiTinhState.value = selectionOption
+                                            gioiTinhState.value = option
                                             gioiTinhExpanded = false
                                         }
                                     )
@@ -249,18 +250,62 @@ fun EditGiangVienScreen(
                         }
                     }
 
+                    // Thêm phần chọn Mã Lớp
                     item {
-                        Text(
-                            text = "Email",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("Mã Lớp", color = Color.Black, fontWeight = FontWeight.Bold)
+                        ExposedDropdownMenuBox(
+                            expanded = lopExpanded,
+                            onExpandedChange = { lopExpanded = !lopExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = maLopState.value,
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = lopExpanded)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor()
+                                    .padding(bottom = 12.dp),
+                                placeholder = { Text("Chọn mã lớp") },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    unfocusedContainerColor = Color.White,
+                                    focusedContainerColor = Color.White,
+                                    focusedBorderColor = Color.Black,
+                                    unfocusedBorderColor = Color.Black,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black
+                                )
+                            )
+                            ExposedDropdownMenu(
+                                expanded = lopExpanded,
+                                onDismissRequest = { lopExpanded = false }
+                            ) {
+                                lopOptions.forEach { maLop ->
+                                    DropdownMenuItem(
+                                        text = { Text(maLop) },
+                                        onClick = {
+                                            maLopState.value = maLop
+                                            lopExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Text("Email", color = Color.Black, fontWeight = FontWeight.Bold)
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp),
                             value = emailState.value,
                             onValueChange = { emailState.value = it },
+                            shape = RoundedCornerShape(12.dp),
+                            placeholder = { Text("Nhập email") },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedContainerColor = Color.White,
                                 focusedContainerColor = Color.White,
@@ -268,15 +313,12 @@ fun EditGiangVienScreen(
                                 unfocusedBorderColor = Color.Black,
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black
-                            ),
-                            placeholder = { Text("Nhập email") },
-                            shape = RoundedCornerShape(12.dp),
+                            )
                         )
                     }
-
                 } else {
                     item {
-                        Text("Lỗi khi lấy API")
+                        Text("Không tìm thấy sinh viên!", color = Color.Red)
                     }
                 }
             }
@@ -312,8 +354,8 @@ fun EditGiangVienScreen(
 
             Button(
                 onClick = {
-                    if (tenGVState.value.isBlank() || ngaySinhState.value.isBlank() ||
-                        gioiTinhState.value.isBlank() || emailState.value.isBlank()
+                    if (tenSVState.value.isBlank() || ngaySinhState.value.isBlank() ||
+                        gioiTinhState.value.isBlank() || emailState.value.isBlank() || maLopState.value.isBlank()
                     ) {
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(
@@ -323,23 +365,25 @@ fun EditGiangVienScreen(
                             snackbarHostState.showSnackbar("Thông báo")
                         }
                     } else {
-                        val parts = ngaySinhState.value.split("-") // dd-MM-yyyy
+                        val parts = ngaySinhState.value.split("-")
                         val ngaySinhDB = if (parts.size == 3) "${parts[2]}-${parts[1]}-${parts[0]}" else ""
 
-                        val giangVienMoi = GiangVien(
-                            MaGV = maGVState.value,
-                            TenGiangVien = tenGVState.value,
-                            NgaySinh = ngaySinhDB, // chuẩn định dạng yyyy-MM-dd để gửi lên API
+                        val svUpdate = SinhVien(
+                            MaSinhVien = maSVState.value,
+                            TenSinhVien = tenSVState.value,
+                            NgaySinh = ngaySinhDB,
                             GioiTinh = gioiTinhState.value,
                             Email = emailState.value,
-                            MatKhau = giangVien?.MatKhau ?: "",
-                            MaLoaiTaiKhoan = giangVien?.MaLoaiTaiKhoan ?: 2,
-                            TrangThai = giangVien?.TrangThai ?: 1
+                            MaLop = maLopState.value, // Cập nhật mã lớp
+                            MatKhau = sinhVien?.MatKhau ?: "",
+                            MaLoaiTaiKhoan = sinhVien?.MaLoaiTaiKhoan ?: 3,
+                            TrangThai = sinhVien?.TrangThai ?: 1
                         )
-                        giangVienViewModel.updateGiangVien(giangVienMoi)
+
+                        sinhVienViewModel.updateSinhVien(svUpdate)
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(
-                                message = "Cập nhật giảng viên thành công!",
+                                message = "Cập nhật sinh viên thành công!",
                                 type = SnackbarType.SUCCESS
                             )
                             snackbarHostState.showSnackbar("Thông báo")
@@ -350,8 +394,11 @@ fun EditGiangVienScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE))
             ) {
-                Text("Lưu Thông Tin")
+                Text("Cập Nhật", color = Color.White)
             }
         }
     }
 }
+
+
+

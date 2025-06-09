@@ -9,6 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.AccessAlarm
+
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.LaptopChromebook
@@ -41,11 +43,16 @@ fun QuanLyScreen(
                 ChucNang("Chuyển Máy", Icons.Outlined.SwapHoriz, Click = { navController.navigate(NavRoute.QUANLYCHUYENMAY.route) }),
                 ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = { navController.navigate(NavRoute.QUANLYGIANGVIEN.route) }),
                 ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = { navController.navigate(NavRoute.QUANLYSINHVIEN.route) }),
+
                 ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = { /* TODO: Navigate */ }),
                 ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLOPHOC.route) }),
                 ChucNang("Quản Lý Năm Học", Icons.Outlined.DateRange, Click = { navController.navigate(NavRoute.QUANLYNAMHOC.route) }),
                 ChucNang("Quản Lý Phiếu Sửa Chữa", Icons.Outlined.Build, Click = { navController.navigate(NavRoute.QUANLYPHIEUSUACHUA.route) }),
                 ChucNang("Quản Lý Phiếu Mượn May", Icons.Outlined.Article, Click = { navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route) }),
+
+                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = {  }),
+                ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLOPHOC.route) }),
+                ChucNang("Quản Lý Ca Học", Icons.Outlined.AccessAlarm, Click = { navController.navigate(NavRoute.QUANLYCAHOC.route) })
             )
         }
         giangVien?.MaLoaiTaiKhoan == 2 -> {

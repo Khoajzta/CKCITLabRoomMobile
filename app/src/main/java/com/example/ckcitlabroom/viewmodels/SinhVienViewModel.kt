@@ -38,6 +38,7 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
     var sinhvienCreateResult by mutableStateOf("")
     var sinhvienUpdateResult by mutableStateOf("")
     var sinhvienDeleteResult by mutableStateOf("")
+    var sinhVienUpdateTrangThaiResult by mutableStateOf("")
 
     private var pollingJob: Job? = null
 
@@ -114,6 +115,21 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun getSinhVienByMaSV(maSV: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                sinhvien = ITLabRoomRetrofitClient.sinhvienAPIService.getSinhVienByByID(maSV)
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("SinhVienViewModel", "Lỗi khi lấy thông tin sinh viên", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+
     fun createSinhVien(sinhVien: SinhVien) {
         viewModelScope.launch {
             isLoading = true
@@ -180,6 +196,43 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
+
+    fun updateSinhVien(sinhVien: SinhVien) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.sinhvienAPIService.updateSinhVien(
+                        sinhVien
+                    )
+                }
+                sinhvienUpdateResult = response.message
+            } catch (e: Exception) {
+                sinhvienUpdateResult = "Lỗi khi cập nhật sinh viên: ${e.message}"
+                Log.e("SinhVienViewModel", "Lỗi khi cập nhật sinh viên: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun updateTrangThaiSinhVien(sinhVien: SinhVien) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.sinhvienAPIService.updateTrangThaiSinhVien(sinhVien)
+                }
+                sinhVienUpdateTrangThaiResult = response.message
+            } catch (e: Exception) {
+                sinhVienUpdateTrangThaiResult = "Lỗi khi cập nhật trạng thái sinh viên: ${e.message}"
+                Log.e("SinhVienViewModel", "Lỗi khi cập nhật trạng thái sinh viên: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
 }
 
 

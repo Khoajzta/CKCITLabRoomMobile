@@ -43,28 +43,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
+import com.composables.icons.lucide.Clock
 import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.School
-import com.example.ckcitlabroom.models.LopHoc
-import com.example.ckcitlabroom.viewmodels.LopHocViewModel
+import com.composables.icons.lucide.Timer
+import com.composables.icons.lucide.TimerOff
+import com.example.ckcitlabroom.models.CaHoc
+import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 
 @Composable
-fun CardLopHoc(
-    lopHoc: LopHoc,
+fun CardCaHoc(
+    caHoc: CaHoc,
     navController: NavHostController,
-    lopHocViewModel: LopHocViewModel
+    caHocViewModel: CaHocViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
-
     var showDialog by remember { mutableStateOf(false) }
-
 
     Card(
         modifier = Modifier
@@ -82,12 +81,14 @@ fun CardLopHoc(
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            InfoRow(icon = Lucide.Hash, label = "Mã lớp", value = lopHoc.MaLopHoc)
-            InfoRow(icon = Lucide.School, label = "Lớp", value = lopHoc.TenLopHoc)
+            InfoRow(icon = Lucide.Hash, label = "Mã ca học", value = caHoc.MaCaHoc.toString())
+            InfoRow(icon = Lucide.Clock, label = "Tên ca", value = caHoc.TenCa)
+            InfoRow(icon = Lucide.Timer, label = "Giờ bắt đầu", value = caHoc.GioBatDau)
+            InfoRow(icon = Lucide.TimerOff, label = "Giờ kết thúc", value = caHoc.GioKetThuc)
 
-            val (color, statusText, statusIcon) = when (lopHoc.TrangThai) {
+            val (color, statusText, statusIcon) = when (caHoc.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFFF44336), "Không hoạt động", Lucide.CircleX)
+                0 -> Triple(Color(0xFFF44336), "Bận", Lucide.CircleX)
                 else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
             }
 
@@ -110,7 +111,6 @@ fun CardLopHoc(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn() + expandVertically(),
@@ -128,7 +128,7 @@ fun CardLopHoc(
 
                     Button(
                         onClick = {
-                            navController.navigate(NavRoute.EDITLOPHOC.route + "?malop=${lopHoc.MaLopHoc}")
+                            navController.navigate(NavRoute.EDITCAHOC.route + "?maca=${caHoc.MaCaHoc}")
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
@@ -145,6 +145,7 @@ fun CardLopHoc(
                     ) {
                         Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
                     }
+
                     if (showDialog) {
                         AlertDialog(
                             containerColor = Color.White,
@@ -153,7 +154,7 @@ fun CardLopHoc(
                                 Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
                             },
                             text = {
-                                Text("Lớp: ${lopHoc.TenLopHoc}", color = Color.Black)
+                                Text("Ca: ${caHoc.TenCa}", color = Color.Black)
                             },
                             confirmButton = {
                                 Row(
@@ -163,8 +164,8 @@ fun CardLopHoc(
                                     Button(
                                         modifier = Modifier.weight(1f).padding(end = 8.dp),
                                         onClick = {
-                                            lopHocViewModel.updateTrangThaiLopHoc(
-                                                LopHoc(lopHoc.MaLopHoc, lopHoc.TenLopHoc, 1)
+                                            caHocViewModel.updateTrangThaiCaHoc(
+                                                CaHoc(caHoc.MaCaHoc, caHoc.TenCa, caHoc.GioBatDau, caHoc.GioKetThuc, 1)
                                             )
                                             showDialog = false
                                         },
@@ -177,15 +178,15 @@ fun CardLopHoc(
                                     Button(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
-                                            lopHocViewModel.updateTrangThaiLopHoc(
-                                                LopHoc(lopHoc.MaLopHoc, lopHoc.TenLopHoc, 0)
+                                            caHocViewModel.updateTrangThaiCaHoc(
+                                                CaHoc(caHoc.MaCaHoc, caHoc.TenCa, caHoc.GioBatDau, caHoc.GioKetThuc, 0)
                                             )
                                             showDialog = false
                                         },
                                         shape = RoundedCornerShape(12.dp),
                                         colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
                                     ) {
-                                        Text("Không Hoạt Động", color = Color.White)
+                                        Text("Bận", color = Color.White)
                                     }
                                 }
                             }
@@ -196,11 +197,11 @@ fun CardLopHoc(
                         AlertDialog(
                             onDismissRequest = { showConfirmDialog = false },
                             title = { Text("Xác nhận") },
-                            text = { Text("Bạn có chắc chắn muốn xóa lớp này không?", fontWeight = FontWeight.Bold) },
+                            text = { Text("Bạn có chắc chắn muốn xóa ca học này không?", fontWeight = FontWeight.Bold) },
                             confirmButton = {
                                 TextButton(
                                     onClick = {
-                                        lopHocViewModel.deleteLopHoc(lopHoc.MaLopHoc)
+                                        caHocViewModel.deleteCaHoc(caHoc.MaCaHoc.toString())
                                         showConfirmDialog = false
                                     }
                                 ) {
@@ -218,7 +219,6 @@ fun CardLopHoc(
                             containerColor = Color.White
                         )
                     }
-
                 }
             }
         }

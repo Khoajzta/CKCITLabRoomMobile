@@ -58,6 +58,8 @@ import com.composables.icons.lucide.PersonStanding
 import com.composables.icons.lucide.User
 import com.composables.icons.lucide.Users
 import com.example.ckcitlabroom.models.LopHoc
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun CardGiangVien(
@@ -107,7 +109,17 @@ fun CardGiangVien(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(imageVector = Lucide.Calendar, contentDescription = "Ngày sinh", tint = Color.Black, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Ngày sinh: ${giangVien.NgaySinh}", fontSize = 16.sp)
+                val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                val outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+
+                val ngaySinhFormatted = try {
+                    LocalDate.parse(giangVien.NgaySinh, inputFormatter).format(outputFormatter)
+                } catch (e: Exception) {
+                    giangVien.NgaySinh
+                }
+
+                Text("Ngày sinh: $ngaySinhFormatted", fontSize = 16.sp)
+
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
