@@ -58,14 +58,12 @@ fun CreateGiangVienScreen(
 
     val maGVState = remember { mutableStateOf("") }
     val tenGVState = remember { mutableStateOf("") }
-    val ngaySinhState = remember { mutableStateOf("") }
     val gioiTinhState = remember { mutableStateOf("") }
     val emailState = remember { mutableStateOf("") }
     val matKhauState = remember { mutableStateOf("") }
 
-    // Trong Composable:
-    val ngaySinhHienThi = remember { mutableStateOf("") } // hiển thị "dd-MM-yyyy"
-    val ngaySinhDb = remember { mutableStateOf("") }       // gửi về DB "yyyy-MM-dd"
+    val ngaySinhHienThi = remember { mutableStateOf("") }
+    val ngaySinhDb = remember { mutableStateOf("") }
 
 
     var gioiTinhExpanded by remember { mutableStateOf(false) }

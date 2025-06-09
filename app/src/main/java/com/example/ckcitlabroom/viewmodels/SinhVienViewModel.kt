@@ -116,6 +116,21 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun getSinhVienByMaSV(maSV: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                sinhvien = ITLabRoomRetrofitClient.sinhvienAPIService.getSinhVienByByID(maSV)
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("SinhVienViewModel", "Lỗi khi lấy thông tin sinh viên", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+
     fun createSinhVien(sinhVien: SinhVien) {
         viewModelScope.launch {
             isLoading = true
@@ -194,8 +209,8 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
                 }
                 sinhvienUpdateResult = response.message
             } catch (e: Exception) {
-                sinhvienUpdateResult = "Lỗi khi cập nhật máy tính: ${e.message}"
-                Log.e("SinhVienViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
+                sinhvienUpdateResult = "Lỗi khi cập nhật sinh viên: ${e.message}"
+                Log.e("SinhVienViewModel", "Lỗi khi cập nhật sinh viên: ${e.message}")
             } finally {
                 isLoading = false
             }

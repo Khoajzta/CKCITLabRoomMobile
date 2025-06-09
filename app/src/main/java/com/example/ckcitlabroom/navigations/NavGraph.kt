@@ -444,25 +444,19 @@ fun NavgationGraph(
                 )
             }
         ) {
-            CreateSinhVienScreen(navController, sinhVienViewModel)
+            CreateSinhVienScreen(navController, sinhVienViewModel, lopHocViewModel)
         }
 
         composable(
-            route = NavRoute.EDITSINHVIEN.route,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(200)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(200)
-                )
-            }
-        ) {
-//            EditSinhVienScreen()
+            NavRoute.EDITSINHVIEN.route + "?masv={masv}",
+            arguments = listOf(
+                navArgument("masv") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val masv = navBackStackEntry.arguments?.getString("masv") ?: ""
+            EditSinhVienScreen(sinhVienViewModel,lopHocViewModel, masv)
         }
 
         composable(

@@ -111,28 +111,10 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
                 giangvien = ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByByID(magv)
             } catch (e: Exception) {
                 errorMessage = e.message
-                Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
+                Log.e("GiangVienViewModel", "Lỗi khi lấy thông tin giảng vieen", e)
 
             } finally {
                 isLoading = false
-
-
-                fun getGiangVienById(magv: String) {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        isLoading = true
-                        try {
-                            val result =
-                                ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByByID(magv)
-                            giangvien = result
-                        } catch (e: Exception) {
-                            errorMessage = e.message
-                            Log.e("GiangVienViewModel", "Lỗi khi lấy thông tin giảng viên", e)
-                        } finally {
-                            isLoading = false
-                        }
-                    }
-                }
-
             }
         }
     }
