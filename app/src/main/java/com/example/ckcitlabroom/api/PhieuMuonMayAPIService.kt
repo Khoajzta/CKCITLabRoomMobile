@@ -10,16 +10,20 @@ data class PhieuMuonMayResponse(
     val phieumuonmay: List<PhieuMuonMay>? = null
 )
 
+data class UpdateTrangThaiRequest(
+    val MaPhieuMuon: String,
+    val TrangThai: Int
+)
 
 
 interface PhieuMuonMayAPIService {
     @GET("PhieuMuonMay/read.php")
     suspend fun getAllPhieuMuonMay(): PhieuMuonMayResponse
 
-    @GET("PhieuMuonMay/getPhieuSuaChuaTheoMa.php")
-    suspend fun getPhieuSuaChuaByMaMay(
-        @Query("MaMay") maMay: String
-    ): PhieuSuaChuaResponse
+    @GET("PhieuMuonMay/show.php")
+    suspend fun getPhieuMuonMayByMaPhieuMuon(
+        @Query("MaPhieuMuon") maphieumuon: String
+    ): PhieuMuonMay
 
     @POST("PhieuMuonMay/create.php")
     suspend fun createPhieuMuonMay(
@@ -27,7 +31,12 @@ interface PhieuMuonMayAPIService {
     ): CreateResponse
 
     @PUT("PhieuMuonMay/update.php")
-    suspend fun updatePhieuSuaChua(
-        @Body phieusuachua: PhieuSuaChua
+    suspend fun updatePhieuMuonMay(
+        @Body phieuMuonMay: PhieuMuonMay
+    ): UpdateResponse
+
+    @PUT("PhieuMuonMay/updateTrangThai.php")
+    suspend fun updateTrangThaiPhieuMuon(
+        @Body trangThaiRequest: UpdateTrangThaiRequest
     ): UpdateResponse
 }

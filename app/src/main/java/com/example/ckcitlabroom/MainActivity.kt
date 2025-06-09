@@ -74,6 +74,7 @@ import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
 
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+import com.example.lapstore.viewmodels.ChiTietPhieuMuonViewModel
 
 
 import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
@@ -118,6 +119,7 @@ fun MainScreen() {
     val chiTietSuDungMayViewModel: ChiTietSuDungMayViewModel = viewModel()
     val lichSuSuaMayViewModel: LichSuSuaMayViewModel = viewModel()
     val phieuMuonMayViewModel: PhieuMuonMayViewModel = viewModel()
+    val chiTietPhieuMuonViewModel: ChiTietPhieuMuonViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -273,7 +275,8 @@ fun MainScreen() {
                     phieuSuaChuaViewModel,
                     chiTietSuDungMayViewModel,
                     lichSuSuaMayViewModel,
-                    phieuMuonMayViewModel
+                    phieuMuonMayViewModel,
+                    chiTietPhieuMuonViewModel
                 )
             }
         }

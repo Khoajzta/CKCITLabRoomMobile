@@ -39,7 +39,8 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 fun CardPhongMayChuyen(
     phongmay: PhongMay,
     navController: NavHostController,
-    mayTinhViewModel: MayTinhViewModel
+    mayTinhViewModel: MayTinhViewModel,
+    click:()-> Unit
 ) {
     val danhsachmaytinh = mayTinhViewModel.danhSachAllMayTinh
     val soLuongMay = danhsachmaytinh?.count { it.MaPhong == phongmay.MaPhong } ?: 0
@@ -59,15 +60,10 @@ fun CardPhongMayChuyen(
             .padding(bottom = 8.dp)
             .fillMaxWidth()
             .width(300.dp)
-            .clickable {
-                val route = if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)) {
-                    NavRoute.PHONGKHOCHUYEN.route
-                } else {
-                    NavRoute.PHONGMAYCHUYEN.route
-                }
-                navController.navigate("$route?maphong=${phongmay.MaPhong}")
-            }
             .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
+        onClick = {
+            click()
+        },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(10.dp)
     ) {
@@ -78,15 +74,11 @@ fun CardPhongMayChuyen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             InfoRow(
-                icon = Lucide.Warehouse,
-                label = "Phòng",
-                value = phongmay.TenPhong
+                icon = Lucide.Warehouse, label = "Phòng", value = phongmay.TenPhong
             )
 
             InfoRow(
-                icon = Lucide.Hash,
-                label = "Số lượng máy",
-                value = soLuongMay.toString()
+                icon = Lucide.Hash, label = "Số lượng máy", value = soLuongMay.toString()
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -98,9 +90,7 @@ fun CardPhongMayChuyen(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "Trạng thái: ",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 16.sp
+                    text = "Trạng thái: ", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp
                 )
                 Box(
                     modifier = Modifier
@@ -110,10 +100,7 @@ fun CardPhongMayChuyen(
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(
-                    text = statusText,
-                    color = color,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    text = statusText, color = color, fontWeight = FontWeight.Bold, fontSize = 16.sp
                 )
             }
         }

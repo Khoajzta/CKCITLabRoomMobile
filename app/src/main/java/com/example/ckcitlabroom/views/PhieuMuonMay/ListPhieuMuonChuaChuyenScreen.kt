@@ -27,12 +27,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.History
 import com.composables.icons.lucide.Lucide
+import com.example.lapstore.viewmodels.ChiTietPhieuMuonViewModel
+import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
 fun ListPhieuMuonChuaChuyen(
     navController: NavHostController,
+    phongMayViewModel: PhongMayViewModel,
     phieuMuonMayViewModel: PhieuMuonMayViewModel,
+    chiTietPhieuMuonViewModel: ChiTietPhieuMuonViewModel,
+    mayTinhViewModel: MayTinhViewModel,
+    lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
 ){
     val danhsachAllPhieuMuonMay = phieuMuonMayViewModel.danhSachAllPhieuMuonMay
 
@@ -91,7 +97,7 @@ fun ListPhieuMuonChuaChuyen(
                 }
             } else {
                 items(danhSachPhieuChuaChuyen) { phieumuonmay ->
-                    CardPhieuMuonMay(phieumuonmay, navController)
+                    CardPhieuMuonMay(phieumuonmay,phieuMuonMayViewModel,phongMayViewModel,navController,chiTietPhieuMuonViewModel,mayTinhViewModel,lichSuChuyenMayViewModel)
                 }
             }
         }

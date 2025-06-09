@@ -75,20 +75,18 @@ class ChiTietDonNhapyViewModel : ViewModel() {
         }
     }
 
-    suspend fun createNhieuChiTietDonNhap(danhSach: List<ChiTietDonNhap>) {
-        isLoading = true
-        try {
-            val response = withContext(Dispatchers.IO) {
-                ITLabRoomRetrofitClient.chitietdonnhapAPIService.createListChiTietDonNhap(danhSach)
+    suspend fun createNhieuChiTietDonNhap(danhSach: List<ChiTietDonNhap>): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = ITLabRoomRetrofitClient.chitietdonnhapAPIService.createListChiTietDonNhap(danhSach)
+                Result.success(response.message ?: "Thêm chi tiết đơn nhập thành công")
+            } catch (e: Exception) {
+                Log.e("ChiTietDonNhapViewModel", "Lỗi thêm nhiều chi tiết đơn nhập: ${e.message}")
+                Result.failure(e)
             }
-            chitietdonnhapCreateResult = response.message
-        } catch (e: Exception) {
-            chitietdonnhapCreateResult = "Lỗi khi thêm danh sách chi tiết đơn nhập: ${e.message}"
-            Log.e("ChiTietDonNhapViewModel", "Lỗi thêm nhiều chi tiết đơn nhập: ${e.message}")
-        } finally {
-            isLoading = false
         }
     }
+
 
     suspend fun createNhieuChiTietDonNhapAsync(ds: List<ChiTietDonNhap>): Boolean {
         return try {

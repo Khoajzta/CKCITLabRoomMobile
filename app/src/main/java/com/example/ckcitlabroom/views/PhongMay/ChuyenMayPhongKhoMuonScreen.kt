@@ -106,7 +106,7 @@ fun PhongKhoMuonChuyenScreen(
                 }
             }else{
                 items(danhsachdonnhap) { donnhap ->
-                    CardDonNhapChuyen(maphong,donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController)
+                    CardDonNhapChuyen(maphong,donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController, click = {})
                 }
             }
         }

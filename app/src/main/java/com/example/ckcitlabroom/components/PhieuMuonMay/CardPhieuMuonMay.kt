@@ -19,6 +19,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,15 +43,46 @@ import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.MapPin
 import com.composables.icons.lucide.Monitor
 import com.composables.icons.lucide.User
+import com.example.lapstore.viewmodels.ChiTietPhieuMuonViewModel
+import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
+import com.example.lapstore.viewmodels.MayTinhViewModel
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun CardPhieuMuonMay(
     phieuMuonMay: PhieuMuonMay,
-    navController: NavHostController
+    phieuMuonMayViewModel: PhieuMuonMayViewModel,
+    phongMayViewModel: PhongMayViewModel,
+    navController: NavHostController,
+    chiTietPhieuMuonViewModel: ChiTietPhieuMuonViewModel,
+    mayTinhViewModel: MayTinhViewModel,
+    lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
 ){
     var showDialog by remember { mutableStateOf(false) }
+
+    var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
+
+    val danhSachChiTiet by remember { derivedStateOf { chiTietPhieuMuonViewModel.danhSachChiTietPhieuMuonTheoMaPhieu } }
+    val danhSachMayTinh by remember { derivedStateOf { mayTinhViewModel.danhSachAllMayTinh } }
+
+    val mayTinhDaMuon = remember(danhSachChiTiet, danhSachMayTinh) {
+        danhSachMayTinh.filter { may ->
+            danhSachChiTiet.any { ct -> ct.MaMay == may.MaMay }
+        }
+    }
+
+    LaunchedEffect(phieuMuonMay.MaPhieuMuon) {
+        chiTietPhieuMuonViewModel.getChiTietPhieuMuonTheoMaPhieuOnce(phieuMuonMay.MaPhieuMuon.toString())
+        mayTinhViewModel.getAllMayTinh()
+    }
+
+    LaunchedEffect(phieuMuonMay.MaPhong) {
+        phongMayCard = phongMayViewModel.fetchPhongMayByMaPhong(phieuMuonMay.MaPhong)
+    }
 
     Card(
         modifier = Modifier
@@ -57,7 +90,10 @@ fun CardPhieuMuonMay(
             .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 7.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        onClick = {
+            navController.navigate(NavRoute.CHITIETPHIEUMUON.route + "?maphieumuon=${phieuMuonMay.MaPhieuMuon}")
+        }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             InfoRow(icon = Lucide.Cpu, label = "Tên Người Mượn", value = phieuMuonMay.NguoiMuon)
@@ -68,10 +104,19 @@ fun CardPhieuMuonMay(
 
             if(phieuMuonMay.NgayTra != "0000-00-00" && phieuMuonMay.TrangThai == 2){
                 InfoRow(icon = Lucide.CalendarDays, label = "Ngày Trả", value = formatNgay(phieuMuonMay.NgayTra))
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
-            InfoRow(icon = Lucide.MapPin, label = "Khoa Mượn", value = phieuMuonMay.MaPhong)
-            Spacer(modifier = Modifier.height(8.dp))
+            if (phongMayCard != null) {
+                InfoRow(
+                    icon = Lucide.MapPin,
+                    label = "Khoa Mượn",
+                    value = phongMayCard?.TenPhong.orEmpty()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+
 
             InfoRow(icon = Lucide.CalendarDays, label = "Số lượng", value = phieuMuonMay.SoLuong)
 
@@ -108,7 +153,7 @@ fun CardPhieuMuonMay(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        navController.navigate(NavRoute.CHUYENMAYPHIEUMUON.route)
+                        navController.navigate(NavRoute.CHUYENMAYPHIEUMUON.route + "?maphong=${phieuMuonMay.MaPhong}&maphieumuon=${phieuMuonMay.MaPhieuMuon}")
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff0b9adc))
@@ -148,7 +193,25 @@ fun CardPhieuMuonMay(
                             Button(
                                 modifier = Modifier.weight(1f).padding(end = 8.dp),
                                 onClick = {
-                                    var phieuMuonMay = phieuMuonMay.copy(TrangThai = 1)
+                                    val ngayHienTai = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                                    val phieuMuonCapNhat = phieuMuonMay.copy(NgayTra = ngayHienTai, TrangThai = 2)
+
+                                    phieuMuonMayViewModel.updatePhieuMuonMay(phieuMuonCapNhat)
+
+                                    mayTinhDaMuon.forEach { mayTinh ->
+                                        val mayTinhCapNhat = mayTinh.copy(MaPhong = "KHOLUUTRU", TenMay = "MAYKHOLUUTRU")
+                                        mayTinhViewModel.updateMayTinh(mayTinhCapNhat)
+
+                                        val lichSu = LichSuChuyenMay(
+                                            MaLichSu = 0,
+                                            MaMay = mayTinh.MaMay,
+                                            MaPhongCu = phieuMuonMay.MaPhong,
+                                            MaPhongMoi = "KHOLUUTRU",
+                                            NgayChuyen = ngayHienTai
+                                        )
+                                        lichSuChuyenMayViewModel.createLichSuChuyenMay(lichSu)
+                                    }
+
                                     showDialog = false
                                 },
                                 shape = RoundedCornerShape(12.dp),

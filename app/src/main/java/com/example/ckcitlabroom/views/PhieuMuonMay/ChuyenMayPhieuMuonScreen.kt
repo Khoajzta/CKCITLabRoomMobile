@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,13 +22,13 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
 fun ChuyenMayPhieuMuonScreen(
+    maphongMuon: String,
+    maphieumuon: String,
     navController: NavHostController,
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
 ){
     val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
-
-
 
     LaunchedEffect(Unit) {
         phongMayViewModel.getAllPhongMay()
@@ -72,7 +73,24 @@ fun ChuyenMayPhieuMuonScreen(
                 }
             } else {
                 items(danhSachPhongMay) { phongmay ->
-                    CardPhongMayChuyen(phongmay, navController, mayTinhViewModel)
+                    CardPhongMayChuyen(
+                        phongmay,
+                        navController,
+                        mayTinhViewModel,
+                        click = {
+                            val route =
+                                if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)) {
+                                    NavRoute.PHONGKHOCHUYENMUON.route
+                                } else {
+                                    NavRoute.PHONGMAYCHUYENMUON.route
+                                }
+
+                            navController.navigate(
+                                "$route?maphong=${phongmay.MaPhong}&maphongmuon=${maphongMuon}&maphieumuon=${maphieumuon}"
+                            )
+
+                        }
+                    )
                 }
             }
         }

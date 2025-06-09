@@ -3,6 +3,7 @@ package com.example.lapstore.api
 import CaHocAPIService
 import CauHinhAPIService
 import ChiTietDonNhapAPIService
+import ChiTietPhieuMuonAPIService
 import ChiTietSuDungMayAPIService
 import DonNhapAPIService
 import GiangVienAPIService
@@ -179,6 +180,14 @@ object Constants {
                 .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
                 .build()
                 .create(PhieuMuonMayAPIService::class.java)
+        }
+
+        val chiteitieuMuonMayAPIService: ChiTietPhieuMuonAPIService by lazy {
+            Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+                .build()
+                .create(ChiTietPhieuMuonAPIService::class.java)
         }
     }
 }

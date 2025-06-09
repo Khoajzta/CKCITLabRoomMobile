@@ -30,10 +30,8 @@ fun ListPhongMayChuyenScreen(
     navController: NavHostController,
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
-){
+) {
     val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
-
-
 
     LaunchedEffect(Unit) {
         phongMayViewModel.getAllPhongMay()
@@ -78,7 +76,20 @@ fun ListPhongMayChuyenScreen(
                 }
             } else {
                 items(danhSachPhongMay) { phongmay ->
-                    CardPhongMayChuyen(phongmay, navController, mayTinhViewModel)
+                    CardPhongMayChuyen(
+                        phongmay,
+                        navController,
+                        mayTinhViewModel,
+                        click = {
+                            val route =
+                                if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)) {
+                                    NavRoute.PHONGKHOCHUYEN.route
+                                } else {
+                                    NavRoute.PHONGMAYCHUYEN.route
+                                }
+                            navController.navigate("$route?maphong=${phongmay.MaPhong}")
+                        }
+                    )
                 }
             }
         }

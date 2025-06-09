@@ -14,10 +14,15 @@ import kotlinx.coroutines.withContext
 
 class PhieuMuonMayViewModel : ViewModel() {
 
+    var phieuMuonMay = PhieuMuonMay(0, "", "", "", "", "", 0)
+
     var danhSachAllPhieuMuonMay by mutableStateOf<List<PhieuMuonMay>>(emptyList())
         private set
 
     var danhSachAllPhieuSuaChuaTheoMa by mutableStateOf<List<PhieuSuaChuaRp>>(emptyList())
+        private set
+
+    var phieuMuonMap by mutableStateOf<Map<String, PhieuMuonMay>>(emptyMap())
         private set
 
     private var pollingAllPhieuMuonMayJob: Job? = null
@@ -53,25 +58,22 @@ class PhieuMuonMayViewModel : ViewModel() {
         pollingAllPhieuMuonMayJob = null
     }
 
-    fun getPhieuSuaChuaTheoMaMay(maMay: String) {
-        viewModelScope.launch {
+    fun getPhieuMuonByMaPhieu(maphieumuon: String) {
+        viewModelScope.launch(Dispatchers.IO) {
             isLoading = true
             try {
-                val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.phieusuachuaAPIService.getPhieuSuaChuaByMaMay(maMay)
+                val result = ITLabRoomRetrofitClient.phieuMuonMayAPIService.getPhieuMuonMayByMaPhieuMuon(maphieumuon)
+                phieuMuonMap = phieuMuonMap.toMutableMap().apply {
+                    put(maphieumuon, result)
                 }
-                danhSachAllPhieuSuaChuaTheoMa = response.phieusuachua ?: emptyList()
-                errorMessage = null
             } catch (e: Exception) {
-                danhSachAllPhieuSuaChuaTheoMa = emptyList()
-                errorMessage = "Lỗi khi lấy phiếu sửa chữa theo mã máy: ${e.message}"
-                Log.e("PhieuSuaChuaViewModel", "Lỗi khi lấy phiếu sửa chữa theo mã máy", e)
+                errorMessage = e.message
+                Log.e("PhieuMuonMayViewModel", "Lỗi khi lấy phiếu mượn", e)
             } finally {
                 isLoading = false
             }
         }
     }
-
 
 
     fun createPhieuMuonMay(phieuMuonMay: PhieuMuonMay) {
@@ -83,7 +85,7 @@ class PhieuMuonMayViewModel : ViewModel() {
                 }
                 phieumuonmayCreateResult = response.message
             } catch (e: Exception) {
-                phieumuonmayCreateResult = "Lỗi khi thêm phieu sua chua: ${e.message}"
+                phieumuonmayCreateResult = "Lỗi khi thêm phieu muon may: ${e.message}"
                 Log.e("PhieuMuonMayViewModel", "Lỗi khi thêm phieu muonmay: ${e.message}")
             } finally {
                 isLoading = false
@@ -91,21 +93,41 @@ class PhieuMuonMayViewModel : ViewModel() {
         }
     }
 
-    fun updatePhieuSuaChua(phieuSuaChua: PhieuSuaChua) {
+    fun updatePhieuMuonMay(phieumuonmay: PhieuMuonMay) {
         viewModelScope.launch {
             isLoading = true
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.phieusuachuaAPIService.updatePhieuSuaChua(phieuSuaChua)
+                    ITLabRoomRetrofitClient.phieuMuonMayAPIService.updatePhieuMuonMay(phieumuonmay)
                 }
                 phieuSuaChuaUpdateResult = response.message
             } catch (e: Exception) {
-                phieuSuaChuaUpdateResult = "Lỗi khi cập nhật phieu sua chua: ${e.message}"
-                Log.e("PhieuSuaChuaViewModel", "Lỗi khi cập nhật phieu sua chua: ${e.message}")
+                phieuSuaChuaUpdateResult = "Lỗi khi cập nhật phieu muon may: ${e.message}"
+                Log.e("PhieuMuonMayViewModel", "Lỗi khi cập nhật phieu muon may: ${e.message}")
             } finally {
                 isLoading = false
             }
         }
     }
+
+    fun updateTrangThaiPhieuMuon(maPhieuMuon: String, trangThai: Int) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.phieuMuonMayAPIService.updateTrangThaiPhieuMuon(
+                        UpdateTrangThaiRequest(maPhieuMuon, trangThai)
+                    )
+                }
+                phieuSuaChuaUpdateResult = response.message
+            } catch (e: Exception) {
+                phieuSuaChuaUpdateResult = "Lỗi khi cập nhật trạng thái: ${e.message}"
+                Log.e("PhieuMuonMayViewModel", "Lỗi khi cập nhật trạng thái", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
 
 }

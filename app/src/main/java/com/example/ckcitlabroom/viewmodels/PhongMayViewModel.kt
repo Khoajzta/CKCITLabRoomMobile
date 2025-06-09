@@ -25,7 +25,6 @@ class PhongMayViewModel : ViewModel() {
     var phongmaycu: PhongMay by mutableStateOf(pm)
         private set
 
-
     var danhSachAllPhongMay by mutableStateOf(listOf<PhongMay>())
         private set
 

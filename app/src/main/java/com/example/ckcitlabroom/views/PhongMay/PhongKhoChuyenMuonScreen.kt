@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,22 +8,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,14 +24,17 @@ import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun PhongKhoChuyenScreen(
+fun PhongKhoChuyenMuonScreen(
+    maphieumuon:String,
     maphong:String,
+    maphongMuon:String,
     navController: NavHostController,
     phongMayViewModel: PhongMayViewModel,
     mayTinhViewModel: MayTinhViewModel,
     donNhapyViewModel: DonNhapViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel
 ){
+
     var danhsachdonnhap = donNhapyViewModel.danhSachDonNhap
 
     LaunchedEffect(Unit) {
@@ -106,7 +98,17 @@ fun PhongKhoChuyenScreen(
                 }
             }else{
                 items(danhsachdonnhap) { donnhap ->
-                    CardDonNhapChuyen(maphong,donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController, click = {navController.navigate(NavRoute.CHITIETDONNHAPCHUYEN.route + "?madonnhap=${donnhap.MaDonNhap}&maphong=${maphong}")})
+                    CardDonNhapChuyen(
+                        maphong,donnhap,
+                        chiTietDonNhapyViewModel,
+                        mayTinhViewModel,
+                        navController,
+                        click = {
+                            navController.navigate(
+                                NavRoute.CHITIETDONNHAPCHUYENMUON.route + "?madonnhap=${donnhap.MaDonNhap}&maphong=${maphong}&maphongmuon=${maphongMuon}&maphieumuon=${maphieumuon}"
+                            )
+                        }
+                    )
                 }
             }
         }
