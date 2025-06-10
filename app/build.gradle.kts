@@ -51,12 +51,12 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.navigation:navigation-compose:2.8.3")
+    implementation("androidx.navigation:navigation-compose:2.9.0")
     implementation("androidx.compose.animation:animation:1.9.0-alpha03")
-    implementation("androidx.compose.material:material-icons-extended-android:1.7.5")
+    implementation("androidx.compose.material:material-icons-extended-android:1.7.8")
     implementation("com.composables:icons-lucide:1.0.0")
     implementation ("androidx.compose.material:material:1.8.2")
-
+    implementation ("androidx.compose.material3:material3:1.2.1")
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     // Fuel library
@@ -75,10 +75,10 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.1")
 
-    implementation("androidx.datastore:datastore:1.1.1")
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore:1.1.7")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
 
     implementation ("com.google.zxing:core:3.5.0")
     implementation ("androidx.camera:camera-core:1.4.2")

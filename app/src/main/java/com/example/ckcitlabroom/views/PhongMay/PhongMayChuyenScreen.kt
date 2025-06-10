@@ -114,7 +114,7 @@ fun PhongMayChuyenScreen(
                 "Danh Sách Máy Tính Phòng ${phongmay.TenPhong}",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
-                color = Color.White
+                color = Color(0xFF1B8DDE)
             )
 
         }
@@ -266,7 +266,7 @@ fun PhongMayChuyenScreen(
 
                             selectedMayTinhs.forEach { mayTinh ->
                                 // Cập nhật máy tính với phòng mới
-                                val mayTinhCapNhat = mayTinh.copy(MaPhong = selectedMaPhong)
+                                val mayTinhCapNhat = mayTinh.copy(MaPhong = selectedMaPhong, TenMay = "MAY${selectedMaPhong}")
                                 mayTinhViewModel.updateMayTinh(mayTinhCapNhat)
 
                                 // Tạo đối tượng lịch sử chuyển máy

@@ -114,30 +114,40 @@ fun PhongMayDetailScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
-                modifier = Modifier.width(180.dp),
-                onClick = { showDialog = true },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-            ) {
-                Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
-            }
+            if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)){
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { showDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                ) {
+                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
+            }else{
+                Button(
+                    modifier = Modifier.width(180.dp),
+                    onClick = { showDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                ) {
+                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
 
-            Button(
-                modifier = Modifier.width(180.dp),
-                onClick = {
-                    if (danhSachMayTinh.isNullOrEmpty()) {
-                        showConfirmDeleteDialog = true
-                    } else {
-                        showDeleteWarning = true
-                    }
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
-            ) {
-                Text("Xóa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                Button(
+                    modifier = Modifier.width(180.dp),
+                    onClick = {
+                        if (danhSachMayTinh.isNullOrEmpty()) {
+                            showConfirmDeleteDialog = true
+                        } else {
+                            showDeleteWarning = true
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                ) {
+                    Text("Xóa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
             }
-
         }
 
         if (showConfirmDeleteDialog) {

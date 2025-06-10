@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -32,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -102,13 +105,13 @@ fun PhongMayDonNhapScreen(
                 "Danh Sách Đơn Nhập",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
-                color = Color.White
+                color = Color(0xFF1B8DDE)
             )
         }
 
         // Danh sách đơn nhập
         LazyColumn(
-            modifier = Modifier.height(520.dp)
+            modifier = Modifier.height(550.dp)
         ) {
 
             if(danhsachdonnhap.isNullOrEmpty()){
@@ -128,7 +131,7 @@ fun PhongMayDonNhapScreen(
                 }
             }else{
                 items(danhsachdonnhap) { donnhap ->
-                    CardDonNhap(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController)
+                    CardDonNhap(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController, click = {navController.navigate(NavRoute.CHITIETDONNHAP.route + "?madonnhap=${donnhap.MaDonNhap}")})
                 }
             }
         }
@@ -137,41 +140,45 @@ fun PhongMayDonNhapScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(55.dp),
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { showDialog = true },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-            ) {
-                Text("Chỉnh sửa phòng máy", color = Color.Black, fontWeight = FontWeight.ExtraBold)
+            if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)){
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { showDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                ) {
+                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
+            }else{
+                Button(
+                    modifier = Modifier.width(180.dp),
+                    onClick = { showDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                ) {
+                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
+
+                Button(
+                    modifier = Modifier.width(180.dp),
+                    onClick = {
+                        if (danhSachMayTinh.isNullOrEmpty()) {
+                            showConfirmDeleteDialog = true
+                        } else {
+                            showDeleteWarning = true
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                ) {
+                    Text("Xóa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
             }
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(55.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    if (danhSachMayTinh.isNullOrEmpty()) {
-                        showConfirmDeleteDialog = true
-                    } else {
-                        showDeleteWarning = true
-                    }
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
-            ) {
-                Text("Xóa phòng máy", color = Color.White, fontWeight = FontWeight.ExtraBold)
-            }
-        }
 
         if (showConfirmDeleteDialog) {
             AlertDialog(
@@ -306,6 +313,7 @@ fun PhongMayDonNhapScreen(
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black
                             ),
+                            textStyle = TextStyle(fontSize = 16.sp),
                             placeholder = { Text("Nhập thông tin") },
                             shape = RoundedCornerShape(12.dp),
                         )

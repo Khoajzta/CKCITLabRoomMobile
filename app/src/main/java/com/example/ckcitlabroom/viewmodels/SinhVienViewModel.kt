@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lapstore.api.ITLabRoomRetrofitClient
+import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -67,6 +67,7 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
                 val response = ITLabRoomRetrofitClient.sinhvienAPIService.CheckLogin(request)
                 _loginResult.value = response
             } catch (e: Exception) {
+                Log.e("LoginError", "Exception khi gọi API", e)
                 _loginResult.value = LoginResponse(
                     result = false, message = "Lỗi kết nối: ${e.message}"
                 )
@@ -90,7 +91,6 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-
     fun logout() {
         viewModelScope.launch {
             sinhvienPreferences.logout()
@@ -98,7 +98,6 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
             _loginResult.value = null
         }
     }
-
 
     fun getAllSinhVien() {
         if (pollingJob != null) return
@@ -235,5 +234,6 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
     }
 
 }
+
 
 

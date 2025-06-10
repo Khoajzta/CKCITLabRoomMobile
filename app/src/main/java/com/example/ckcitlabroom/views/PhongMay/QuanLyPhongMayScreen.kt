@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,19 +47,19 @@ fun QuanLyPhongMay(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(bottom = 16.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 "Quản Lý Phòng Máy",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
-                color = Color.White
+                fontSize = 20.sp,
+                color = Color(0xFF1B8DDE)
             )
             IconButton(
                 onClick = {
@@ -65,9 +67,10 @@ fun QuanLyPhongMay(
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Add,
+                    modifier = Modifier.size(35.dp),
+                    imageVector = Icons.Filled.AddCircle,
                     contentDescription = "Thêm cấu hình",
-                    tint = Color.White
+                    tint = Color(0xFF1B8DDE),
                 )
             }
         }

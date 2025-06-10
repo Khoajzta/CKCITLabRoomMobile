@@ -9,7 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ckcitlabroom.models.LopHoc
-import com.example.lapstore.api.ITLabRoomRetrofitClient
+import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -232,4 +232,14 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
             TrangThai = 0
         )
     }
+
+    suspend fun getGiangVienByMaGOrEmailSync(key: String): GiangVien? {
+        return try {
+            ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByEmailOrMaGV(key)
+        } catch (e: Exception) {
+            Log.e("GiangVienViewModel", "Lỗi khi lấy giảng viên (sync): ${e.localizedMessage}", e)
+            null
+        }
+    }
+
 }

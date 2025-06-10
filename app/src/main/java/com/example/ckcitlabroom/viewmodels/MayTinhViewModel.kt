@@ -1,13 +1,14 @@
 package com.example.lapstore.viewmodels
 
 import MayTinh
+import MayTinhTrangThaiUpdateRequest
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lapstore.api.ITLabRoomRetrofitClient
+import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -127,6 +128,36 @@ class MayTinhViewModel : ViewModel() {
         }
     }
 
+    suspend fun createNhieuMayTinh(danhSach: List<MayTinh>) {
+        isLoading = true
+        try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.maytinhAPIService.createListMayTinh(danhSach)
+            }
+            maytinhCreateResult = response.message
+        } catch (e: Exception) {
+            maytinhCreateResult = "Lỗi khi thêm danh sách máy: ${e.message}"
+            Log.e("MayTinhViewModel", "Lỗi thêm nhiều máy: ${e.message}")
+        } finally {
+            isLoading = false
+        }
+    }
+
+    suspend fun createNhieuMayTinhAsync(danhSach: List<MayTinh>): Boolean {
+        return try {
+            val response = withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.maytinhAPIService.createListMayTinh(danhSach)
+            }
+            response.message.contains("thành công", ignoreCase = true)
+        } catch (e: Exception) {
+            Log.e("MayTinhViewModel", "Lỗi khi tạo nhiều máy tính: ${e.message}")
+            false
+        }
+    }
+
+
+
+
     suspend fun createMayTinhBlocking(maytinh: MayTinh): Boolean {
         return try {
             val response = withContext(Dispatchers.IO) {
@@ -156,6 +187,26 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
+
+    fun updateTrangThaiMayTinh(request: MayTinhTrangThaiUpdateRequest) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.maytinhAPIService.updateTrangThaiMay(request)
+                }
+                maytinhUpdateResult = response.message
+            } catch (e: Exception) {
+                maytinhUpdateResult = "Lỗi khi cập nhật máy tính: ${e.message}"
+                Log.e("MayTinhViewModel", "Lỗi khi cập nhật máy tính: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+
+
 
     fun deleteMayTinh(mamay: String) {
         viewModelScope.launch {

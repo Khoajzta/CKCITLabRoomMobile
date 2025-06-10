@@ -72,7 +72,8 @@ fun CardDonNhap(
     donNhap: DonNhap,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     mayTinhViewModel: MayTinhViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    click:()->Unit
 ) {
     // Lấy chi tiết đơn nhập riêng theo Mã đơn
     val chiTietState = produceState<List<ChiTietDonNhap>>(initialValue = emptyList(), donNhap.MaDonNhap) {
@@ -91,7 +92,7 @@ fun CardDonNhap(
         danhSachMayTinh.filter { it.MaMay in maMayTheoDon }
     }
 
-    val soLuongMayTrongKho = danhSachMayTheoDon.count { it.MaPhong == "KHO" }
+    val soLuongMayTrongKho = danhSachMayTheoDon.count { it.MaPhong == "KHOLUUTRU" }
 
     Card(
         modifier = Modifier
@@ -101,7 +102,7 @@ fun CardDonNhap(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = {
-            navController.navigate(NavRoute.CHITIETDONNHAP.route + "?madonnhap=${donNhap.MaDonNhap}")
+            click()
         }
     ) {
         Column(

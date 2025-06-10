@@ -27,7 +27,7 @@ data class LoginResponse(
 
 interface GiangVienAPIService {
 
-    @POST("GiangVien/checklogin.php")
+    @POST("GiangVien/checkLogin.php")
     suspend fun CheckLogin(@Body request: LoginRequest): LoginResponse
 
 
@@ -36,12 +36,6 @@ interface GiangVienAPIService {
 
     @GET("GiangVien/getGiangVienTheoMaOrEmail.php")
     suspend fun getGiangVienByEmailOrMaGV(@Query("key") key: String): GiangVien
-
-
-    @GET("MayTinh/show.php")
-    suspend fun getMayTinhByMaMay(
-        @Query("MaMay") mamay: String
-    ): MayTinh
 
     @GET("GiangVien/show.php")
     suspend fun getGiangVienByByID(

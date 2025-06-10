@@ -3,13 +3,18 @@ package com.example.ckcitlabroom
 import AnimatedNavigationBar
 import ButtonData
 import GiangVienViewModel
+import LichSuSuaMayViewModel
 import LoginSVScreen
 import LoginSinhVienState
+import NamHocViewModel
 import NavRoute
 import NavgationGraph
+import PhieuMuonMayViewModel
+import PhieuSuaChuaViewModel
 import PhongMayViewModel
 import SinhVienViewModel
 import SinhVienPreferences
+import TuanViewModel
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -69,8 +74,10 @@ import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
-
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
+
+
+import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
 import com.example.lapstore.viewmodels.DonNhapViewModel
 
 import com.example.lapstore.viewmodels.LichHocViewModel
@@ -106,7 +113,15 @@ fun MainScreen() {
     val chitietdonNhapyViewModel: ChiTietDonNhapyViewModel = viewModel()
     val sinhVienViewModel: SinhVienViewModel = viewModel()
     val lopHocViewModel: LopHocViewModel = viewModel()
+
     val caHocViewModel: CaHocViewModel = viewModel()
+
+    val namHocViewModel: NamHocViewModel = viewModel()
+    val tuanViewModel: TuanViewModel = viewModel()
+    val phieuSuaChuaViewModel: PhieuSuaChuaViewModel = viewModel()
+    val chiTietSuDungMayViewModel: ChiTietSuDungMayViewModel = viewModel()
+    val lichSuSuaMayViewModel: LichSuSuaMayViewModel = viewModel()
+    val phieuMuonMayViewModel: PhieuMuonMayViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -257,7 +272,16 @@ fun MainScreen() {
                     donNhapyViewModel,
                     chitietdonNhapyViewModel,
                     sinhVienViewModel,
+
                     caHocViewModel
+
+
+                    namHocViewModel,
+                    tuanViewModel,
+                    phieuSuaChuaViewModel,
+                    chiTietSuDungMayViewModel,
+                    lichSuSuaMayViewModel,
+                    phieuMuonMayViewModel
 
                 )
             }

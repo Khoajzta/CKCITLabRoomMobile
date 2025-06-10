@@ -4,5 +4,6 @@ data class PhieuSuaChua(
     var NgayBaoHong:String,
     var MoTaLoi:String,
     var MaPhong:String,
+    var MaNguoiBaoHong:String,
     var TrangThai:Int
 )

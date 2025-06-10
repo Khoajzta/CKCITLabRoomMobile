@@ -32,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,8 +62,14 @@ fun ChiTietDonNhapChuyenScreen(
     mayTinhViewModel: MayTinhViewModel,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
 ) {
-    val danhSachChiTiet = chiTietDonNhapyViewModel.danhSachChiTietDonNhaptheoMaDonNhap
-    val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
+    val danhSachChiTiet by produceState(initialValue = emptyList<ChiTietDonNhap>(), maDonNhap) {
+        value = chiTietDonNhapyViewModel.getChiTietDonNhapListOnce(maDonNhap)
+    }
+
+    val danhSachMayTinh by produceState(initialValue = emptyList<MayTinh>()) {
+        value = mayTinhViewModel.getAllMayTinhOnce()
+    }
+
     val phongmay = phongMayViewModel.phongmay
 
     val danhSachMayTinhTheoDon = remember(danhSachChiTiet, danhSachMayTinh) {
@@ -124,7 +131,7 @@ fun ChiTietDonNhapChuyenScreen(
                 "Danh Sách Máy Tính Chưa chuyển Theo Đơn",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
-                color = Color.White
+                color = Color(0xFF1B8DDE)
             )
 
         }
@@ -277,7 +284,7 @@ fun ChiTietDonNhapChuyenScreen(
 
                             selectedMayTinhs.forEach { mayTinh ->
                                 // Cập nhật máy tính với phòng mới
-                                val mayTinhCapNhat = mayTinh.copy(MaPhong = selectedMaPhong)
+                                val mayTinhCapNhat = mayTinh.copy(MaPhong = selectedMaPhong, TenMay = "MAY${selectedMaPhong}")
                                 mayTinhViewModel.updateMayTinh(mayTinhCapNhat)
 
                                 // Tạo đối tượng lịch sử chuyển máy

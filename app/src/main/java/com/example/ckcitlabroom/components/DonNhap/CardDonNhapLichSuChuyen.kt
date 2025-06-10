@@ -53,7 +53,7 @@ fun CardDonNhapLichSuChuyen(
         danhSachMayTinh.filter { it.MaMay in maMayTheoDon }
     }
 
-    val soLuongMayTrongKho = danhSachMayTheoDon.count { it.MaPhong == "KHO" }
+    val soLuongMayTrongKho = danhSachMayTheoDon.count { it.MaPhong == "KHOLUUTRU" }
 
     Card(
         modifier = Modifier

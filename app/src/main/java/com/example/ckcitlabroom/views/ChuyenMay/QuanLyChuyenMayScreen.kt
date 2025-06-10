@@ -1,12 +1,18 @@
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,80 +36,37 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 @Composable
 fun QuanLyChuyenMayScreen(
     navController: NavHostController,
-    mayTinhViewModel: MayTinhViewModel,
-    phongMayViewModel: PhongMayViewModel,
-    donNhapViewModel: DonNhapViewModel
 ) {
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
-
-
-
-    LaunchedEffect(Unit) {
-        phongMayViewModel.getAllPhongMay()
-        mayTinhViewModel.getAllMayTinh()
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            mayTinhViewModel.stopPollingAllMayTinh()
-        }
-    }
+    val dsChucNang =
+        listOf(
+            ChucNang("Danh Sách Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.LISTPHONGMAYCHUYEN.route) }),
+            ChucNang("Lịch Sử Chuyển Máy", Icons.Filled.History, Click = { navController.navigate(NavRoute.LICHSUCHUYENMAY.route) }),
+        )
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Center
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Chuyển máy",
-                color = Color.White,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 25.sp
-            )
+        Text(
+            modifier = Modifier.padding(bottom = 16.dp),
+            text = "Quản Lý Chuyển Máy",
+            color = Color(0xFF1B8DDE),
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 20.sp
+        )
 
-            IconButton(
-                onClick = {
-                    navController.navigate(NavRoute.LICHSUCHUYENMAY.route)
-                }
-            ) {
-                Icon(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = Lucide.History,
-                    contentDescription = null,
-                    tint = Color.White
-                )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize(),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(dsChucNang) { chucNang ->
+                CardChucNang(chucNang)
             }
         }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            if (danhSachPhongMay.isNullOrEmpty()) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "Chưa có phòng máy",
-                            color = Color.White,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                }
-            } else {
-                items(danhSachPhongMay) { phongmay ->
-                    CardPhongMayChuyen(phongmay, navController, phongMayViewModel, mayTinhViewModel)
-                }
-            }
-        }
-
-
     }
 }

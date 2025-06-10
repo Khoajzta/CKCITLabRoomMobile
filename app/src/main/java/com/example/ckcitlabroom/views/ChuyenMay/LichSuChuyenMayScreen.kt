@@ -52,14 +52,14 @@ fun LichSuChuyenMayScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 "Danh Sách Đơn Nhập",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
-                color = Color.White
+                fontSize = 20.sp,
+                color = Color(0xFF1B8DDE)
             )
         }
 
