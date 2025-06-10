@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -72,8 +73,8 @@ fun PhongMayDetailScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -83,6 +84,12 @@ fun PhongMayDetailScreen(
                 color = Color(0xFF1B8DDE)
             )
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
+        )
 
         LazyColumn(
             modifier = Modifier.height(550.dp)
@@ -97,7 +104,7 @@ fun PhongMayDetailScreen(
                     ) {
                         Text(
                             "Chưa có máy tính nào",
-                            color = Color.White,
+                            color = Color.Black,
                             modifier = Modifier.padding(16.dp)
                         )
                     }

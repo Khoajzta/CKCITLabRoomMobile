@@ -68,86 +68,44 @@ fun CardGiangVien(
     giangVienViewModel: GiangVienViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var showConfirmDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
-    // Chọn màu trạng thái dựa trên giangVien.TrangThai (1: hoạt động, 0: không hoạt động)
-    val (color, statusText) = when (giangVien.TrangThai) {
-        1 -> Color(0xFF4CAF50) to "Hoạt động"
-        0 -> Color(0xFFF44336) to "Không hoạt động"
-        else -> Color.Gray to "Không xác định"
+    val (color, statusText, statusIcon) = when (giangVien.TrangThai) {
+        1 -> Triple(Color(0xFF4CAF50), "Đang Công Tác", Lucide.CircleCheck)
+        0 -> Triple(Color(0xFFF44336), "Ngừng Công Tác", Lucide.CircleX)
+        else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
     }
 
     Card(
         modifier = Modifier
-            .padding(bottom = 8.dp)
             .fillMaxWidth()
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
+            .padding(bottom = 12.dp)
+            .clickable {
                 expanded = !expanded
             }
-            .animateContentSize(
-                animationSpec = tween(durationMillis = 20, easing = FastOutSlowInEasing)
-            ),
+            .animateContentSize(),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(7.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            InfoRow(icon = Lucide.Hash, label = "Mã GV", value = giangVien.MaGV)
+            Spacer(Modifier.height(8.dp))
+            InfoRow(icon = Lucide.User, label = "Tên", value = giangVien.TenGiangVien)
+            Spacer(Modifier.height(8.dp))
+            InfoRow(icon = Lucide.Calendar, label = "Ngày sinh", value = formatNgay(giangVien.NgaySinh))
+            Spacer(Modifier.height(8.dp))
+            InfoRow(icon = Lucide.Users, label = "Giới tính", value = giangVien.GioiTinh)
+            Spacer(Modifier.height(8.dp))
+            InfoRow(icon = Lucide.Mail, label = "Email", value = giangVien.Email)
+            Spacer(Modifier.height(8.dp))
+
+            // Trạng thái
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Hash, contentDescription = "Mã GV", tint = Color.Black, modifier = Modifier.size(20.dp))
+                Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Mã GV: ${giangVien.MaGV}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.User, contentDescription = "Tên GV", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Tên: ${giangVien.TenGiangVien}", fontSize = 16.sp)
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Calendar, contentDescription = "Ngày sinh", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                val outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-
-                val ngaySinhFormatted = try {
-                    LocalDate.parse(giangVien.NgaySinh, inputFormatter).format(outputFormatter)
-                } catch (e: Exception) {
-                    giangVien.NgaySinh
-                }
-
-                Text("Ngày sinh: $ngaySinhFormatted", fontSize = 16.sp)
-
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Users , contentDescription = "Giới tính", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Giới tính: ${giangVien.GioiTinh}")
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Mail, contentDescription = "Email", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Email: ${giangVien.Email}")
-            }
-
-            val (color, statusText, statusIcon) = when (giangVien.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFFF44336), "Không hoạt động", Lucide.CircleX)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = statusIcon,
-                    contentDescription = "Trạng thái",
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ")
+                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold)
                 Box(
                     modifier = Modifier
                         .size(10.dp)
@@ -155,98 +113,90 @@ fun CardGiangVien(
                         .background(color)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color)
+                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(Modifier.height(8.dp))
+            if (expanded) {
+                Spacer(modifier = Modifier.height(12.dp))
 
-            AnimatedVisibility(
-                visible = expanded,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                Column {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { showDialog = true },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
-                    ) {
-                        Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
-                    }
-                    if (showDialog) {
-                        AlertDialog(
-                            containerColor = Color.White,
-                            onDismissRequest = { showDialog = false },
-                            title = {
-                                Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
-                            },
-                            text = {
-                                Text("Giảng viên: ${giangVien.TenGiangVien}", color = Color.Black)
-                            },
-                            confirmButton = {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Button(
-                                        modifier = Modifier.weight(1f).padding(end = 8.dp),
-                                        onClick = {
-                                            giangVienViewModel.updateTrangThaiGiangVien(
-                                                GiangVien(giangVien.MaGV, giangVien.TenGiangVien, giangVien.NgaySinh, giangVien.GioiTinh,
-                                                    giangVien.Email, giangVien.MatKhau, giangVien.MaLoaiTaiKhoan, 1)
-                                            )
-                                            showDialog = false
-                                        },
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                                    ) {
-                                        Text("Hoạt Động", color = Color.White)
-                                    }
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { showDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
+                ) {
+                    Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
+                }
 
-                                    Button(
-                                        modifier = Modifier.weight(1f),
-                                        onClick = {
-                                            giangVienViewModel.updateTrangThaiGiangVien(
-                                                GiangVien(giangVien.MaGV, giangVien.TenGiangVien, giangVien.NgaySinh, giangVien.GioiTinh,
-                                                    giangVien.Email, giangVien.MatKhau, giangVien.MaLoaiTaiKhoan, 0)
-                                            )
-                                            showDialog = false
-                                        },
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
-                                    ) {
-                                        Text("Không Hoạt Động", color = Color.White)
-                                    }
-                                }
-                            }
-                        )
-                    }
+                Button(
+                    onClick = {
+                        navController.navigate(NavRoute.EDITGIANGVIEN.route + "?magv=${giangVien.MaGV}")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE))
+                ) {
+                    Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
+                }
 
-                    Button(
-                        onClick = {
-                            navController.navigate(NavRoute.EDITGIANGVIEN.route + "?magv=${giangVien.MaGV}")
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
-                    }
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { showConfirmDialog = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
-                    }
+                Button(
+                    onClick = { showConfirmDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808))
+                ) {
+                    Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }
     }
 
+    // Dialog trạng thái
+    if (showDialog) {
+        AlertDialog(
+            containerColor = Color.White,
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Text("Giảng viên: ${giangVien.TenGiangVien}", color = Color.Black)
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                        onClick = {
+                            giangVienViewModel.updateTrangThaiGiangVien(giangVien.copy(TrangThai = 1))
+                            showDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                    ) {
+                        Text("Hoạt Động", color = Color.White)
+                    }
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            giangVienViewModel.updateTrangThaiGiangVien(giangVien.copy(TrangThai = 0))
+                            showDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
+                    ) {
+                        Text("Không Hoạt Động", color = Color.White)
+                    }
+                }
+            }
+        )
+    }
+
+    // Dialog xác nhận xóa
     if (showConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },

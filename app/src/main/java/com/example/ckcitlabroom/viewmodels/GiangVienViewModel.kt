@@ -99,7 +99,7 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
                 } catch (e: Exception) {
                     Log.e("GiangVienViewModel", "Polling lỗi", e)
                 }
-                delay(500)
+                delay(200)
             }
         }
     }

@@ -27,6 +27,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -108,7 +109,7 @@ fun PhongMayChuyenScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -119,6 +120,12 @@ fun PhongMayChuyenScreen(
                 color = Color(0xFF1B8DDE)
             )
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
+        )
 
         if (showButton) {
             // Khi có máy chọn, đặt chiều cao LazyColumn cố định 550.dp
@@ -132,7 +139,7 @@ fun PhongMayChuyenScreen(
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("Chưa có máy tính nào", color = Color.White, modifier = Modifier.padding(16.dp))
+                            Text("Chưa có máy tính nào", color = Color.Black, modifier = Modifier.padding(16.dp))
                         }
                     }
                 } else {
@@ -158,7 +165,7 @@ fun PhongMayChuyenScreen(
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("Chưa có máy tính nào", color = Color.White, modifier = Modifier.padding(16.dp))
+                            Text("Chưa có máy tính nào", color = Color.Black, modifier = Modifier.padding(16.dp))
                         }
                     }
                 } else {

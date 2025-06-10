@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.MeetingRoom
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.SupervisorAccount
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -59,6 +60,12 @@ fun QuanLyPhieuSuaChuaScreen(
             color = Color(0xFF1B8DDE),
             fontWeight = FontWeight.ExtraBold,
             fontSize = 20.sp
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
         )
 
         LazyVerticalGrid(

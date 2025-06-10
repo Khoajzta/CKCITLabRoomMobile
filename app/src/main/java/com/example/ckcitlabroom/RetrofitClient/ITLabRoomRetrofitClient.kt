@@ -189,5 +189,13 @@ object Constants {
                 .build()
                 .create(ChiTietPhieuMuonAPIService::class.java)
         }
+
+        val monHocAPIService: MonHocAPIService by lazy {
+            Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+                .build()
+                .create(MonHocAPIService::class.java)
+        }
     }
 }

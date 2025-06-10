@@ -29,6 +29,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -130,10 +131,25 @@ fun CardMayTinhChuyen(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            InfoRow(icon = Lucide.Monitor, label = "Mã Máy", value = maytinh.MaMay)
-            InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = maytinh.TenMay)
-            InfoRow(icon = Lucide.Building2, label = "Phòng hiện tại", value = phongMayCard?.TenPhong ?: "Đang tải...")
+            Text(
+                text = "Thông tin máy tính",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
 
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
+
+            InfoRow(icon = Lucide.Monitor, label = "Mã Máy", value = maytinh.MaMay)
+            Spacer(Modifier.height(8.dp))
+            InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = maytinh.TenMay)
+            Spacer(Modifier.height(8.dp))
+            InfoRow(icon = Lucide.Building2, label = "Phòng hiện tại", value = phongMayCard?.TenPhong ?: "Đang tải...")
+            Spacer(Modifier.height(8.dp))
             val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
                 0 -> Triple(Color(0xFFF44336), "Đang bảo trì", Lucide.CircleX)

@@ -61,6 +61,7 @@ import com.composables.icons.lucide.Monitor
 import com.composables.icons.lucide.MousePointer2
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import android.graphics.Paint
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.graphics.vector.ImageVector
 
 
@@ -105,17 +106,31 @@ fun CardMayTinh(
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Thông tin máy tính",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
 
             // QR Code
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                QRCodeImage(base64Str = maytinh.QRCode, modifier = Modifier.size(100.dp))
+                QRCodeImage(base64Str = maytinh.QRCode, modifier = Modifier.size(120.dp))
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             // Basic info
             InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = maytinh.TenMay)
+            Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.MapPin, label = "Vị Trí", value = maytinh.ViTri)
+            Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.Building2, label = "Phòng", value = phongMayCard?.TenPhong ?: "Đang tải...")
 
             val (color, statusText, statusIcon) = when (maytinh.TrangThai) {

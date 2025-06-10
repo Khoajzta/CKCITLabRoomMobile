@@ -25,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -145,11 +146,17 @@ fun CreateDonNhapScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 12.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text("Nhập Đơn Hàng ", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             }
+
+            HorizontalDivider(
+                modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color.Gray,
+            )
 
             LazyColumn(
                 modifier = Modifier
@@ -470,9 +477,15 @@ fun CreateDonNhapScreen(
                 }
             }
 
+            HorizontalDivider(
+                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color.Gray,
+            )
+
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(8.dp)
             ) { data ->
                 snackbarData.value?.let { customData ->
                     Snackbar(
@@ -556,13 +569,12 @@ fun CreateDonNhapScreen(
                         dialogMessage.value = "Vui lòng nhập nhà cung cấp!"
                         openDialog.value = true
                     } else if (fields.any { it.isBlank() }) {
-                        dialogMessage.value = "Vui lòng nhập đầy đủ thông tin linh kiện!"
+                        dialogMessage.value = "Vui lòng nhập đầy đủ thông tin linh kiện. Nếu không có thì nhập trống"
                         openDialog.value = true
                     } else {
-                        loadingState.value = true  // Hiện loading ngay khi bắt đầu
+                        loadingState.value = true
 
                         coroutineScope.launch {
-                            // Chạy toàn bộ tác vụ nặng trong Dispatchers.IO để không block UI
                             withContext(Dispatchers.IO) {
                                 val ngayNhap = sdfNgayNhap.format(parsedDate)
                                 val dateMaMay = sdfMaMay.format(parsedDate)
@@ -642,21 +654,21 @@ fun CreateDonNhapScreen(
 
             if (openDialog.value) {
                 AlertDialog(
-                    modifier = Modifier.background(Color.White),
+                    containerColor = Color.White,
+                    modifier = Modifier.background(Color.Transparent),
                     onDismissRequest = { openDialog.value = false },
                     confirmButton = {
                         TextButton(onClick = {
                             openDialog.value = false
-                            navController.popBackStack()
                         }) {
-                            Text("OK")
+                            Text("OK",color = Color(0XFF1B8DDE))
                         }
                     },
                     title = {
-                        Text(text = "Thông báo")
+                        Text(text = "Thông báo",color = Color.Black)
                     },
                     text = {
-                        Text(dialogMessage.value)
+                        Text(dialogMessage.value,color = Color.Black)
                     }
                 )
             }

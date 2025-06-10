@@ -27,16 +27,14 @@ sealed class NavRoute(val route: String) {
     object LOGINSINHVIEN : NavRoute("loginsv_screen")
     object QUANLY : NavRoute("quanly_screen")
 
+    //Đơn Nhập
     object QUANLYDONNHAP : NavRoute("quanlydonnhap_screen")
     object ADDDONNHAP : NavRoute("adddonnhap_screen")
     object CHITIETDONNHAP : NavRoute("chitietdonnhap_screen")
     object CHITIETDONNHAPCHUYEN : NavRoute("chitietdonnhapchuyen_screen")
     object CHITIETDONNHAPCHUYENMUON : NavRoute("chitietdonnhapchuyenmuon_screen")
 
-
-    object ADDCAUHINH : NavRoute("addcauhinh_screen")
-    object EDITCAUHINH : NavRoute("editcauhinh_screen")
-
+    //Máy Tinh
     object QUANLYMAYTINH : NavRoute("quanlymaytinh_screen")
     object EDITMAYTINH : NavRoute("editmaytinh_screen")
     object ADDTMAYTINH : NavRoute("addmaytinh_screen")
@@ -64,12 +62,15 @@ sealed class NavRoute(val route: String) {
     object LISTMAYTINHTHEODONCHUYEN : NavRoute("danhsachmaytinhtheodonchuyen_screen")
     object LISTPHONGMAYCHUYEN : NavRoute("danhsachphongmaychuyen_screen")
 
+    //Quet QR
     object QUETQRCODE : NavRoute("quetqrcode_screen")
 
+    //Sinh Viên
     object QUANLYSINHVIEN : NavRoute("quanlysinhvien_screen")
     object ADDSINHVIEN : NavRoute("addsinhvien_screen")
     object EDITSINHVIEN : NavRoute("editsinhvien_screen")
 
+    //Lớp Học
     object QUANLYLOPHOC : NavRoute("quanlylophoc_screen")
     object ADDLOPHOC : NavRoute("addlophoc_screen")
     object EDITLOPHOC : NavRoute("editlophoc_screen")
@@ -79,6 +80,7 @@ sealed class NavRoute(val route: String) {
     object ADDCAHOC : NavRoute("addcahoc_screen")
     object EDITCAHOC : NavRoute("editcahoc_screen")
 
+    //Phiêu Sửa Chữa
     object ADDPHIEUSUACHUA : NavRoute("addphieusuachua_screen")
     object QUANLYPHIEUSUACHUA : NavRoute("quanlyphieusuachua_screen")
     object LICHSUSUAMAY : NavRoute("lichsusuamay_screen")
@@ -87,7 +89,7 @@ sealed class NavRoute(val route: String) {
     object LISTPHIEUCHUASUA : NavRoute("danhsachphieuchuasua_screen")
     object LISTPHIEUDASUA : NavRoute("danhsachphieudasua_screen")
 
-
+    //Màn hình bắt đầu
     object STARTSCREEN : NavRoute("start_screen")
 
     //Năm học
@@ -107,6 +109,18 @@ sealed class NavRoute(val route: String) {
     object LISTPHIEUMUONMAYCHUACHUYEN : NavRoute("danhsachphieumuonmaychuachuyen_screen")
     object CHUYENMAYPHIEUMUON : NavRoute("chuyenmayphieumuon_screen")
     object CHITIETPHIEUMUON : NavRoute("chitietphieumuon_screen")
+
+    //Lịch Học
+    object QUANLYLICHHOC : NavRoute("quanlylichhoc_screen")
+    object ADDLICHHOC : NavRoute("addlichhoc_screen")
+    object EDITLICHHOC : NavRoute("editlichhoc_screen")
+
+    //Môn Học
+    object QUANLYMONHOC : NavRoute("quanlymonhoc_screen")
+    object ADDMONHOC : NavRoute("addmonhoc_screen")
+    object EDITMONHOC : NavRoute("editmonhoc_screen")
+    object LISTMONHOCDANGDAY : NavRoute("listmonhocdangday_screen")
+    object LISTMONHOCNGUNGDAY : NavRoute("listmonhocngungday_screen")
 
 }
 
@@ -128,8 +142,9 @@ fun NavgationGraph(
     chiTietSuDungMayViewModel: ChiTietSuDungMayViewModel,
     lichSuSuaMayViewModel: LichSuSuaMayViewModel,
     phieuMuonMayViewModel: PhieuMuonMayViewModel,
-    chitetPhieuMuonViewModel: ChiTietPhieuMuonViewModel
-    caHocViewModel: CaHocViewModel
+    chitetPhieuMuonViewModel: ChiTietPhieuMuonViewModel,
+    caHocViewModel: CaHocViewModel,
+    monhocViewModel: MonHocViewModel
 
 ) {
 
@@ -342,42 +357,6 @@ fun NavgationGraph(
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
             MayTinhDetailScreen(mamay,phongMayViewModel,giangVienViewModel,navController)
-        }
-
-        composable(
-            route = NavRoute.ADDCAUHINH.route,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(300)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(300)
-                )
-            }
-        ) {
-            CreateCauHinhScreen()
-        }
-
-        composable(
-            route = NavRoute.EDITCAUHINH.route,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up,
-                    animationSpec = tween(300)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Down,
-                    animationSpec = tween(300)
-                )
-            }
-        ) {
-//            EditCauHinhScreen()
         }
 
         composable(
@@ -1190,6 +1169,109 @@ fun NavgationGraph(
         ) { navBackStackEntry ->
             val maphieumuon = navBackStackEntry.arguments?.getString("maphieumuon") ?: ""
             ChiTietPhieuMuonMay(maphieumuon,chitetPhieuMuonViewModel,mayTinhViewModel,phongMayViewModel)
+        }
+
+        composable(
+            route = NavRoute.QUANLYLICHHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            QuanLyLichHocScreen(navController)
+        }
+
+        //Môn Học
+        composable(
+            route = NavRoute.QUANLYMONHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            QuanLyMonHocScreen(navController)
+        }
+
+        composable(
+            route = NavRoute.ADDMONHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            CreateMonHocScreen(navController,monhocViewModel)
+        }
+
+        composable(
+            NavRoute.EDITMONHOC.route + "?mamonhoc={mamonhoc}",
+            arguments = listOf(
+                navArgument("mamonhoc") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val mamonhoc = navBackStackEntry.arguments?.getString("mamonhoc") ?: ""
+            EditMonHocScreen(mamonhoc,monhocViewModel)
+        }
+
+        composable(
+            route = NavRoute.LISTMONHOCDANGDAY.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ListMonHocDangDayScreen(navController,monhocViewModel)
+        }
+
+        composable(
+            route = NavRoute.LISTMONHOCNGUNGDAY.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ListMonHocNgungDayScreen(navController,monhocViewModel)
         }
     }
 }

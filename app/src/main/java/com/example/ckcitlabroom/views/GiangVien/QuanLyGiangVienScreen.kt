@@ -4,13 +4,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -24,68 +21,58 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun QuanLyPhongMay(
+fun QuanLyGiangVien(
     navController: NavHostController,
-    phongMayViewModel: PhongMayViewModel,
-    mayTinhViewModel: MayTinhViewModel
+    giangVienViewModel: GiangVienViewModel
 ) {
-
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
+    val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien
 
     LaunchedEffect(Unit) {
-        phongMayViewModel.getAllPhongMay()
+        giangVienViewModel.getAllGiangVien()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            phongMayViewModel.stopPollingPhongMay()
+            giangVienViewModel.stopPollingGiangVien()
         }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 12.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Phòng Máy",
+                "Quản Lý Giảng Viên",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
+                fontSize = 22.sp,
+                color = Color.White
             )
             IconButton(
                 onClick = {
-                    navController.navigate(NavRoute.ADDPHONGMAY.route)
+                    navController.navigate(NavRoute.ADDGIANGVIEN.route)
                 }
             ) {
                 Icon(
-                    modifier = Modifier.size(35.dp),
-                    imageVector = Icons.Filled.AddCircle,
-                    contentDescription = "Thêm cấu hình",
-                    tint = Color(0xFF1B8DDE),
+                    imageVector = Icons.Outlined.Add,
+                    contentDescription = "Thêm giảng viên",
+                    tint = Color.White
                 )
             }
         }
 
-        HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (danhSachPhongMay == null || danhSachPhongMay.isEmpty()) {
+            if (danhSachGiangVien == null || danhSachGiangVien.isEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -93,16 +80,15 @@ fun QuanLyPhongMay(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Chưa có phòng nào",
+                            "Chưa có giảng viên nào",
                             color = Color.White,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
-
                 }
             } else {
-                items(danhSachPhongMay) { phongmay ->
-                    CardPhongMay(phongmay,navController,phongMayViewModel,mayTinhViewModel)
+                items(danhSachGiangVien) { giangvien ->
+                    CardGiangVien(giangvien, navController, giangVienViewModel)
                 }
             }
         }

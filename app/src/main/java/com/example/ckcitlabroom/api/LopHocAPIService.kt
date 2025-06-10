@@ -17,9 +17,6 @@ data class LopResponse(
 
 
 interface LopHocAPIService {
-    @GET("LichHoc/read.php")
-    suspend fun getAllLichHoc(): LichHocResponse
-
     @GET("LopHoc/read.php")
     suspend fun getAllLopHoc(): LopResponse
 

@@ -1,4 +1,3 @@
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,21 +6,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,21 +21,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.ckcitlabroom.components.CardMonHoc
 
 @Composable
-fun QuanLyGiangVien(
+fun ListMonHocNgungDayScreen(
     navController: NavHostController,
-    giangVienViewModel: GiangVienViewModel
-) {
-    val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien
+    monHocViewModel: MonHocViewModel,
+){
+    val danhsachAllMonHoc = monHocViewModel.danhSachAllMonHoc
 
     LaunchedEffect(Unit) {
-        giangVienViewModel.getAllGiangVien()
+        monHocViewModel.getAllMonHoc()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            giangVienViewModel.stopPollingGiangVien()
+            monHocViewModel.stopPollingAllMonHoc()
+        }
+    }
+
+    val danhsachMonHocNgungDay by remember(danhsachAllMonHoc) {
+        derivedStateOf {
+            danhsachAllMonHoc.filter { it.TrangThai == 0 }
         }
     }
 
@@ -54,33 +53,28 @@ fun QuanLyGiangVien(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Giảng Viên",
+                "Danh Sách Môn Học Dã Ngừng Dạy",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
-                color = Color.White
+                fontSize = 20.sp,
+                color = Color(0xFF1B8DDE)
             )
-            IconButton(
-                onClick = {
-                    navController.navigate(NavRoute.ADDGIANGVIEN.route)
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = "Thêm giảng viên",
-                    tint = Color.White
-                )
-            }
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
+        )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (danhSachGiangVien == null || danhSachGiangVien.isEmpty()) {
+            if (danhsachMonHocNgungDay.isEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -88,17 +82,19 @@ fun QuanLyGiangVien(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Chưa có giảng viên nào",
-                            color = Color.White,
+                            "Không có môn học nào",
+                            color = Color.Black,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
+
                 }
             } else {
-                items(danhSachGiangVien) { giangvien ->
-                    CardGiangVien(giangvien, navController, giangVienViewModel)
+                items(danhsachMonHocNgungDay) { monhoc ->
+                    CardMonHoc(monhoc = monhoc, navController = navController, monHocViewModel = monHocViewModel)
                 }
             }
         }
     }
+
 }

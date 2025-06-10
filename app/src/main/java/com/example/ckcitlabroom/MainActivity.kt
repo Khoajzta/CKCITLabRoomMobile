@@ -6,6 +6,7 @@ import GiangVienViewModel
 import LichSuSuaMayViewModel
 import LoginSVScreen
 import LoginSinhVienState
+import MonHocViewModel
 import NamHocViewModel
 import NavRoute
 import NavgationGraph
@@ -122,6 +123,7 @@ fun MainScreen() {
     val phieuMuonMayViewModel: PhieuMuonMayViewModel = viewModel()
     val chiTietPhieuMuonViewModel: ChiTietPhieuMuonViewModel = viewModel()
     val caHocViewModel: CaHocViewModel = viewModel()
+    val monHocViewModel: MonHocViewModel = viewModel()
 
     var isLoading by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -279,8 +281,8 @@ fun MainScreen() {
                     lichSuSuaMayViewModel,
                     phieuMuonMayViewModel,
                     chiTietPhieuMuonViewModel,
-                    caHocViewModel
-
+                    caHocViewModel,
+                    monHocViewModel
                 )
             }
         }

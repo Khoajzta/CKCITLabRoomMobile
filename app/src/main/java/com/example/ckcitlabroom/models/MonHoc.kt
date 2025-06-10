@@ -1,10 +1,5 @@
-data class MoHoc(
-    var MaSinhVien:String,
-    var TenSinhVien:String,
-    var NgaySinh:String,
-    var GioiTinh:String,
-    var MaLop:String,
-    var MatKhau:String,
-    var MaLoaiTaiKhoan:Int,
-    var TrangThai:Int,
+data class MonHoc(
+    var MaMonHoc: String,
+    var TenMonHoc: String,
+    var TrangThai: Int
 )

@@ -17,8 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -57,12 +55,13 @@ fun EditGiangVienScreen(
             tenGVState.value = it.TenGiangVien
             val parts = it.NgaySinh.split("-") // yyyy-MM-dd
             if (parts.size == 3) {
-                ngaySinhState.value = "${parts[2]}-${parts[1]}-${parts[0]}" // dd-MM-yyyy
+                ngaySinhState.value = "${parts[2]}/${parts[1]}/${parts[0]}" // dd/MM/yyyy
             }
             gioiTinhState.value = it.GioiTinh
             emailState.value = it.Email
         }
     }
+
 
     DisposableEffect(Unit) {
         onDispose {
@@ -71,23 +70,30 @@ fun EditGiangVienScreen(
     }
 
     if (showDatePicker) {
-        val parts = ngaySinhState.value.split("_")
+        val parts = ngaySinhState.value.split("/")
         val day = parts.getOrNull(0)?.toIntOrNull() ?: calendar.get(Calendar.DAY_OF_MONTH)
-        val month = parts.getOrNull(1)?.toIntOrNull()?.minus(1) ?: calendar.get(Calendar.MONTH) // tháng 0-based
+        val month = parts.getOrNull(1)?.toIntOrNull()?.minus(1) ?: calendar.get(Calendar.MONTH)
         val year = parts.getOrNull(2)?.toIntOrNull() ?: calendar.get(Calendar.YEAR)
 
-        DatePickerDialog(
+        val datePickerDialog = DatePickerDialog(
             context,
             { _, selectedYear, selectedMonth, selectedDayOfMonth ->
-                ngaySinhState.value = "${selectedDayOfMonth.toString().padStart(2, '0')}-${(selectedMonth + 1).toString()
-                    .padStart(2, '0')}-$selectedYear"
+                ngaySinhState.value = "${selectedDayOfMonth.toString().padStart(2, '0')}/${(selectedMonth + 1).toString()
+                    .padStart(2, '0')}/$selectedYear"
                 showDatePicker = false
             },
             year,
             month,
             day
-        ).show()
+        )
+
+        datePickerDialog.setOnCancelListener {
+            showDatePicker = false
+        }
+
+        datePickerDialog.show()
     }
+
 
 
     Card(
@@ -171,7 +177,7 @@ fun EditGiangVienScreen(
 
                     item {
                         Text(
-                            text = "Ngày Sinh (YYYY-MM-DD)",
+                            text = "Ngày Sinh",
                             color = Color.Black,
                             fontWeight = FontWeight.Bold
                         )
@@ -179,7 +185,7 @@ fun EditGiangVienScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp),
-                            value = ngaySinhState.value,
+                            value = formatNgay(ngaySinhState.value),
                             onValueChange = { ngaySinhState.value = it },
                             readOnly = true,
                             trailingIcon = {
@@ -323,8 +329,9 @@ fun EditGiangVienScreen(
                             snackbarHostState.showSnackbar("Thông báo")
                         }
                     } else {
-                        val parts = ngaySinhState.value.split("-") // dd-MM-yyyy
+                        val parts = ngaySinhState.value.split("/") // dd/MM/yyyy
                         val ngaySinhDB = if (parts.size == 3) "${parts[2]}-${parts[1]}-${parts[0]}" else ""
+
 
                         val giangVienMoi = GiangVien(
                             MaGV = maGVState.value,
@@ -350,7 +357,7 @@ fun EditGiangVienScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE))
             ) {
-                Text("Lưu Thông Tin")
+                Text("Lưu Thông Tin", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }

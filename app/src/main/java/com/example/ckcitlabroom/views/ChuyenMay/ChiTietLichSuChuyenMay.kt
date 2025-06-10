@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -45,7 +46,7 @@ fun ChiTietLichSuChuyenMay(
         verticalArrangement = Arrangement.Top
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -54,6 +55,11 @@ fun ChiTietLichSuChuyenMay(
             Text("Số lần: ${danhsachlichsu.count()}" , fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1B8DDE))
         }
 
+        HorizontalDivider(
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
+        )
 
         LazyColumn {
             if(danhsachlichsu.isNullOrEmpty()){
@@ -63,7 +69,7 @@ fun ChiTietLichSuChuyenMay(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Chưa có lịch sử chuyển máy", color = Color.Black, fontSize = 20.sp)
+                        Text("Chưa có lịch sử chuyển máy", color = Color.Black)
                     }
                 }
             }
