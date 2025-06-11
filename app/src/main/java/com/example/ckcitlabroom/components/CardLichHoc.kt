@@ -27,112 +27,132 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.NoteAlt
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.ViewWeek
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.composables.icons.lucide.CircleAlert
+import com.composables.icons.lucide.CircleCheck
+import com.composables.icons.lucide.Clock
+import com.composables.icons.lucide.Lucide
 
 @Composable
-fun CardLichHoc(lichHoc: LichHoc) {
-    var expanded by remember { mutableStateOf(false) }
-    Box(
+fun CardLichHoc(
+    lichHoc: LichHocRP,
+    giangVien: GiangVien? = null,
+    sinhvien: SinhVien? = null,
+    navController: NavHostController
+) {
+    val isGiangVien = giangVien != null
+    val tieuDe = if (isGiangVien) "Thông tin lịch dạy" else "Thông tin lịch học"
+    val nhanCa = if (isGiangVien) "Ca dạy" else "Ca học"
+
+    Card(
         modifier = Modifier
-            .shadow(10.dp, RoundedCornerShape(20.dp))
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
-    ){
-        Card(
-            modifier = Modifier
-                .width(300.dp)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    expanded = !expanded
-                }
-                .animateContentSize(
-                    animationSpec = tween(
-                        durationMillis = 20,
-                        easing = FastOutSlowInEasing,
-                    )
-                ),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            .padding(bottom = 8.dp)
+            .fillMaxWidth(),
+        onClick = {
+            navController.navigate(NavRoute.EDITLICHHOC.route + "?malichhoc=${lichHoc.MaLichHoc}")
+        },
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
 
-            ) {
-            Column(
+            Text(
+                text = tieuDe,
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            HorizontalDivider(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
+
+            if (isGiangVien) {
+                InfoRow(
+                    icon = Icons.Filled.Person,
+                    label = "Giảng viên",
+                    value = giangVien?.TenGiangVien ?: "Không rõ"
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+            }
+
+            InfoRow(icon = Icons.Filled.MenuBook, label = "Môn học", value = lichHoc.TenMonHoc.toString())
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Filled.MeetingRoom, label = "Phòng", value = lichHoc.TenPhong.toString())
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Filled.Event, label = "Ngày học", value = formatNgay(lichHoc.NgayDay))
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Filled.Schedule, label = nhanCa, value = lichHoc.TenCa.toString())
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Filled.AccessTime, label = "Giờ bắt đầu", value = formatGio(lichHoc.GioBatDau))
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Filled.AccessTime, label = "Giờ kết thúc", value = formatGio(lichHoc.GioKetThuc))
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Filled.Today, label = "Thứ", value = lichHoc.Thu)
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Filled.Groups, label = "Lớp", value = lichHoc.TenLopHoc.toString())
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Icons.Filled.DateRange, label = "Tuần", value = lichHoc.TenTuan.toString())
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(
+                icon = Icons.Filled.NoteAlt,
+                label = "Ghi chú",
+                value = if (!lichHoc.GhiChu.isNullOrBlank()) lichHoc.GhiChu else "Không có ghi chú"
+            )
+
+
+            val (color, statusText, statusIcon) = when (lichHoc.TrangThai) {
+                0 -> Triple(Color(0xFF1B8DDE), "Đã Kết Thúc", Lucide.CircleCheck)
+                1 -> Triple(Color(0xFF4CAF50), "Đang Diễn Ra", Lucide.Clock)
+                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 8.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                    Icon(Icons.Filled.Person, contentDescription = "Giáo viên", tint = Color.Black, modifier = Modifier.size(22.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "GV: ${lichHoc.MaGV}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                    Icon(Icons.Filled.MenuBook, contentDescription = "Môn học", tint = Color.Black, modifier = Modifier.size(22.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Môn: ${lichHoc.MaMonHoc}", fontSize = 16.sp)
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                    Icon(Icons.Filled.MeetingRoom, contentDescription = "Phòng học", tint = Color.Black, modifier = Modifier.size(22.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Phòng: ${lichHoc.MaPhong}", fontSize = 16.sp)
-                }
-
-                AnimatedVisibility(
-                    visible = expanded,
-                    enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
-                ) {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                            Icon(Icons.Filled.AccessTime, contentDescription = "Ca", tint = Color.Black, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Ca: ${lichHoc.MaCaHoc}", fontSize = 16.sp)
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                            Icon(Icons.Filled.CalendarToday, contentDescription = "Thứ", tint = Color.Black, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Thứ: ${lichHoc.Thu}", fontSize = 16.sp)
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                            Icon(Icons.Filled.School, contentDescription = "Lớp", tint = Color.Black, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Lớp: ${lichHoc.MaLopHoc}", fontSize = 16.sp)
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                            Icon(Icons.Filled.ViewWeek, contentDescription = "Tuần", tint = Color.Black, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Tuần: ${lichHoc.Tuan}", fontSize = 16.sp)
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                            Icon(Icons.Filled.Event, contentDescription = "Ngày", tint = Color.Black, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Ngày: ${lichHoc.NgayDay}", fontSize = 16.sp)
-                        }
-                    }
-                }
+                Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold)
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
         }
     }
 }
+
+
 
 
 

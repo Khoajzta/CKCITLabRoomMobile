@@ -90,6 +90,19 @@ fun CardGiangVien(
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Thông tin giảng viên",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
+
             InfoRow(icon = Lucide.Hash, label = "Mã GV", value = giangVien.MaGV)
             Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.User, label = "Tên", value = giangVien.TenGiangVien)

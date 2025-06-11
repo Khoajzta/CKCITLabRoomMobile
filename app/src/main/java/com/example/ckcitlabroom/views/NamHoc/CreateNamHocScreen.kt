@@ -201,7 +201,7 @@ fun CreateNamHocScreen(
                         TenNam = tenNam.value,
                         NgayBatDau = ngayBatDau.value.format(formatter),
                         NgayKetThuc = ngayKetThuc.value.format(formatter),
-                        TrangThai = 0
+                        TrangThai = 1
                     )
 
                     namHocViewModel.createNamHoc(namHoc)

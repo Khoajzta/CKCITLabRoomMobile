@@ -114,6 +114,8 @@ sealed class NavRoute(val route: String) {
     object QUANLYLICHHOC : NavRoute("quanlylichhoc_screen")
     object ADDLICHHOC : NavRoute("addlichhoc_screen")
     object EDITLICHHOC : NavRoute("editlichhoc_screen")
+    object LISTLICHHOC : NavRoute("danhsachlichhoc_screen")
+    object LISTLICHHOCDADAY : NavRoute("danhsachlichhocdaday_screen")
 
     //Môn Học
     object QUANLYMONHOC : NavRoute("quanlymonhoc_screen")
@@ -190,7 +192,7 @@ fun NavgationGraph(
                 )
             }
         ) { navBackStackEntry ->
-            HomeScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel)
+            HomeScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel,navController)
         }
 
 
@@ -1186,7 +1188,83 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLyLichHocScreen(navController)
+            QuanLyLichHocScreen(navController,sinhVienViewModel)
+        }
+
+        composable(
+            route = NavRoute.ADDLICHHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            CreateLichHocScreen(
+                navController,
+                lichHocViewModel,
+                namHocViewModel,
+                monhocViewModel,
+                tuanViewModel,
+                giangVienViewModel,
+                lopHocViewModel,
+                phongMayViewModel,
+                caHocViewModel
+            )
+        }
+
+        composable(
+            NavRoute.EDITLICHHOC.route + "?malichhoc={malichhoc}",
+            arguments = listOf(
+                navArgument("malichhoc") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(300)) },
+            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
+        ) { navBackStackEntry ->
+            val malichhoc = navBackStackEntry.arguments?.getString("malichhoc") ?: ""
+            EditLichHocScreen(malichhoc,navController,lichHocViewModel,namHocViewModel,monhocViewModel,tuanViewModel,giangVienViewModel,lopHocViewModel,phongMayViewModel,caHocViewModel)
+        }
+
+        composable(
+            route = NavRoute.LISTLICHHOC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ListLichHocScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel,namHocViewModel,tuanViewModel,navController)
+        }
+
+        composable(
+            route = NavRoute.LISTLICHHOCDADAY.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ListLichHocDaDayScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel,namHocViewModel,tuanViewModel,navController)
         }
 
         //Môn Học

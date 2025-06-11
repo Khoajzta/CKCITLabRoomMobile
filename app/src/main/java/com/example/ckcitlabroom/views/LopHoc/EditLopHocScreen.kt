@@ -70,6 +70,14 @@ fun EditLopHocScreen(
                 Text("Chỉnh Sửa Thông Tin Lớp Học", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             }
 
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
+
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
@@ -139,7 +147,6 @@ fun EditLopHocScreen(
 
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(16.dp)
             ) { data ->
                 snackbarData.value?.let { customData ->
                     Snackbar(
@@ -196,7 +203,7 @@ fun EditLopHocScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE))
             ) {
-                Text("Lưu Thông Tin")
+                Text("Lưu Thông Tin",color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }

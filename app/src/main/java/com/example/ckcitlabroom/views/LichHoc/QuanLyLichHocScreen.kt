@@ -8,7 +8,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -24,13 +26,25 @@ import androidx.navigation.NavHostController
 @Composable
 fun QuanLyLichHocScreen(
     navController: NavHostController,
+    sinhVienViewModel: SinhVienViewModel
 ){
-    val dsChucNang =
+
+    val sinhvien = sinhVienViewModel.sinhvienSet
+
+    val dsChucNang = if (sinhvien != null) {
         listOf(
-            ChucNang("Danh Sách Lịch Dạy Theo Tuần", Icons.Outlined.Build, Click = {  }),
-            ChucNang("Danh Sách Lịch Đã Dạy", Icons.Outlined.Build, Click = { }),
-            ChucNang("Thêm Mới Lịch Dạy", Icons.Outlined.History, Click = { }),
+            ChucNang("Danh Sách Lịch Học Theo Tuần", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.LISTLICHHOC.route) }),
+            ChucNang("Danh Sách Lịch Đã Học", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.LISTLICHHOCDADAY.route) })
+            // Không có nút thêm
         )
+    } else {
+        listOf(
+            ChucNang("Danh Sách Lịch Dạy Theo Tuần", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.LISTLICHHOC.route) }),
+            ChucNang("Danh Sách Lịch Đã Dạy", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.LISTLICHHOCDADAY.route) }),
+            ChucNang("Thêm Mới Lịch Dạy", Icons.Outlined.AddCircle, Click = { navController.navigate(NavRoute.ADDLICHHOC.route) })
+        )
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize(),

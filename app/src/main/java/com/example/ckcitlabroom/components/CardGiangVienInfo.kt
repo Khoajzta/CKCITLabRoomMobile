@@ -1,3 +1,4 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,10 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.ckcitlabroom.R
 
 @Composable
 fun CardGiangVienInfo(
@@ -50,6 +53,15 @@ fun CardGiangVienInfo(
             modifier = Modifier
                 .padding(16.dp)
         ) {
+
+            Image(
+                painter = painterResource(R.drawable.logo),
+                contentDescription = "Logo",
+                modifier = Modifier
+                    .size(135.dp)
+                    .clip(CircleShape)
+            )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
@@ -95,7 +107,7 @@ fun CardGiangVienInfo(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        giangVien.NgaySinh,
+                        formatNgay(giangVien.NgaySinh),
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp
                     )
@@ -152,11 +164,12 @@ fun CardGiangVienInfo(
                 Button(
                     modifier = Modifier.width(170.dp),
                     onClick = { /* TODO */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE)),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Default.Key, contentDescription = null)
+                    Icon(Icons.Default.Key, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Đổi mật khẩu")
+                    Text("Đổi mật khẩu", color = Color.White)
                 }
 
                 Button(
@@ -170,11 +183,12 @@ fun CardGiangVienInfo(
                         }
 
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE)),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Default.Logout, contentDescription = null)
+                    Icon(Icons.Default.Logout, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Đăng xuất")
+                    Text("Đăng xuất", color = Color.White)
                 }
             }
         }

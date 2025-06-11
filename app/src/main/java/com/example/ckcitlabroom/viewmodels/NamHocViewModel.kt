@@ -63,4 +63,22 @@ class NamHocViewModel : ViewModel() {
             }
         }
     }
+
+    fun updateNamHoc(namhoc: NamHoc) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.namhocAPIService.updateNamHoc(namhoc)
+                }
+                namhocUpdateResult = response.message
+            } catch (e: Exception) {
+                namhocUpdateResult = "Lỗi khi cập nhật môn học: ${e.message}"
+                Log.e("NamHocViewModel", "Lỗi khi cập nhật môn học: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
 }

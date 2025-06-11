@@ -29,6 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -82,7 +83,23 @@ fun CardLopHoc(
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Thông tin lớp học",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
+
             InfoRow(icon = Lucide.Hash, label = "Mã lớp", value = lopHoc.MaLopHoc)
+            Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.School, label = "Lớp", value = lopHoc.TenLopHoc)
 
             val (color, statusText, statusIcon) = when (lopHoc.TrangThai) {
@@ -108,24 +125,12 @@ fun CardLopHoc(
                 Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { showConfirmDialog = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
-                    }
-
                     Button(
                         onClick = {
                             navController.navigate(NavRoute.EDITLOPHOC.route + "?malop=${lopHoc.MaLopHoc}")
@@ -153,19 +158,17 @@ fun CardLopHoc(
                                 Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
                             },
                             text = {
-                                Text("Lớp: ${lopHoc.TenLopHoc}", color = Color.Black)
+                                Text("Lớp: ${lopHoc.TenLopHoc}", color = Color.Black, fontSize = 17.sp)
                             },
                             confirmButton = {
-                                Row(
+                                Column(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Button(
-                                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                                        modifier = Modifier.fillMaxWidth(),
                                         onClick = {
-                                            lopHocViewModel.updateTrangThaiLopHoc(
-                                                LopHoc(lopHoc.MaLopHoc, lopHoc.TenLopHoc, 1)
-                                            )
+                                            var lophocnew = lopHoc.copy(TrangThai = 1)
+                                            lopHocViewModel.updateLopHoc(lophocnew)
                                             showDialog = false
                                         },
                                         shape = RoundedCornerShape(12.dp),
@@ -175,11 +178,10 @@ fun CardLopHoc(
                                     }
 
                                     Button(
-                                        modifier = Modifier.weight(1f),
+                                        modifier = Modifier.fillMaxWidth(),
                                         onClick = {
-                                            lopHocViewModel.updateTrangThaiLopHoc(
-                                                LopHoc(lopHoc.MaLopHoc, lopHoc.TenLopHoc, 0)
-                                            )
+                                            var lophocnew = lopHoc.copy(TrangThai = 0)
+                                            lopHocViewModel.updateLopHoc(lophocnew)
                                             showDialog = false
                                         },
                                         shape = RoundedCornerShape(12.dp),

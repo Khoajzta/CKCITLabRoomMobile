@@ -88,6 +88,9 @@ dependencies {
     implementation ("com.google.mlkit:barcode-scanning:17.3.0")
     implementation ("androidx.activity:activity-compose:1.10.1")
 
+    implementation ("androidx.work:work-runtime-ktx:2.10.1")
+
+
 
     implementation(libs.play.services.maps)
     implementation(libs.common)

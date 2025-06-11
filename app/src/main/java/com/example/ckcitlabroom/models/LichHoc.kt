@@ -1,12 +1,15 @@
 data class LichHoc(
-    var MaLichHoc: String,
+    var MaLichHoc: Int,
     var MaGV: String,
     var MaPhong: String,
     var NgayDay: String,
     var MaLopHoc: String,
-    var MaCaHoc: String,
+    var MaCaHoc: Int,
     var MaMonHoc: String,
     var Thu: String,
-    var Tuan: String,
-    var GhiChu: String
+    var MaTuan: Int,
+    var GhiChu: String,
+    var TrangThai: Int,
+
+
 )

@@ -672,8 +672,6 @@ fun CreateDonNhapScreen(
                     }
                 )
             }
-
-
         }
     }
 }

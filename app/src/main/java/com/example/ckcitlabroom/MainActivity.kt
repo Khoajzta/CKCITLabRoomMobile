@@ -16,6 +16,8 @@ import PhongMayViewModel
 import SinhVienViewModel
 import SinhVienPreferences
 import TuanViewModel
+import UpdateLichHocWorker
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -71,6 +73,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.composables.icons.lucide.Bell
+import com.composables.icons.lucide.House
+import com.composables.icons.lucide.HousePlug
+import com.composables.icons.lucide.HousePlus
+import com.composables.icons.lucide.LayoutGrid
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 
@@ -89,6 +102,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.ScanLine
+import com.composables.icons.lucide.User
+import com.composables.icons.lucide.Warehouse
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,6 +115,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CKCITLabRoomTheme {
                 MainScreen()
+                scheduleUpdateLichHocWorker(applicationContext)
             }
         }
     }
@@ -125,44 +144,36 @@ fun MainScreen() {
     val caHocViewModel: CaHocViewModel = viewModel()
     val monHocViewModel: MonHocViewModel = viewModel()
 
-    var isLoading by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val giangVien = giangVienViewModel.giangvienSet
     val sinhVien = sinhVienViewModel.sinhvienSet
 
     val buttons = listOf(
-        ButtonData("Home", Icons.Default.Home) {
-            isLoading = true
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(500)
-                isLoading = false
-                navController.navigate(NavRoute.HOME.route) {
-                    popUpTo(0) { inclusive = true }
-                }
+        ButtonData("Home", Lucide.House) {
+            navController.navigate(NavRoute.HOME.route) {
+                popUpTo(0) { inclusive = true }
             }
         },
-        ButtonData("Quản Lý", Icons.Default.Apps) {
-            isLoading = true
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(500)
-                isLoading = false
-                navController.navigate(NavRoute.QUANLY.route) {
-                    popUpTo(0) { inclusive = true }
-                }
+        ButtonData("Quản Lý", Lucide.LayoutGrid) {
+            navController.navigate(NavRoute.QUANLY.route) {
+                popUpTo(0) { inclusive = true }
             }
         },
-        ButtonData("Quét Mã", Icons.Default.QrCodeScanner) {
-            navController.navigate(NavRoute.QUETQRCODE.route)
+        ButtonData("Quét Mã", Lucide.ScanLine) {
+            navController.navigate(NavRoute.QUETQRCODE.route) {
+                popUpTo(0) { inclusive = true }
+            }
         },
-        ButtonData("Thông Báo", Icons.Default.Notifications) {},
-        ButtonData("Thông Tin", Icons.Default.AccountCircle) {
+        ButtonData("Thông Báo", Lucide.Bell) {},
+        ButtonData("Thông Tin", Lucide.User) {
             if (giangVien != null || sinhVien != null) {
-                navController.navigate(NavRoute.ACCOUNT.route){
+                navController.navigate(NavRoute.ACCOUNT.route) {
                     popUpTo(0) { inclusive = true }
                 }
             }
         }
     )
+
 
     val topAppBars = listOf<@Composable () -> Unit>(
         {
@@ -232,8 +243,8 @@ fun MainScreen() {
                         buttons = buttons,
                         barColor = Color.White,
                         circleColor = Color.White,
-                        selectedColor = Color(0xFF1B8DDE),
-                        unselectedColor = Color.Gray,
+                        selectedColor = Color.Black,
+                        unselectedColor = Color.Black,
                         currentRoute = currentRoute
                     )
                 }
@@ -288,6 +299,29 @@ fun MainScreen() {
         }
     }
 }
+
+fun scheduleUpdateLichHocWorker(context: Context) {
+    // Chạy ngay một lần
+    val immediateWork = OneTimeWorkRequestBuilder<UpdateLichHocWorker>().build()
+    WorkManager.getInstance(context).enqueue(immediateWork)
+
+    // Sau đó lặp lại mỗi 15 phút
+    val periodicWork = PeriodicWorkRequestBuilder<UpdateLichHocWorker>(
+        15, TimeUnit.MINUTES
+    ).setConstraints(
+        Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+    ).build()
+
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        "updateLichHocWorker",
+        ExistingPeriodicWorkPolicy.KEEP,
+        periodicWork
+    )
+}
+
+
 
 
 

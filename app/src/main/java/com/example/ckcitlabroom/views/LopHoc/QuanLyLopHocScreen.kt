@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -56,7 +57,7 @@ fun QuanLyLopHoc(
                 "Quản Lý Lớp Học",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
-                color = Color.White
+                color = Color(0xFF1B8DDE)
             )
             IconButton(
                 onClick = {
@@ -64,9 +65,9 @@ fun QuanLyLopHoc(
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Add,
+                    imageVector = Icons.Outlined.AddCircle,
                     contentDescription = "Thêm lớp học",
-                    tint = Color.White
+                    tint = Color(0xFF1B8DDE)
                 )
             }
         }
@@ -83,7 +84,7 @@ fun QuanLyLopHoc(
                     ) {
                         Text(
                             "Chưa có lớp học nào",
-                            color = Color.White,
+                            color = Color.Black,
                             modifier = Modifier.padding(16.dp)
                         )
                     }

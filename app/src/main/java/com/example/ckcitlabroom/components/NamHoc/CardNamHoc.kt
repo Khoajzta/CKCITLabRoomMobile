@@ -1,5 +1,6 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Update
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -26,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -36,27 +41,57 @@ import com.composables.icons.lucide.Clock
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Tag
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.unit.sp
+
 @Composable
 fun CardNamHoc(
     namHoc: NamHoc,
     navController: NavHostController,
     namHocViewModel: NamHocViewModel,
 ) {
-
-    var showDialog by remember { mutableStateOf(false) }
+    var showUpdateButton by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
             .padding(bottom = 12.dp)
             .fillMaxWidth()
-            .clickable {
-                navController.navigate(NavRoute.NAMHOCDETAIL.route + "?manam=${namHoc.MaNam}")
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        if (namHoc.TrangThai != 0) {
+                            showUpdateButton = !showUpdateButton
+                        }
+                    },
+                    onTap = {
+                        navController.navigate(NavRoute.NAMHOCDETAIL.route + "?manam=${namHoc.MaNam}")
+                    }
+                )
             },
-        shape = RoundedCornerShape(12.dp), // Bo góc 12.dp
-        elevation = CardDefaults.cardElevation(defaultElevation = 7.dp), // Bóng đổ
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 7.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
+            Text(
+                text = "Thông tin năm học",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
+
             InfoRow(icon = Lucide.Tag, label = "Mã Năm Học", value = namHoc.MaNam)
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.BookOpen, label = "Tên Năm Học", value = namHoc.TenNam)
@@ -64,11 +99,13 @@ fun CardNamHoc(
             InfoRow(icon = Icons.Default.CalendarToday, label = "Ngày Bắt Đầu", value = formatNgay(namHoc.NgayBatDau))
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Icons.Default.CalendarToday, label = "Ngày Kết Thúc", value = formatNgay(namHoc.NgayKetThuc))
+
             val (color, statusText, statusIcon) = when (namHoc.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Đã Kết Thúc", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFF1B8DDE), "Đang Thực Hiện", Lucide.Clock)
+                0 -> Triple(Color(0xFF1B8DDE), "Đã Kết Thúc", Lucide.CircleCheck)
+                1 -> Triple(Color(0xFF4CAF50), "Đang Diễn Ra", Lucide.Clock)
                 else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
             }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -86,63 +123,32 @@ fun CardNamHoc(
                 Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-
-//            Button(
-//                modifier = Modifier.fillMaxWidth(),
-//                onClick = { showDialog = true },
-//                shape = RoundedCornerShape(12.dp),
-//                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
-//            ) {
-//                Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
-//            }
-
-//            if (showDialog) {
-//                AlertDialog(
-//                    containerColor = Color.White,
-//                    onDismissRequest = { showDialog = false },
-//                    title = {
-//                        Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
-//                    },
-//                    text = {
-//                        Text("Phòng: ${namHoc.TenNam}", color = Color.Black)
-//                    },
-//                    confirmButton = {
-//                        Row(
-//                            modifier = Modifier.fillMaxWidth(),
-//                            horizontalArrangement = Arrangement.SpaceBetween
-//                        ) {
-//                            Button(
-//                                modifier = Modifier.weight(1f).padding(end = 8.dp),
-//                                onClick = {
-//                                    namHocViewModel.updateTrangThaiPhongMay(
-//                                        PhongMay(phongmay.MaPhong, phongmay.TenPhong, 1)
-//                                    )
-//                                    showDialog = false
-//                                },
-//                                shape = RoundedCornerShape(12.dp),
-//                                colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-//                            ) {
-//                                Text("Hoạt Động", color = Color.White)
-//                            }
-//
-//                            Button(
-//                                modifier = Modifier.weight(1f),
-//                                onClick = {
-//                                    phongMayViewModel.updateTrangThaiPhongMay(
-//                                        PhongMay(phongmay.MaPhong, phongmay.TenPhong, 0)
-//                                    )
-//                                    showDialog = false
-//                                },
-//                                shape = RoundedCornerShape(12.dp),
-//                                colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
-//                            ) {
-//                                Text("Bảo Trì", color = Color.White)
-//                            }
-//                        }
-//                    }
-//                )
-//            }
+            // Chỉ hiển thị nút nếu trạng thái != 0
+            AnimatedVisibility(
+                visible = showUpdateButton,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            val namHocNew = namHoc.copy(TrangThai = 0)
+                            namHocViewModel.updateNamHoc(namHocNew)
+                            showUpdateButton = false
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Update, contentDescription = null, tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Đã Hoàn Thành", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
     }
-
 }
+
+

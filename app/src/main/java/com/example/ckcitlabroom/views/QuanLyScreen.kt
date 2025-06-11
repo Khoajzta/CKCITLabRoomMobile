@@ -58,7 +58,7 @@ fun QuanLyScreen(
         }
         giangVien?.MaLoaiTaiKhoan == 2 -> {
             listOf(
-                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = { /* TODO: Navigate */ }),
+                ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.QUANLYLICHHOC.route) }),
                 ChucNang("Quản Lý Phiếu Sửa Chữa", Icons.Outlined.Build, Click = { navController.navigate(NavRoute.QUANLYPHIEUSUACHUA.route) }),
                 ChucNang("Quản Lý Phiếu Mượn May", Icons.Outlined.Article, Click = { navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route) }),
                 ChucNang("Chuyển Máy", Icons.Outlined.SwapHoriz, Click = { navController.navigate(NavRoute.QUANLYCHUYENMAY.route) }),
@@ -66,7 +66,7 @@ fun QuanLyScreen(
         }
         sinhvien != null -> {
             listOf(
-                ChucNang("Danh Sách Lịch Học", Icons.Outlined.CalendarMonth, Click = {  })
+                ChucNang("Danh Sách Lịch Học", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.QUANLYLICHHOC.route) })
 
             )
         }

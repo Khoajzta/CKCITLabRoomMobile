@@ -70,6 +70,14 @@ fun CardSinhVien(
         else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
     }
 
+    val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    val ngaySinhFormatted = try {
+        LocalDate.parse(sinhVien.NgaySinh, inputFormatter).format(outputFormatter)
+    } catch (e: Exception) {
+        sinhVien.NgaySinh
+    }
+
     Card(
         modifier = Modifier
             .padding(bottom = 8.dp)
@@ -86,58 +94,39 @@ fun CardSinhVien(
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Hash, contentDescription = "Mã SV", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Mã SV: ${sinhVien.MaSinhVien}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            }
+            Text(
+                text = "Thông tin sinh viên",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
+
+            InfoRow(icon = Lucide.Hash, label = "Mã SV", value = sinhVien.MaSinhVien)
+            Spacer(Modifier.height(6.dp))
+
+            InfoRow(icon = Lucide.User, label = "Tên", value = sinhVien.TenSinhVien)
+            Spacer(Modifier.height(6.dp))
+
+            InfoRow(icon = Lucide.Calendar, label = "Ngày sinh", value = ngaySinhFormatted)
+            Spacer(Modifier.height(6.dp))
+
+            InfoRow(icon = Lucide.Users, label = "Giới tính", value = sinhVien.GioiTinh)
+            Spacer(Modifier.height(6.dp))
+
+            InfoRow(icon = Lucide.Mail, label = "Email", value = sinhVien.Email)
+            Spacer(Modifier.height(6.dp))
+
+            InfoRow(icon = Lucide.Badge, label = "Mã lớp", value = sinhVien.MaLop)
+            Spacer(Modifier.height(6.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.User, contentDescription = "Tên SV", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Tên: ${sinhVien.TenSinhVien}", fontSize = 16.sp)
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Calendar, contentDescription = "Ngày sinh", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                val outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-
-                val ngaySinhFormatted = try {
-                    LocalDate.parse(sinhVien.NgaySinh, inputFormatter).format(outputFormatter)
-                } catch (e: Exception) {
-                    sinhVien.NgaySinh
-                }
-
-                Text("Ngày sinh: $ngaySinhFormatted", fontSize = 16.sp)
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Users , contentDescription = "Giới tính", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Giới tính: ${sinhVien.GioiTinh}")
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Mail, contentDescription = "Email", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Email: ${sinhVien.Email}")
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Badge, contentDescription = "Mã lớp", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Mã lớp: ${sinhVien.MaLop}")
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = statusIcon,
-                    contentDescription = "Trạng thái",
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(imageVector = statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
                 Text("Trạng thái: ")
                 Box(
@@ -152,12 +141,14 @@ fun CardSinhVien(
 
             Spacer(Modifier.height(8.dp))
 
+            // Nút bấm mở rộng
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
+                    // Nút cập nhật trạng thái
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { showDialog = true },
@@ -166,16 +157,13 @@ fun CardSinhVien(
                     ) {
                         Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
                     }
+
                     if (showDialog) {
                         AlertDialog(
                             containerColor = Color.White,
                             onDismissRequest = { showDialog = false },
-                            title = {
-                                Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
-                            },
-                            text = {
-                                Text("Sinh viên: ${sinhVien.TenSinhVien}", color = Color.Black)
-                            },
+                            title = { Text("Cập nhật trạng thái", fontWeight = FontWeight.Bold) },
+                            text = { Text("Sinh viên: ${sinhVien.TenSinhVien}") },
                             confirmButton = {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -185,8 +173,7 @@ fun CardSinhVien(
                                         modifier = Modifier.weight(1f).padding(end = 8.dp),
                                         onClick = {
                                             sinhVienViewModel.updateTrangThaiSinhVien(
-                                                SinhVien(sinhVien.MaSinhVien, sinhVien.TenSinhVien, sinhVien.NgaySinh, sinhVien.GioiTinh,
-                                                    sinhVien.Email, sinhVien.MatKhau, sinhVien.MaLop, sinhVien.MaLoaiTaiKhoan, 1)
+                                                sinhVien.copy(TrangThai = 1)
                                             )
                                             showDialog = false
                                         },
@@ -200,8 +187,7 @@ fun CardSinhVien(
                                         modifier = Modifier.weight(1f),
                                         onClick = {
                                             sinhVienViewModel.updateTrangThaiSinhVien(
-                                                SinhVien(sinhVien.MaSinhVien, sinhVien.TenSinhVien, sinhVien.NgaySinh, sinhVien.GioiTinh,
-                                                    sinhVien.Email, sinhVien.MatKhau, sinhVien.MaLop, sinhVien.MaLoaiTaiKhoan, 0)
+                                                sinhVien.copy(TrangThai = 0)
                                             )
                                             showDialog = false
                                         },
@@ -215,6 +201,7 @@ fun CardSinhVien(
                         )
                     }
 
+                    // Nút chỉnh sửa
                     Button(
                         onClick = {
                             navController.navigate(NavRoute.EDITSINHVIEN.route + "?masv=${sinhVien.MaSinhVien}")
@@ -226,6 +213,7 @@ fun CardSinhVien(
                         Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
 
+                    // Nút xoá
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { showConfirmDialog = true },
@@ -266,4 +254,5 @@ fun CardSinhVien(
         )
     }
 }
+
 

@@ -150,10 +150,9 @@ fun QRCodeScannerScreen(
                 color = Color.White,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 50.dp)
+                    .padding(top = 150.dp)
             )
 
-            // Ô vuông trung tâm làm khung quét
             Box(
                 modifier = Modifier
                     .size(250.dp)

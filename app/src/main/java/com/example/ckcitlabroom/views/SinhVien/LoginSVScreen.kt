@@ -327,7 +327,7 @@ fun LoginSVScreen(
                     sinhVienViewModel.setSV(sinhvien)
                     userPreferences.saveLoginForSinhVien(sinhvien)
                     navController.navigate(NavRoute.HOME.route) {
-                        popUpTo(NavRoute.LOGINSINHVIEN.route) { inclusive = true }
+                        popUpTo(0) { inclusive = true }
                     }
                 }
             }

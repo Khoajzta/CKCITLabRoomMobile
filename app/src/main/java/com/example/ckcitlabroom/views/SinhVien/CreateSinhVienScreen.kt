@@ -152,7 +152,7 @@ fun CreateSinhVienScreen(
                         )
                     )
 
-                    Text("Tên Giảng Viên", fontWeight = FontWeight.Bold, color = Color.Black)
+                    Text("Tên Sinh Viên", fontWeight = FontWeight.Bold, color = Color.Black)
                     OutlinedTextField(
                         value = tenSVState.value,
                         onValueChange = { tenSVState.value = it },

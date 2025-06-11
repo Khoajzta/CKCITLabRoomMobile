@@ -1,6 +1,7 @@
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Query
 
 data class NamHocResponse(
@@ -16,10 +17,10 @@ interface NamHocAPIService {
     ): CreateResponse
 
 
-    @GET("NamHoc/show.php")
-    suspend fun getChiTietDonNhapTheoMaDon(
-        @Query("MaDonNhap") MaDonNhap: String
-    ): ChiTietDonNhapResponse
+    @PUT("NamHoc/update.php")
+    suspend fun updateNamHoc(
+        @Body namhoc: NamHoc
+    ): UpdateResponse
 
     @GET("NamHoc/read.php")
     suspend fun getAllNamHoc(): NamHocResponse

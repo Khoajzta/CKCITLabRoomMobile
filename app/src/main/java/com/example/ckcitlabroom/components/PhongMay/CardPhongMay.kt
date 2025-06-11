@@ -74,7 +74,21 @@ fun CardPhongMay(
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
+            Text(
+                text = "Thông tin phòng máy",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
             InfoRow(icon = Lucide.Warehouse, label = "Phòng", value = phongmay.TenPhong)
+            Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.Hash, label = "Số lượng máy", value = soLuongMay.toString())
 
             val (color, statusText, statusIcon) = when (phongmay.TrangThai) {
