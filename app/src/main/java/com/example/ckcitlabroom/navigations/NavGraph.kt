@@ -54,6 +54,10 @@ sealed class NavRoute(val route: String) {
     object QUANLYGIANGVIEN : NavRoute("quanlygiangvien_screen")
     object ADDGIANGVIEN : NavRoute("addgiangvien_screen")
     object EDITGIANGVIEN : NavRoute("editgiangvien_screen")
+    object LISTGIANGVIENCONGTAC : NavRoute("danhsachgiangvien_screen")
+    object LISTGIANGVIENNGUNGCONGTAC : NavRoute("danhsachgiangvienngungcongtac_screen")
+    object PHANQUYEN : NavRoute("phanquyen_screen")
+
 
     //Chuyển Máy
     object QUANLYCHUYENMAY : NavRoute("quanlychuyenmay_screen")
@@ -76,11 +80,12 @@ sealed class NavRoute(val route: String) {
     object EDITLOPHOC : NavRoute("editlophoc_screen")
 
     //Sua May
+
     object QUANLYCAHOC : NavRoute("quanlycahoc_screen")
     object ADDCAHOC : NavRoute("addcahoc_screen")
     object EDITCAHOC : NavRoute("editcahoc_screen")
 
-    //Phiêu Sửa Chữa
+
     object ADDPHIEUSUACHUA : NavRoute("addphieusuachua_screen")
     object QUANLYPHIEUSUACHUA : NavRoute("quanlyphieusuachua_screen")
     object LICHSUSUAMAY : NavRoute("lichsusuamay_screen")
@@ -138,6 +143,7 @@ fun NavgationGraph(
     donNhapViewModel: DonNhapViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     sinhVienViewModel: SinhVienViewModel,
+
     namHocViewModel: NamHocViewModel,
     tuanViewModel: TuanViewModel,
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
@@ -147,7 +153,6 @@ fun NavgationGraph(
     chitetPhieuMuonViewModel: ChiTietPhieuMuonViewModel,
     caHocViewModel: CaHocViewModel,
     monhocViewModel: MonHocViewModel
-
 ) {
 
     val context = LocalContext.current.applicationContext
@@ -413,7 +418,61 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLyGiangVien(navController, giangVienViewModel)
+            QuanLyGiangVien(navController)
+        }
+
+        composable(
+            route = NavRoute.LISTGIANGVIENCONGTAC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ListGiangVienCongTac(navController,giangVienViewModel)
+        }
+
+        composable(
+            route = NavRoute.LISTGIANGVIENNGUNGCONGTAC.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ListGiangVienNgungCongTac(navController,giangVienViewModel)
+        }
+
+        composable(
+            route = NavRoute.PHANQUYEN.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            QuanLyPhanQuyen(navController,giangVienViewModel)
         }
 
         composable(

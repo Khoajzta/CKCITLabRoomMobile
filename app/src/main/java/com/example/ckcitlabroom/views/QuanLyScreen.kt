@@ -6,11 +6,15 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+
+
+import androidx.compose.material.icons.outlined.AccessAlarm
+
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.Build
-import androidx.compose.material.icons.outlined.AccessAlarm
+
 
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.DateRange
@@ -43,6 +47,7 @@ fun QuanLyScreen(
                 ChucNang("Quản Lý Đơn Nhập", Icons.Outlined.ReceiptLong, Click = { navController.navigate(NavRoute.QUANLYDONNHAP.route) }),
                 ChucNang("Quản Lý Phòng Máy", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
                 ChucNang("Chuyển Máy", Icons.Outlined.SwapHoriz, Click = { navController.navigate(NavRoute.QUANLYCHUYENMAY.route) }),
+
                 ChucNang("Quản Lý Phiếu Sửa Chữa", Icons.Outlined.Build, Click = { navController.navigate(NavRoute.QUANLYPHIEUSUACHUA.route) }),
                 ChucNang("Quản Lý Phiếu Mượn May", Icons.Outlined.Article, Click = { navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route) }),
 
@@ -54,6 +59,8 @@ fun QuanLyScreen(
                 ChucNang("Quản Lý Năm Học", Icons.Outlined.DateRange, Click = { navController.navigate(NavRoute.QUANLYNAMHOC.route) }),
                 ChucNang("Quản Lý Ca Học", Icons.Outlined.AccessAlarm, Click = { navController.navigate(NavRoute.QUANLYCAHOC.route) }),
                 ChucNang("Quản Lý Môn Học", Icons.Outlined.MenuBook, Click = { navController.navigate(NavRoute.QUANLYMONHOC.route) }),
+
+
             )
         }
         giangVien?.MaLoaiTaiKhoan == 2 -> {
