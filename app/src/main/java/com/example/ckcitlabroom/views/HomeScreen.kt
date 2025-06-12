@@ -47,11 +47,13 @@ fun HomeScreen(
     val sinhvien = sinhVienViewModel.sinhvienSet
     val giangVien = giangVienViewModel.giangvienSet
 
-    // Gọi API tùy theo vai trò
-    LaunchedEffect(giangVien, sinhvien) {
-        when {
-            giangVien != null -> lichhocviewmodel.startPollingLichHocByMaGV(giangVien.MaGV)
-            sinhvien != null -> lichhocviewmodel.startPollingLichHocByMaLopHoc(sinhvien.MaLop)
+    // Gọi API chỉ khi đã có dữ liệu
+    LaunchedEffect(giangVien?.MaGV, sinhvien?.MaLop) {
+        giangVien?.MaGV?.let {
+            lichhocviewmodel.startPollingLichHocByMaGV(it)
+        }
+        sinhvien?.MaLop?.let {
+            lichhocviewmodel.startPollingLichHocByMaLopHoc(it)
         }
     }
 
@@ -68,19 +70,14 @@ fun HomeScreen(
     val danhSachGV = lichhocviewmodel.danhSachLichHoctheomagv
     val danhSachSV = lichhocviewmodel.danhSachLichHoctheomalop
 
-    // Nếu là sinh viên, lọc theo MaLop và ngày hiện tại
     val lichhocSinhVien = danhSachSV.filter {
         it.MaLopHoc == sinhvien?.MaLop && it.TrangThai == 1 && it.NgayDay == today
     }
 
-    Log.d("lICH SV" , lichhocSinhVien.toString())
-
-    // Nếu là giảng viên, lọc theo ngày hiện tại
     val lichDangDienRa = danhSachGV.filter {
         it.TrangThai == 1 && it.NgayDay == today
     }
 
-    // Danh sách để hiển thị tuỳ vai trò
     val lichHienThi = when {
         sinhvien != null -> lichhocSinhVien
         giangVien != null -> lichDangDienRa
@@ -120,15 +117,18 @@ fun HomeScreen(
                 }
             } else {
                 items(lichHienThi) { lichhoc ->
-                    when {
-                        giangVien != null -> CardLichHoc(lichhoc, giangVien = giangVien, sinhvien = null,navController)
-                        sinhvien != null -> CardLichHoc(lichhoc, giangVien = null ,sinhvien = sinhvien, navController)
-                    }
+                    CardLichHoc(
+                        lichhoc,
+                        giangVien,
+                        sinhvien,
+                        navController
+                    )
                 }
             }
         }
     }
 }
+
 
 
 

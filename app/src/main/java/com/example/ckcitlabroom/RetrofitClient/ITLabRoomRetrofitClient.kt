@@ -15,6 +15,7 @@ import LopHocAPIService
 import MayTinhAPIService
 import MonHocAPIService
 import NamHocAPIService
+import NotificationApiService
 import PhieuMuonMayAPIService
 import PhieuSuaChuaAPIService
 import PhongMayAPIService
@@ -25,7 +26,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object Constants {
-    const val BASE_URL = "http://10.0.2.2/ITLabRoomAPI/api/"
+    const val BASE_URL = "http://chillcup.io.vn/ITLabRoomAPI/api/"
+    const val BASE_URLNOT = "http://chillcup.io.vn/send-fcm/"
 //    const val BASE_URL = "http://192.168.1.113/ITLabRoomAPI/api/"
 
 
@@ -196,6 +198,14 @@ object Constants {
                 .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
                 .build()
                 .create(MonHocAPIService::class.java)
+        }
+
+        val notificationAPIService: NotificationApiService by lazy {
+            Retrofit.Builder()
+                .baseUrl(Constants.BASE_URLNOT)
+                .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+                .build()
+                .create(NotificationApiService::class.java)
         }
     }
 }

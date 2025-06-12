@@ -153,17 +153,6 @@ fun CardGiangVien(
                 ) {
                     Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
                 }
-
-                Button(
-                    onClick = { showConfirmDialog = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808))
-                ) {
-                    Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
-                }
             }
         }
     }
@@ -184,25 +173,31 @@ fun CardGiangVien(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Button(
-                        modifier = Modifier.weight(1f).padding(end = 8.dp),
-                        onClick = {
-                            giangVienViewModel.updateTrangThaiGiangVien(giangVien.copy(TrangThai = 1))
-                            showDialog = false
-                        },
-                        colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                    ) {
-                        Text("Hoạt Động", color = Color.White)
-                    }
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            giangVienViewModel.updateTrangThaiGiangVien(giangVien.copy(TrangThai = 0))
-                            showDialog = false
-                        },
-                        colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
-                    ) {
-                        Text("Không Hoạt Động", color = Color.White)
+
+                    if(giangVien.TrangThai == 0){
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                giangVienViewModel.updateTrangThaiGiangVien(giangVien.copy(TrangThai = 1))
+                                showDialog = false
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50)),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Công tác lại", color = Color.White)
+                        }
+                    }else{
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                giangVienViewModel.updateTrangThaiGiangVien(giangVien.copy(TrangThai = 0))
+                                showDialog = false
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFE53935)),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Ngừng công tác", color = Color.White)
+                        }
                     }
                 }
             }

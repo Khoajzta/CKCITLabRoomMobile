@@ -61,7 +61,8 @@ fun EditLichHocScreen(
     lopHocViewModel: LopHocViewModel,
     phongMayViewModel: PhongMayViewModel,
     caHocViewModel: CaHocViewModel,
-    sinhVienViewModel: SinhVienViewModel
+    sinhVienViewModel: SinhVienViewModel,
+    notificationViewModel: NotificationViewModel
 ) {
     val context = LocalContext.current
 
@@ -307,7 +308,6 @@ fun EditLichHocScreen(
                         selectedMonHoc != null &&
                         selectedNamHoc != null
                     ) {
-                        // Lấy ngày đầu tiên dạy dựa trên tuần và thứ
                         val tuan = selectedTuanTu!!
                         val thu = selectedThu!!
                         val offset = thuToOffset[thu] ?: 0
@@ -318,7 +318,6 @@ fun EditLichHocScreen(
                             ""
                         }
 
-                        // Tạo đối tượng LichHoc để cập nhật
                         val newLichHoc = LichHoc(
                             MaLichHoc = malichhoc.toIntOrNull() ?: 0,
                             MaGV = selectedGiangVien!!.MaGV,
@@ -330,10 +329,21 @@ fun EditLichHocScreen(
                             Thu = thu,
                             MaTuan = tuan.MaTuan,
                             GhiChu = ghiChu,
-                            TrangThai = 1
+                            TrangThai = lichhoc?.TrangThai ?: 0
                         )
 
+
+                        // Cập nhật lịch học
                         lichhocViewModel.updateLichHoc(newLichHoc)
+
+                        // Gửi thông báo FCM
+                        val uniqueTokens = danhSachTokenSinhVienTheoLop.distinct()
+                        if (uniqueTokens.isNotEmpty()) {
+                            val title = "Thông báo lịch học"
+                            val body = "Lịch học môn ${selectedMonHoc!!.TenMonHoc} của lớp ${selectedLop!!.TenLopHoc}\n Thông báo: ${ghiChu}."
+                            notificationViewModel.sendNotificationToTokens(uniqueTokens, title, body)
+                        }
+
 
                         Toast.makeText(context, "Cập nhật lịch học thành công", Toast.LENGTH_SHORT).show()
                         navController.popBackStack()

@@ -113,6 +113,9 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging-ktx")
 
 
+    implementation ("com.google.accompanist:accompanist-navigation-animation:0.34.0")
+
+
     // Google Maps & Other Libs
     implementation(libs.play.services.maps)
     implementation(libs.common)

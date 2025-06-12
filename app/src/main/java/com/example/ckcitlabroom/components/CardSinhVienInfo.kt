@@ -217,6 +217,9 @@ fun CardSinhVienInfo(
                 Button(
                     modifier = Modifier.width(170.dp),
                     onClick = {
+                        var sinhviennew = sinhvien.copy(Token = "")
+                        sinhVienViewModel.updateSinhVien(sinhviennew)
+
                         sinhVienViewModel.setSV(null)
                         sinhVienViewModel.resetLoginResult()
                         sinhVienViewModel.logout()

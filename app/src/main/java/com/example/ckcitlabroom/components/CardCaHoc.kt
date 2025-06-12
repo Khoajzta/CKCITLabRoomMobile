@@ -29,6 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
@@ -81,9 +83,25 @@ fun CardCaHoc(
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Thông tin ca học",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
+
             InfoRow(icon = Lucide.Hash, label = "Mã ca học", value = caHoc.MaCaHoc.toString())
+            Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.Clock, label = "Tên ca", value = caHoc.TenCa)
+            Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.Timer, label = "Giờ bắt đầu", value = caHoc.GioBatDau)
+            Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.TimerOff, label = "Giờ kết thúc", value = caHoc.GioKetThuc)
 
             val (color, statusText, statusIcon) = when (caHoc.TrangThai) {
@@ -109,22 +127,20 @@ fun CardCaHoc(
                 Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { showConfirmDialog = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
-                    }
+//                    Button(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        onClick = { showConfirmDialog = true },
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
+//                        shape = RoundedCornerShape(12.dp)
+//                    ) {
+//                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
+//                    }
 
                     Button(
                         onClick = {

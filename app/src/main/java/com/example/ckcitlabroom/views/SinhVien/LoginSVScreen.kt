@@ -96,9 +96,6 @@ fun LoginSVScreen(
 
     val isAutoLoginChecked = remember { mutableStateOf(false) }
 
-    Log.d("Thông báo","Lưu thành công")
-    Log.d("SV",loginState.tenSinhVien.toString())
-
 
     LaunchedEffect(loginState) {
         if (loginState.isLoggedIn && loginState.maSinhVien != null && !isAutoLoginChecked.value) {
@@ -125,7 +122,7 @@ fun LoginSVScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = Color(0xFF1B8DDE))
+            DotLoading()
         }
     } else {
         // Hiển thị form đăng nhập
@@ -150,8 +147,6 @@ fun LoginSVScreen(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Các phần UI nhập email, mật khẩu, nút đăng nhập,...
-                    // (giữ nguyên như code bạn đã viết)
                     Image(
                         painter = painterResource(R.drawable.logo),
                         contentDescription = "Logo",
@@ -314,7 +309,6 @@ fun LoginSVScreen(
                             snackbarHostState.showSnackbar("Thông báo")
                         }
 
-                        Log.d("SV",sinhvien.toString())
                         sinhVienViewModel.resetLoginResult()
                     }
                 }

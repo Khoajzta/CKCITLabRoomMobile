@@ -175,6 +175,9 @@ fun CardGiangVienInfo(
                 Button(
                     modifier = Modifier.width(170.dp),
                     onClick = {
+                        var giangViennew = giangVien.copy(Token = "")
+                        giangVienViewModel.updateGiangVien(giangViennew)
+
                         giangVienViewModel.setGV(null)
                         giangVienViewModel.resetLoginResult()
                         giangVienViewModel.logout()

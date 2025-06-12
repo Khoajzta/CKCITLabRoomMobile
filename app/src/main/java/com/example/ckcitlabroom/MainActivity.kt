@@ -4,23 +4,19 @@ import AnimatedNavigationBar
 import ButtonData
 import GiangVienViewModel
 import LichSuSuaMayViewModel
-import LoginSVScreen
-import LoginSinhVienState
 import MonHocViewModel
 import NamHocViewModel
 import NavRoute
 import NavgationGraph
+import NotificationViewModel
 import PhieuMuonMayViewModel
 import PhieuSuaChuaViewModel
 import PhongMayViewModel
+import RequestPermissionsOnFirstLaunch
 import SinhVienViewModel
-import SinhVienPreferences
 import TuanViewModel
 import UpdateLichHocWorker
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -39,14 +35,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,25 +44,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.work.Constraints
@@ -84,8 +64,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.composables.icons.lucide.Bell
 import com.composables.icons.lucide.House
-import com.composables.icons.lucide.HousePlug
-import com.composables.icons.lucide.HousePlus
 import com.composables.icons.lucide.LayoutGrid
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
@@ -124,7 +102,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
 
-
+    RequestPermissionsOnFirstLaunch()
 
     val navController = rememberNavController()
     val lichHocViewModel: LichHocViewModel = viewModel()
@@ -145,6 +123,7 @@ fun MainScreen() {
     val chiTietPhieuMuonViewModel: ChiTietPhieuMuonViewModel = viewModel()
     val caHocViewModel: CaHocViewModel = viewModel()
     val monHocViewModel: MonHocViewModel = viewModel()
+    val notificationViewModel: NotificationViewModel = viewModel()
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val giangVien = giangVienViewModel.giangvienSet
@@ -166,76 +145,67 @@ fun MainScreen() {
                 popUpTo(0) { inclusive = true }
             }
         },
-        ButtonData("Thông Báo", Lucide.Bell) {},
         ButtonData("Thông Tin", Lucide.User) {
-            if (giangVien != null || sinhVien != null) {
-                navController.navigate(NavRoute.ACCOUNT.route) {
-                    popUpTo(0) { inclusive = true }
-                }
+            navController.navigate(NavRoute.ACCOUNT.route) {
+                popUpTo(0) { inclusive = true }
             }
         }
     )
 
+    // AppBar logic dùng rõ ràng theo route thay vì index
+    @Composable
+    fun TopBar() {
+        when (currentRoute) {
+            NavRoute.LOGINSINHVIEN.route,
+            NavRoute.LOGINGIANGVIEN.route -> {}
 
-    val topAppBars = listOf<@Composable () -> Unit>(
-        {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                title = {
-                    Text("Trở lại", fontWeight = FontWeight.Bold, color = Color(0xFF1B8DDE))
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Back",
-                            tint = Color(0xFF1B8DDE)
-                        )
+            NavRoute.HOME.route,
+            NavRoute.QUANLY.route,
+            NavRoute.ACCOUNT.route -> {
+
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                painter = painterResource(id = R.drawable.logo),
+                                contentDescription = "Logo",
+                                modifier = Modifier.size(40.dp).clip(CircleShape)
+                            )
+                            Spacer(modifier = Modifier.width(7.dp))
+                            Text(
+                                text = "IT LabRoom",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 25.sp,
+                                color = Color(0xFF1B8DDE)
+                            )
+                        }
                     }
-                }
-            )
-        },
-        {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo),
-                            contentDescription = "Logo",
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                        )
-                        Spacer(modifier = Modifier.width(7.dp))
-                        Text(
-                            text = "IT LabRoom",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 25.sp,
-                            color = Color(0xFF1B8DDE)
-                        )
+                )
+            }
+
+            else -> {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    title = {
+                        Text("Trở lại", fontWeight = FontWeight.Bold, color = Color(0xFF1B8DDE))
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBackIosNew,
+                                contentDescription = "Back",
+                                tint = Color(0xFF1B8DDE)
+                            )
+                        }
                     }
-                }
-            )
-        },
-        {}
-    )
+                )
+            }
+        }
+    }
 
     Scaffold(
-        topBar = {
-            when (currentRoute) {
-                NavRoute.LOGINSINHVIEN.route,
-                NavRoute.LOGINGIANGVIEN.route -> {}
-
-                NavRoute.HOME.route,
-                NavRoute.QUANLY.route,
-                NavRoute.ACCOUNT.route -> topAppBars[1]()
-
-                else -> topAppBars[0]()
-            }
-        },
+        topBar = { TopBar() },
         bottomBar = {
             when (currentRoute) {
                 NavRoute.LOGINSINHVIEN.route,
@@ -259,10 +229,7 @@ fun MainScreen() {
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(
-                            Color.White,
-                            Color(0xFF1B8DDE)
-                        ),
+                        colors = listOf(Color.White, Color(0xFF1B8DDE)),
                         startY = 0f,
                         endY = Float.POSITIVE_INFINITY
                     )
@@ -270,9 +237,7 @@ fun MainScreen() {
                 .padding(paddingValues)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp),
+                modifier = Modifier.fillMaxSize().padding(12.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -295,12 +260,14 @@ fun MainScreen() {
                     phieuMuonMayViewModel,
                     chiTietPhieuMuonViewModel,
                     caHocViewModel,
-                    monHocViewModel
+                    monHocViewModel,
+                    notificationViewModel
                 )
             }
         }
     }
 }
+
 
 fun scheduleUpdateLichHocWorker(context: Context) {
     // Chạy ngay một lần

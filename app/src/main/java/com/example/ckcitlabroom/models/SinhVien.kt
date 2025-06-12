@@ -1,5 +1,5 @@
 data class SinhVien(
-    var MaSinhVien:String,
+	var MaSinhVien:String,
 	var TenSinhVien:String,
 	var NgaySinh:String,
 	var GioiTinh:String,
@@ -7,5 +7,6 @@ data class SinhVien(
 	var MaLop:String,
 	var MatKhau:String,
 	var MaLoaiTaiKhoan:Int,
+	var Token: String? = null,
 	var TrangThai:Int,
 )

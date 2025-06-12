@@ -6,6 +6,7 @@ data class GiangVien(
     var Email: String,
     var MatKhau :String,
     var MaLoaiTaiKhoan :Int,
+    var Token: String? = null,
     var TrangThai:Int,
 )
 

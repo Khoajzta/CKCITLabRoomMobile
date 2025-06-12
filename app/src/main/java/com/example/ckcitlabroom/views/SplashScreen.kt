@@ -44,7 +44,7 @@ fun StartupCheckScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            DotLoading()
         }
     }
 

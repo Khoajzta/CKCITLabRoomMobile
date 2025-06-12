@@ -41,9 +41,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
+import formatNgay
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
@@ -95,7 +99,7 @@ fun CreateSinhVienScreen(
                 calendar.set(year, month, dayOfMonth)
 
                 // Format hiển thị: dd-MM-yyyy
-                val sdfHienThi = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                val sdfHienThi = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                 ngaySinhHienThi.value = sdfHienThi.format(calendar.time)
 
                 // Format lưu DB: yyyy-MM-dd
@@ -230,11 +234,12 @@ fun CreateSinhVienScreen(
                         )
                         ExposedDropdownMenu(
                             expanded = gioiTinhExpanded,
-                            onDismissRequest = { gioiTinhExpanded = false }
+                            onDismissRequest = { gioiTinhExpanded = false },
+                            containerColor = Color.White
                         ) {
                             gioiTinhOptions.forEach { selectionOption ->
                                 DropdownMenuItem(
-                                    text = { Text(selectionOption) },
+                                    text = { Text(selectionOption, color = Color.Black)},
                                     onClick = {
                                         gioiTinhState.value = selectionOption
                                         gioiTinhExpanded = false
@@ -271,11 +276,12 @@ fun CreateSinhVienScreen(
 
                         ExposedDropdownMenu(
                             expanded = lopExpanded,
-                            onDismissRequest = { lopExpanded = false }
+                            onDismissRequest = { lopExpanded = false },
+                            containerColor = Color.White
                         ) {
                             lopOptions.forEach { maLop ->
                                 DropdownMenuItem(
-                                    text = { Text(maLop) },
+                                    text = { Text(maLop, color = Color.Black) },
                                     onClick = {
                                         maLopState.value = maLop
                                         lopExpanded = false
@@ -337,7 +343,15 @@ fun CreateSinhVienScreen(
                         contentColor = Color.White,
                         shape = RoundedCornerShape(12.dp),
                         action = {
-                            TextButton(onClick = { snackbarData.value = null }) {
+                            TextButton(onClick = {
+                                maSVState.value = ""
+                                tenSVState.value = ""
+                                ngaySinhHienThi.value = ""
+                                gioiTinhState.value = ""
+                                emailState.value = ""
+                                matKhauState.value = ""
+                                snackbarData.value = null
+                            }) {
                                 Text("Đóng", color = Color.White)
                             }
                         }
@@ -358,6 +372,17 @@ fun CreateSinhVienScreen(
 
             Button(
                 onClick = {
+                    val emailRegex = Regex("^[A-Za-z0-9+_.-]+@caothang\\.edu\\.vn$")
+                    val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,}$")
+
+                    val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val today = LocalDate.now()
+                    val birthDate = try {
+                        LocalDate.parse(ngaySinhDb.value, dateFormat)
+                    } catch (e: Exception) {
+                        null
+                    }
+
                     if (maSVState.value.isBlank() || tenSVState.value.isBlank() ||
                         ngaySinhDb.value.isBlank() || gioiTinhState.value.isBlank() ||
                         emailState.value.isBlank() || matKhauState.value.isBlank()
@@ -369,12 +394,45 @@ fun CreateSinhVienScreen(
                             )
                             snackbarHostState.showSnackbar("Thông báo")
                         }
+                    } else if (birthDate == null) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Ngày sinh không hợp lệ! (Định dạng yyyy-MM-dd)",
+                                type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+                    } else if (Period.between(birthDate, today).years < 18) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Sinh viên phải đủ 18 tuổi trở lên!",
+                                type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+                    } else if (!emailRegex.matches(emailState.value)) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Email phải có định dạng @caothang.edu.vn",
+                                type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+                    } else if (!passwordRegex.matches(matKhauState.value)) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Mật khẩu phải từ 8 ký tự, có chữ hoa, chữ thường và ký tự đặc biệt",
+                                type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
                     } else {
                         val daTonTai = danhSachSinhVien.any { it.MaSinhVien == maSVState.value }
                         if (daTonTai) {
                             coroutineScope.launch {
                                 snackbarData.value = CustomSnackbarData(
-                                    message = "Mã sinh viên đã tồn tại!", type = SnackbarType.ERROR
+                                    message = "Mã sinh viên đã tồn tại!",
+                                    type = SnackbarType.ERROR
                                 )
                                 snackbarHostState.showSnackbar("Thông báo")
                             }
@@ -387,7 +445,7 @@ fun CreateSinhVienScreen(
                                 Email = emailState.value,
                                 MatKhau = matKhauState.value,
                                 MaLop = maLopState.value,
-                                MaLoaiTaiKhoan = 3,  // mặc định 1
+                                MaLoaiTaiKhoan = 3,
                                 TrangThai = 1
                             )
                             sinhVienViewModel.createSinhVien(sinhVienMoi)
@@ -397,8 +455,12 @@ fun CreateSinhVienScreen(
                                     type = SnackbarType.SUCCESS
                                 )
                                 snackbarHostState.showSnackbar("Thông báo")
-                                delay(1000)
-                                navController.popBackStack()
+                                maSVState.value = ""
+                                tenSVState.value = ""
+                                ngaySinhHienThi.value = ""
+                                gioiTinhState.value = ""
+                                emailState.value = ""
+                                matKhauState.value = ""
                             }
                         }
                     }
@@ -407,7 +469,7 @@ fun CreateSinhVienScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {
-                Text("Thêm sinh viên")
+                Text("Thêm sinh viên",color = Color.White,fontWeight = FontWeight.Bold)
             }
         }
     }

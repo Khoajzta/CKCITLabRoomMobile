@@ -37,6 +37,9 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
@@ -169,7 +172,7 @@ fun CreateGiangVienScreen(
 
                     Text("Ngày Sinh", fontWeight = FontWeight.Bold, color = Color.Black)
                     OutlinedTextField(
-                        value = ngaySinhHienThi.value,
+                        value = formatNgay(ngaySinhHienThi.value),
                         onValueChange = {},
                         readOnly = true,
                         placeholder = { Text("Chọn ngày sinh") },
@@ -221,11 +224,12 @@ fun CreateGiangVienScreen(
                         )
                         ExposedDropdownMenu(
                             expanded = gioiTinhExpanded,
-                            onDismissRequest = { gioiTinhExpanded = false }
+                            onDismissRequest = { gioiTinhExpanded = false },
+                            containerColor = Color.White
                         ) {
                             gioiTinhOptions.forEach { selectionOption ->
                                 DropdownMenuItem(
-                                    text = { Text(selectionOption) },
+                                    text = { Text(selectionOption, color = Color.Black) },
                                     onClick = {
                                         gioiTinhState.value = selectionOption
                                         gioiTinhExpanded = false
@@ -286,7 +290,15 @@ fun CreateGiangVienScreen(
                         contentColor = Color.White,
                         shape = RoundedCornerShape(12.dp),
                         action = {
-                            TextButton(onClick = { snackbarData.value = null }) {
+                            TextButton(onClick = {
+                                maGVState.value = ""
+                                tenGVState.value = ""
+                                ngaySinhHienThi.value = ""
+                                gioiTinhState.value = ""
+                                emailState.value = ""
+                                matKhauState.value = ""
+                                snackbarData.value = null
+                            }) {
                                 Text("Đóng", color = Color.White)
                             }
                         }
@@ -307,6 +319,14 @@ fun CreateGiangVienScreen(
 
             Button(
                 onClick = {
+                    val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val today = LocalDate.now()
+                    val birthDate = try {
+                        LocalDate.parse(ngaySinhDb.value, dateFormat)
+                    } catch (e: Exception) {
+                        null
+                    }
+
                     if (maGVState.value.isBlank() || tenGVState.value.isBlank() ||
                         ngaySinhDb.value.isBlank() || gioiTinhState.value.isBlank() ||
                         emailState.value.isBlank() || matKhauState.value.isBlank()
@@ -314,6 +334,35 @@ fun CreateGiangVienScreen(
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(
                                 message = "Vui lòng nhập đầy đủ thông tin!", type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+                    } else if (birthDate == null) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Ngày sinh không hợp lệ! (Định dạng yyyy-MM-dd)", type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+                    } else if (Period.between(birthDate, today).years < 22) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Giảng viên phải đủ 22 tuổi trở lên!", type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+                    } else if (!isValidEmail(emailState.value)) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Email phải có đuôi @caothang.edu.vn!", type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+                    } else if (!isValidPassword(matKhauState.value)) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Mật khẩu phải từ 8 ký tự, gồm chữ hoa, chữ thường và ký tự đặc biệt!",
+                                type = SnackbarType.ERROR
                             )
                             snackbarHostState.showSnackbar("Thông báo")
                         }
@@ -345,17 +394,23 @@ fun CreateGiangVienScreen(
                                     type = SnackbarType.SUCCESS
                                 )
                                 snackbarHostState.showSnackbar("Thông báo")
-                                delay(1000)
-                                navController.popBackStack()
+                                maGVState.value = ""
+                                tenGVState.value = ""
+                                ngaySinhHienThi.value = ""
+                                gioiTinhState.value = ""
+                                emailState.value = ""
+                                matKhauState.value = ""
                             }
                         }
                     }
-                },
+                }
+
+                ,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {
-                Text("Thêm giảng viên")
+                Text("Thêm giảng viên",color = Color.White,fontWeight = FontWeight.Bold)
             }
         }
     }

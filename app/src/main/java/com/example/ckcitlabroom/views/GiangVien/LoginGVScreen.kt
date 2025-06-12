@@ -117,7 +117,7 @@ fun LoginGVScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = Color(0xFF1B8DDE))
+            DotLoading()
         }
     } else {
         // Hiển thị form đăng nhập

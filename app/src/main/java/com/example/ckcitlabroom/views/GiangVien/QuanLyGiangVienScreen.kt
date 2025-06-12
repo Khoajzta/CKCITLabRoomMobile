@@ -26,11 +26,11 @@ fun QuanLyGiangVien(
 
     val dsChucNang =
         listOf(
-            ChucNang("Giảng Viên Ngừng Công Tác", Icons.Outlined.Article, Click = {
-                navController.navigate(NavRoute.LISTGIANGVIENNGUNGCONGTAC.route)
-            }),
             ChucNang("Giảng Viên Đang Dạy", Icons.Outlined.Article, Click = {
                 navController.navigate(NavRoute.LISTGIANGVIENCONGTAC.route)
+            }),
+            ChucNang("Giảng Viên Ngừng Công Tác", Icons.Outlined.Article, Click = {
+                navController.navigate(NavRoute.LISTGIANGVIENNGUNGCONGTAC.route)
             }),
             ChucNang("Phân Quyền Giảng Viên", Icons.Outlined.ManageAccounts, Click = {
                 navController.navigate(NavRoute.PHANQUYEN.route)

@@ -56,7 +56,7 @@ fun QuanLyCaHoc(
                 "Quản Lý Ca Học",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
-                color = Color.White
+                color = Color(0xFF1B8DDE)
             )
             IconButton(
                 onClick = {

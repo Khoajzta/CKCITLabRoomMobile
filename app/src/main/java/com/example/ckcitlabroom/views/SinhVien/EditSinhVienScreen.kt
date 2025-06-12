@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
+import formatNgay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -186,7 +187,7 @@ fun EditSinhVienScreen(
                     item {
                         Text("Ngày Sinh", color = Color.Black, fontWeight = FontWeight.Bold)
                         OutlinedTextField(
-                            value = ngaySinhState.value,
+                            value = formatNgay(ngaySinhState.value),
                             onValueChange = {},
                             readOnly = true,
                             modifier = Modifier

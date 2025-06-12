@@ -1,5 +1,6 @@
 import android.graphics.PointF
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -32,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -53,7 +55,9 @@ import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
@@ -81,7 +85,6 @@ fun AnimatedNavigationBar(
     currentRoute: String?
 ) {
     val circleRadius = 26.dp
-
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(currentRoute) {
@@ -89,60 +92,46 @@ fun AnimatedNavigationBar(
             val index = when (route) {
                 NavRoute.HOME.route -> 0
                 NavRoute.QUANLY.route -> 1
-                NavRoute.ACCOUNT.route -> 4
+                NavRoute.QUETQRCODE.route -> 2
+                NavRoute.ACCOUNT.route -> 3
                 else -> selectedItem
             }
             selectedItem = index
         }
     }
 
-    var barSize by remember { mutableStateOf(IntSize(0, 0)) }
     val density = LocalDensity.current
-
-    val paddingHorizontalPx = with(density) { 16.dp.toPx() * 2 }
-    val usableWidth = (barSize.width.toFloat() - paddingHorizontalPx)
-    val offsetStep = remember(barSize) {
-        if (barSize.width == 0) 0f else usableWidth / (buttons.size * 2)
-    }
-
-    val offset = remember(selectedItem, offsetStep) {
-        with(density) { 16.dp.toPx() } + (selectedItem + 0.5f) * 2 * offsetStep
-    }
-
     val circleRadiusPx = with(density) { circleRadius.toPx().toInt() }
+    val itemCenters = remember { mutableStateListOf<Float>() }
 
-    val offsetTransition = updateTransition(offset, label = "offset transition")
-    val animation = spring<Float>(dampingRatio = 0.5f, stiffness = Spring.StiffnessVeryLow)
+    // Dùng Animatable để điều khiển animation mượt hơn
+    val animatableOffset = remember { Animatable(0f) }
 
-    val cutoutOffset by offsetTransition.animateFloat(
-        transitionSpec = {
-            if (this.initialState == 0f) snap() else animation
-        },
-        label = "cutout offset"
-    ) { it }
-
-    val circleOffset by offsetTransition.animateIntOffset(
-        transitionSpec = {
-            if (this.initialState == 0f) snap()
-            else spring(animation.dampingRatio, animation.stiffness)
-        },
-        label = "circle offset"
-    ) {
-        val extraOffsetX = with(density) { 12.dp.toPx().toInt() }
-        IntOffset(it.toInt() - circleRadiusPx + extraOffsetX, -circleRadiusPx)
+    LaunchedEffect(selectedItem, itemCenters) {
+        val target = itemCenters.getOrNull(selectedItem) ?: return@LaunchedEffect
+        animatableOffset.animateTo(
+            target,
+            animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow)
+        )
     }
 
+    // Tính toán vị trí điểm khuyết
+    val circleOffset = run {
+        val shiftRight = with(density) { 12.dp.toPx() }
+        val circleSize = with(density) { (circleRadius * 2).toPx() }
+        IntOffset((animatableOffset.value - circleSize / 2 + shiftRight).toInt(), -circleRadiusPx)
+    }
 
-    val barShape = remember(cutoutOffset) {
+    val barShape = remember(animatableOffset.value) {
         BarShape(
-            offset = cutoutOffset,
+            offset = animatableOffset.value,
             circleRadius = circleRadius,
             cornerRadius = 35.dp,
         )
     }
 
-
     Box {
+        // Điểm khuyết (circle)
         Circle(
             modifier = Modifier
                 .offset { circleOffset }
@@ -153,11 +142,11 @@ fun AnimatedNavigationBar(
             iconColor = selectedColor,
         )
 
+        // Navigation bar
         Row(
             modifier = Modifier
                 .padding(bottom = 18.dp, start = 12.dp, end = 12.dp)
                 .height(95.dp)
-                .onPlaced { barSize = it.size }
                 .graphicsLayer {
                     shape = barShape
                     clip = true
@@ -169,36 +158,55 @@ fun AnimatedNavigationBar(
         ) {
             buttons.forEachIndexed { index, button ->
                 val isSelected = index == selectedItem
-                NavigationBarItem(
-                    selected = isSelected,
-                    onClick = {
-                        button.click()
-                        selectedItem = index
-                    },
-                    icon = {
-                        val iconAlpha by animateFloatAsState(
-                            targetValue = if (isSelected) 0f else 1f,
-                            label = "Navbar item icon"
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .onGloballyPositioned { coordinates ->
+                            val centerX = coordinates.positionInParent().x + coordinates.size.width / 2
+                            if (itemCenters.size <= index) {
+                                itemCenters.add(centerX)
+                            } else if (itemCenters[index] != centerX) {
+                                itemCenters[index] = centerX
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    this@Row.NavigationBarItem(
+                        selected = isSelected,
+                        onClick = {
+                            button.click()
+                            selectedItem = index
+                        },
+                        icon = {
+                            val iconAlpha by animateFloatAsState(
+                                targetValue = if (isSelected) 0f else 1f,
+                                label = "Navbar item icon"
+                            )
+                            Icon(
+                                imageVector = button.icon,
+                                contentDescription = button.text,
+                                modifier = Modifier.alpha(iconAlpha).size(35.dp)
+                            )
+                        },
+                        label = {
+                            Text(button.text, fontWeight = FontWeight.Bold)
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = selectedColor,
+                            selectedTextColor = selectedColor,
+                            unselectedIconColor = unselectedColor,
+                            unselectedTextColor = unselectedColor,
+                            indicatorColor = Color.Transparent
                         )
-                        Icon(
-                            imageVector = button.icon,
-                            contentDescription = button.text,
-                            modifier = Modifier.alpha(iconAlpha).size(35.dp)
-                        )
-                    },
-                    label = { Text(button.text, fontWeight = FontWeight.Bold) },
-                    colors = NavigationBarItemDefaults.colors().copy(
-                        selectedIconColor = selectedColor,
-                        selectedTextColor = selectedColor,
-                        unselectedIconColor = unselectedColor,
-                        unselectedTextColor = unselectedColor,
-                        selectedIndicatorColor = Color.Transparent,
                     )
-                )
+                }
             }
         }
     }
 }
+
+
 
 
 private class BarShape(

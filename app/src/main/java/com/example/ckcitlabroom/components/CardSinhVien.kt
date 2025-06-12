@@ -87,50 +87,37 @@ fun CardSinhVien(
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Hash, contentDescription = "Mã SV", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Mã SV: ${sinhVien.MaSinhVien}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.User, contentDescription = "Tên SV", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Tên: ${sinhVien.TenSinhVien}", fontSize = 16.sp)
-            }
+            Text(
+                text = "Thông tin sinh viên",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Calendar, contentDescription = "Ngày sinh", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                val outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
 
-                val ngaySinhFormatted = try {
-                    LocalDate.parse(sinhVien.NgaySinh, inputFormatter).format(outputFormatter)
-                } catch (e: Exception) {
-                    sinhVien.NgaySinh
-                }
+            InfoRow(icon = Lucide.Hash, label = "Mã SV", value = sinhVien.MaSinhVien)
+            Spacer(Modifier.height(8.dp))
 
-                Text("Ngày sinh: $ngaySinhFormatted", fontSize = 16.sp)
-            }
+            InfoRow(icon = Lucide.User, label = "Tên", value = sinhVien.TenSinhVien)
+            Spacer(Modifier.height(8.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Users , contentDescription = "Giới tính", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Giới tính: ${sinhVien.GioiTinh}")
-            }
+            InfoRow(icon = Lucide.Calendar, label = "Ngày sinh", value = formatNgay(sinhVien.NgaySinh))
+            Spacer(Modifier.height(8.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Mail, contentDescription = "Email", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Email: ${sinhVien.Email}")
-            }
+            InfoRow(icon = Lucide.Users, label = "Giới tính", value = sinhVien.GioiTinh)
+            Spacer(Modifier.height(8.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Lucide.Badge, contentDescription = "Mã lớp", tint = Color.Black, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Mã lớp: ${sinhVien.MaLop}")
-            }
+            InfoRow(icon = Lucide.Mail, label = "Email", value = sinhVien.Email)
+            Spacer(Modifier.height(8.dp))
+
+            InfoRow(icon = Lucide.Badge, label = "Mã lớp", value = sinhVien.MaLop)
+            Spacer(Modifier.height(8.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -139,16 +126,9 @@ fun CardSinhVien(
                     tint = color,
                     modifier = Modifier.size(20.dp)
                 )
-                Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ")
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color)
+                Spacer(Modifier.width(8.dp))
+                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                Text(text = statusText, color = color, fontWeight = FontWeight.Medium, fontSize = 16.sp)
             }
 
             Spacer(Modifier.height(8.dp))
@@ -182,37 +162,32 @@ fun CardSinhVien(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Button(
-                                        modifier = Modifier.weight(1f).padding(end = 8.dp),
-                                        onClick = {
-                                            sinhVienViewModel.updateTrangThaiSinhVien(
-                                                SinhVien(sinhVien.MaSinhVien, sinhVien.TenSinhVien, sinhVien.NgaySinh, sinhVien.GioiTinh,
-                                                    sinhVien.Email, sinhVien.MatKhau, sinhVien.MaLop, sinhVien.MaLoaiTaiKhoan, 1),
-                                                maLop
-                                            )
-                                            showDialog = false
-                                        },
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                                    ) {
-                                        Text("Đang học", color = Color.White)
-                                    }
-
-                                    Button(
-                                        modifier = Modifier.weight(1f),
-                                        onClick = {
-                                            sinhVienViewModel.updateTrangThaiSinhVien(
-                                                SinhVien(sinhVien.MaSinhVien, sinhVien.TenSinhVien, sinhVien.NgaySinh, sinhVien.GioiTinh,
-                                                    sinhVien.Email, sinhVien.MatKhau, sinhVien.MaLop, sinhVien.MaLoaiTaiKhoan, 0),
-                                                maLop
-                                            )
-                                            showDialog = false
-                                            sinhVienViewModel.getSinhVienByMaLop(maLop)
-                                        },
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
-                                    ) {
-                                        Text("Đình chỉ", color = Color.White)
+                                    if(sinhVien.TrangThai == 0){
+                                        Button(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            onClick = {
+                                                var sinhviennew = sinhVien.copy(TrangThai = 1)
+                                                sinhVienViewModel.updateSinhVien(sinhviennew)
+                                                showDialog = false
+                                            },
+                                            shape = RoundedCornerShape(12.dp),
+                                            colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                                        ) {
+                                            Text("Đang học", color = Color.White)
+                                        }
+                                    }else{
+                                        Button(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            onClick = {
+                                                var sinhviennew = sinhVien.copy(TrangThai = 0)
+                                                sinhVienViewModel.updateSinhVien(sinhviennew)
+                                                showDialog = false
+                                            },
+                                            shape = RoundedCornerShape(12.dp),
+                                            colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
+                                        ) {
+                                            Text("Đình chỉ", color = Color.White)
+                                        }
                                     }
                                 }
                             }
@@ -230,14 +205,6 @@ fun CardSinhVien(
                         Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
 
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { showConfirmDialog = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
-                    }
                 }
             }
         }
