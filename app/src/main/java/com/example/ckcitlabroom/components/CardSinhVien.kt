@@ -58,7 +58,8 @@ import kotlin.math.sinh
 fun CardSinhVien(
     sinhVien: SinhVien,
     navController: NavHostController,
-    sinhVienViewModel: SinhVienViewModel
+    sinhVienViewModel: SinhVienViewModel,
+    maLop: String
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -186,7 +187,8 @@ fun CardSinhVien(
                                         onClick = {
                                             sinhVienViewModel.updateTrangThaiSinhVien(
                                                 SinhVien(sinhVien.MaSinhVien, sinhVien.TenSinhVien, sinhVien.NgaySinh, sinhVien.GioiTinh,
-                                                    sinhVien.Email, sinhVien.MatKhau, sinhVien.MaLop, sinhVien.MaLoaiTaiKhoan, 1)
+                                                    sinhVien.Email, sinhVien.MatKhau, sinhVien.MaLop, sinhVien.MaLoaiTaiKhoan, 1),
+                                                maLop
                                             )
                                             showDialog = false
                                         },
@@ -201,9 +203,11 @@ fun CardSinhVien(
                                         onClick = {
                                             sinhVienViewModel.updateTrangThaiSinhVien(
                                                 SinhVien(sinhVien.MaSinhVien, sinhVien.TenSinhVien, sinhVien.NgaySinh, sinhVien.GioiTinh,
-                                                    sinhVien.Email, sinhVien.MatKhau, sinhVien.MaLop, sinhVien.MaLoaiTaiKhoan, 0)
+                                                    sinhVien.Email, sinhVien.MatKhau, sinhVien.MaLop, sinhVien.MaLoaiTaiKhoan, 0),
+                                                maLop
                                             )
                                             showDialog = false
+                                            sinhVienViewModel.getSinhVienByMaLop(maLop)
                                         },
                                         shape = RoundedCornerShape(12.dp),
                                         colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
@@ -249,6 +253,7 @@ fun CardSinhVien(
                     onClick = {
                         sinhVienViewModel.deleteSinhVien(sinhVien.MaSinhVien)
                         showConfirmDialog = false
+                        sinhVienViewModel.getSinhVienByMaLop(maLop)
                     }
                 ) {
                     Text("Xóa", color = Color.Red)

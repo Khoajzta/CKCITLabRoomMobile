@@ -11,6 +11,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
+import com.example.ckcitlabroom.views.SinhVien.CreateSinhVienScreen
+import com.example.ckcitlabroom.views.SinhVien.EditSinhVienScreen
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
 import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
 import com.example.lapstore.viewmodels.DonNhapViewModel
@@ -67,6 +69,8 @@ sealed class NavRoute(val route: String) {
     object QUANLYSINHVIEN : NavRoute("quanlysinhvien_screen")
     object ADDSINHVIEN : NavRoute("addsinhvien_screen")
     object EDITSINHVIEN : NavRoute("editsinhvien_screen")
+    object LISTSINHVIENTHEOLOP : NavRoute("sinhviendanghoc_screen")
+    object LISTSINHVIENDINHCHI : NavRoute("sinhvientheolop_screen")
 
     object QUANLYLOPHOC : NavRoute("quanlylophoc_screen")
     object ADDLOPHOC : NavRoute("addlophoc_screen")
@@ -532,7 +536,7 @@ fun NavgationGraph(
                 )
             }
         ) {
-            QuanLySinhVien(navController, sinhVienViewModel)
+            QuanLySinhVien(navController)
         }
         composable(
             route = NavRoute.ADDSINHVIEN.route,
@@ -551,6 +555,44 @@ fun NavgationGraph(
         ) {
             CreateSinhVienScreen(navController, sinhVienViewModel, lopHocViewModel)
         }
+
+
+        composable(
+            route = NavRoute.LISTSINHVIENDINHCHI.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            ListSinhVienDinhChi(navController,sinhVienViewModel, lopHocViewModel)
+        }
+
+        composable(
+            route = NavRoute.LISTSINHVIENTHEOLOP.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            SinhVienTheoLopScreen(navController,sinhVienViewModel, lopHocViewModel)
+        }
+
 
         composable(
             NavRoute.EDITSINHVIEN.route + "?masv={masv}",
@@ -599,6 +641,8 @@ fun NavgationGraph(
         ) {
             CreateLopHocScreen(navController,lopHocViewModel)
         }
+
+
 
         composable(
             NavRoute.EDITLOPHOC.route + "?malop={malop}",
