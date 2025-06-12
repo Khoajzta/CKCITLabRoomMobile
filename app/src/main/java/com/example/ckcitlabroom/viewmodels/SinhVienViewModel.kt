@@ -121,6 +121,21 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun getSinhVienByMaLop(maLop: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                val response = ITLabRoomRetrofitClient.sinhvienAPIService.getSinhVienByMaLop(maLop)
+                danhSachAllSinhVien = response.sinhvien ?: emptyList()
+            } catch (e: Exception) {
+                errorMessage = e.message
+                Log.e("SinhVienViewModel", "Lỗi khi lấy sinh viên theo lớp", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
 
     fun createSinhVien(sinhVien: SinhVien) {
         viewModelScope.launch {
@@ -208,7 +223,7 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun updateTrangThaiSinhVien(sinhVien: SinhVien) {
+    fun updateTrangThaiSinhVien(sinhVien: SinhVien, maLop: String) {
         viewModelScope.launch {
             isLoading = true
             try {
@@ -216,6 +231,10 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
                     ITLabRoomRetrofitClient.sinhvienAPIService.updateTrangThaiSinhVien(sinhVien)
                 }
                 sinhVienUpdateTrangThaiResult = response.message
+
+                // ✅ Gọi lại danh sách sinh viên trong lớp để cập nhật giao diện
+                getSinhVienByMaLop(maLop)
+
             } catch (e: Exception) {
                 sinhVienUpdateTrangThaiResult = "Lỗi khi cập nhật trạng thái sinh viên: ${e.message}"
                 Log.e("SinhVienViewModel", "Lỗi khi cập nhật trạng thái sinh viên: ${e.message}")
@@ -224,7 +243,7 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
-
+    
     fun updateToken(maSinhVien: String, token: String) {
         viewModelScope.launch {
             try {
@@ -267,7 +286,6 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
-
 }
 
 

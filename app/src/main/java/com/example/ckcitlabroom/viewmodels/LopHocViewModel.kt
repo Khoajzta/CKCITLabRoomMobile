@@ -38,25 +38,21 @@ class LopHocViewModel: ViewModel() {
     }
 
     fun getAllLopHoc() {
-        if (pollingJob != null) return
-
-        pollingJob = viewModelScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                try {
-                    val response = ITLabRoomRetrofitClient.lophocAPIService.getAllLopHoc()
-                    if (response.lophoc != null) {
-                        danhSachAllLopHoc = response.lophoc!!
-                    } else {
-                        danhSachAllLopHoc = emptyList()
-                    }
-
-                } catch (e: Exception) {
-                    Log.e("LopHocViewModel", "Polling lỗi", e)
-                }
-                delay(500)
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = ITLabRoomRetrofitClient.lophocAPIService.getAllLopHoc()
+                danhSachAllLopHoc = response.lophoc ?: emptyList()
+                Log.d("LopHocViewModel", "Lấy danh sách lớp: ${danhSachAllLopHoc.size} lớp")
+            } catch (e: Exception) {
+                errorMessage = "Lỗi: ${e.localizedMessage ?: e.message}"
+                Log.e("LopHocViewModel", "Lỗi khi lấy danh sách lớp", e)
+            } finally {
+                isLoading = false
             }
         }
     }
+
 
     fun getLopHocById(malop: String) {
         viewModelScope.launch(Dispatchers.IO) {

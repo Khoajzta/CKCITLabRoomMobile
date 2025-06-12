@@ -1,3 +1,9 @@
+package com.example.ckcitlabroom.views.SinhVien
+
+import CustomSnackbarData
+import SinhVien
+import SinhVienViewModel
+import SnackbarType
 import android.icu.util.Calendar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -358,7 +364,8 @@ fun CreateSinhVienScreen(
                     ) {
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(
-                                message = "Vui lòng nhập đầy đủ thông tin!", type = SnackbarType.ERROR
+                                message = "Vui lòng nhập đầy đủ thông tin!",
+                                type = SnackbarType.ERROR
                             )
                             snackbarHostState.showSnackbar("Thông báo")
                         }
