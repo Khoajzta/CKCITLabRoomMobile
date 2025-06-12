@@ -61,6 +61,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.R
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 
 @Composable
@@ -319,13 +320,17 @@ fun LoginSVScreen(
                 }
             }
 
-
-
-
             LaunchedEffect(loginResult, sinhvien) {
                 if (loginResult?.result == true && sinhvien != null) {
                     sinhVienViewModel.setSV(sinhvien)
                     userPreferences.saveLoginForSinhVien(sinhvien)
+
+                    FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                        Log.d("FirebaseToken", "Token: $token")
+
+                        val maSinhVien = sinhVienViewModel.sinhvien?.MaSinhVien ?: return@addOnSuccessListener
+                        sinhVienViewModel.updateToken(maSinhVien, token)
+                    }
                     navController.navigate(NavRoute.HOME.route) {
                         popUpTo(0) { inclusive = true }
                     }

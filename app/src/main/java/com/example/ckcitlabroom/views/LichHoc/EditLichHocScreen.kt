@@ -1,3 +1,4 @@
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +47,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.sinh
 
 @Composable
 fun EditLichHocScreen(
@@ -57,11 +60,13 @@ fun EditLichHocScreen(
     giangvienViewModel: GiangVienViewModel,
     lopHocViewModel: LopHocViewModel,
     phongMayViewModel: PhongMayViewModel,
-    caHocViewModel: CaHocViewModel
+    caHocViewModel: CaHocViewModel,
+    sinhVienViewModel: SinhVienViewModel
 ) {
     val context = LocalContext.current
 
     var lichhoc by remember { mutableStateOf<LichHoc?>(null) }
+    var originalMaLopHoc by remember { mutableStateOf<String?>(null) }
 
     var selectedGiangVien by remember { mutableStateOf<GiangVien?>(null) }
     var selectedPhong by remember { mutableStateOf<PhongMay?>(null) }
@@ -80,9 +85,10 @@ fun EditLichHocScreen(
     val danhSachMonHoc = monHocViewModel.danhSachAllMonHoc.filter { it.TrangThai == 1 }
     val danhSachLopHoc = lopHocViewModel.danhSachAllLopHoc.filter { it.TrangThai == 1 }
     val danhSachCaHoc = caHocViewModel.danhSachAllCaHoc.filter { it.TrangThai == 1 }
+    val danhSachTokenSinhVienTheoLop by rememberUpdatedState(newValue = sinhVienViewModel.danhSachToken)
+
 
     val danhSachThu = listOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật")
-
     val thuToOffset = mapOf(
         "Thứ 2" to 0, "Thứ 3" to 1, "Thứ 4" to 2,
         "Thứ 5" to 3, "Thứ 6" to 4, "Thứ 7" to 5,
@@ -114,6 +120,7 @@ fun EditLichHocScreen(
         val data = lichhocViewModel.lichhoc
         if (data != null) {
             lichhoc = data
+            originalMaLopHoc = data.MaLopHoc
             selectedGiangVien = danhSachGiangVien.find { it.MaGV == data.MaGV }
             selectedPhong = danhSachPhong.find { it.MaPhong == data.MaPhong }
             selectedLop = danhSachLopHoc.find { it.MaLopHoc == data.MaLopHoc }
@@ -122,8 +129,22 @@ fun EditLichHocScreen(
             selectedTuanTu = danhSachTuanTheoNam.find { it.MaTuan == data.MaTuan }
             selectedTuanDen = selectedTuanTu
             selectedThu = danhSachThu.find { it == data.Thu }
+
+            // Lấy danh sách token theo lớp gốc
+            sinhVienViewModel.getTokensByMaLop(data.MaLopHoc)
         }
     }
+
+    // Cập nhật token khi đổi lớp
+    LaunchedEffect(selectedLop?.MaLopHoc) {
+        selectedLop?.MaLopHoc?.let { maLop ->
+            sinhVienViewModel.getTokensByMaLop(maLop)
+        }
+    }
+
+    Log.d("DanhSachToken", "Danh sách token: $danhSachTokenSinhVienTheoLop")
+
+
 
     // UI hiển thị
     Card(

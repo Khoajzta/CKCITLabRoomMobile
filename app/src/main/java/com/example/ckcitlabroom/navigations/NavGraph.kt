@@ -1228,7 +1228,7 @@ fun NavgationGraph(
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(300)) }
         ) { navBackStackEntry ->
             val malichhoc = navBackStackEntry.arguments?.getString("malichhoc") ?: ""
-            EditLichHocScreen(malichhoc,navController,lichHocViewModel,namHocViewModel,monhocViewModel,tuanViewModel,giangVienViewModel,lopHocViewModel,phongMayViewModel,caHocViewModel)
+            EditLichHocScreen(malichhoc,navController,lichHocViewModel,namHocViewModel,monhocViewModel,tuanViewModel,giangVienViewModel,lopHocViewModel,phongMayViewModel,caHocViewModel,sinhVienViewModel)
         }
 
         composable(

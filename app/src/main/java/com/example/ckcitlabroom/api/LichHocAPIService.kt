@@ -25,6 +25,18 @@ data class UpdateLichHocRequest(
     val MaLichHocList: List<Int>
 )
 
+data class NotificationRequest(
+    val MaLopHoc: String,
+    val title: String,
+    val message: String
+)
+
+
+data class NotificationResponse(
+    val success: Boolean,
+    val message: String
+)
+
 
 
 interface LichHocAPIService {
@@ -60,5 +72,10 @@ interface LichHocAPIService {
     suspend fun updateTrangThaiLichHoc(
         @Body request: UpdateLichHocRequest
     ): UpdateResponse
+
+    @POST("LichHoc/sendNotificationToLop.php")
+    suspend fun sendNotificationToLop(
+        @Body request: NotificationRequest
+    ): NotificationResponse
 
 }

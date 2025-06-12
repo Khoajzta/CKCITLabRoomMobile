@@ -15,6 +15,20 @@ data class SinhVienResponse(
     val sinhvien: List<SinhVien>? = null
 )
 
+data class TokenUpdateRequest(
+    val MaSinhVien: String,
+    val Token: String
+)
+
+data class TokenResponse(
+    val status: String,
+    val tokens: List<String>
+)
+
+data class MaLopRequest(
+    val MaLop: String
+)
+
 
 interface SinhVienAPIService {
     @GET("LichHoc/read.php")
@@ -47,6 +61,10 @@ interface SinhVienAPIService {
         @Body sinhVien: SinhVien
     ): UpdateResponse
 
+    @POST("SinhVien/updatetoken.php")
+    suspend fun updateToken(@Body request: TokenUpdateRequest): UpdateResponse
+
+
     @HTTP(method = "DELETE", path = "SinhVien/delete.php", hasBody = true)
     suspend fun deleteSinhVien(
         @Body body: Map<String, String>
@@ -54,5 +72,8 @@ interface SinhVienAPIService {
 
     @GET("SinhVien/getSinhVienTheoMaOrEmail.php")
     suspend fun getSinhVienByEmailOrMaSV(@Query("key") key: String): SinhVien
+
+    @POST("SinhVien/gettokensbylop.php")
+    suspend fun getTokensByMaLop(@Body request: MaLopRequest): TokenResponse
 
 }

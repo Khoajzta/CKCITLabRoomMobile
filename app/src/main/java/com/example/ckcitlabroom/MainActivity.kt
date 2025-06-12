@@ -17,7 +17,10 @@ import SinhVienViewModel
 import SinhVienPreferences
 import TuanViewModel
 import UpdateLichHocWorker
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -98,14 +101,9 @@ import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.LichHocViewModel
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.User
-import com.composables.icons.lucide.Warehouse
 import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
@@ -119,11 +117,15 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
+
+
+
     val navController = rememberNavController()
     val lichHocViewModel: LichHocViewModel = viewModel()
     val giangVienViewModel: GiangVienViewModel = viewModel()

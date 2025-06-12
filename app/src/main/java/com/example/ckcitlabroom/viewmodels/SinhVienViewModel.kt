@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -30,6 +31,13 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
         private set
 
     var sinhvienSet: SinhVien? by mutableStateOf(null)
+        private set
+
+    var danhSachToken by mutableStateOf<List<String>>(emptyList())
+        private set
+
+
+    var tokenError by mutableStateOf<String?>(null)
         private set
 
     var danhSachAllSinhVien by mutableStateOf<List<SinhVien>>(emptyList())
@@ -72,22 +80,6 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
                     result = false, message = "Lỗi kết nối: ${e.message}"
                 )
             }
-        }
-    }
-
-    fun setSVFromPrefs(state: LoginSinhVienState) {
-        if (state.isLoggedIn && state.maSinhVien != null && state.tenSinhVien != null) {
-            sinhvien = SinhVien(
-                MaSinhVien = state.maSinhVien,
-                TenSinhVien = state.tenSinhVien,
-                NgaySinh = "",
-                GioiTinh = "",
-                MaLop = "",
-                Email = "",
-                MatKhau = "",
-                MaLoaiTaiKhoan = 3,
-                TrangThai = 0
-            )
         }
     }
 
@@ -227,6 +219,49 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
             } catch (e: Exception) {
                 sinhVienUpdateTrangThaiResult = "Lỗi khi cập nhật trạng thái sinh viên: ${e.message}"
                 Log.e("SinhVienViewModel", "Lỗi khi cập nhật trạng thái sinh viên: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun updateToken(maSinhVien: String, token: String) {
+        viewModelScope.launch {
+            try {
+                val request = TokenUpdateRequest(
+                    MaSinhVien = maSinhVien,
+                    Token = token
+                )
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.sinhvienAPIService.updateToken(request)
+                }
+                Log.d("TokenUpdate", "Token updated: ${response.message}")
+            } catch (e: Exception) {
+                Log.e("TokenUpdate", "Lỗi khi cập nhật token: ${e.message}")
+            }
+        }
+    }
+
+    fun getTokensByMaLop(maLop: String) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    val request = MaLopRequest(maLop)
+                    ITLabRoomRetrofitClient.sinhvienAPIService.getTokensByMaLop(request)
+                }
+
+                if (response.status == "success") {
+                    danhSachToken = response.tokens.filter { it.isNotBlank() } // Lọc token rỗng
+                    tokenError = null
+                } else {
+                    danhSachToken = emptyList()
+                    tokenError = "Không thể lấy danh sách token"
+                }
+            } catch (e: Exception) {
+                danhSachToken = emptyList()
+                tokenError = "Lỗi: ${e.message}"
+                Log.e("SinhVienViewModel", "Lỗi khi lấy token theo mã lớp", e)
             } finally {
                 isLoading = false
             }
