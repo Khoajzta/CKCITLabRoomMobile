@@ -57,6 +57,11 @@ interface GiangVienAPIService {
         @Body giangVien: GiangVien
     ): UpdateResponse
 
+    @PUT("giangvien/updateLoaiTKGiangVien.php")
+    suspend fun updateLoaiTaiKhoanGiangVien(
+        @Body giangVien: GiangVien
+    ): UpdateResponse
+
     @HTTP(method = "DELETE", path = "GiangVien/delete.php", hasBody = true)
     suspend fun deleteGiangVien(
         @Body body: Map<String, String>

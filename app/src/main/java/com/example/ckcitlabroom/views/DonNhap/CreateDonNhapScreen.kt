@@ -25,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -145,11 +146,17 @@ fun CreateDonNhapScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 12.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text("Nhập Đơn Hàng ", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             }
+
+            HorizontalDivider(
+                modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color.Gray,
+            )
 
             LazyColumn(
                 modifier = Modifier
@@ -470,9 +477,15 @@ fun CreateDonNhapScreen(
                 }
             }
 
+            HorizontalDivider(
+                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color.Gray,
+            )
+
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(8.dp)
             ) { data ->
                 snackbarData.value?.let { customData ->
                     Snackbar(
@@ -517,95 +530,148 @@ fun CreateDonNhapScreen(
                 }
             }
 
-            if (loadingState.value) {
-                DotLoading()
-            } else {
-                Button(
-                    onClick = {
-                        val sdf = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
-                        val dateStr = sdf.format(Date())
-                        val randomSuffix = (1000..9999).random().toString()
-                        val maDonNhap = dateStr + randomSuffix
 
-                        val soLuong = soluongState.value.toIntOrNull() ?: 0
-                        if (soLuong <= 0) {
-                            dialogMessage.value = "Số lượng máy phải lớn hơn 0"
-                            openDialog.value = true
-                            return@Button
-                        }
+            Button(
+                onClick = {
+                    val sdfInput = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val sdfNgayNhap = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val sdfMaMay = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+                    val sdfMaDon = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
 
+                    val parsedDate = try {
+                        sdfInput.parse(ngayNhapState.value)
+                    } catch (e: Exception) {
+                        null
+                    }
 
-                        val danhSachMay = mutableListOf<MayTinh>()
+                    val soLuong = soluongState.value.toIntOrNull() ?: 0
+                    val nhaCungCap = nhacungcapState.value.trim()
 
-                        for (i in 1..soLuong) {
-                            val stt = i.toString().padStart(3, '0') // ví dụ 001, 002...
-                            val maMay = "MAY${phonkho.MaPhong}$stt$randomSuffix"
+                    val fields = listOf(
+                        mainState.value,
+                        cpuState.value,
+                        ramState.value,
+                        vgaState.value,
+                        manHinhState.value,
+                        banPhimState.value,
+                        chuotState.value,
+                        hddState.value,
+                        ssdState.value
+                    )
 
-                            val may = MayTinh(
-                                MaMay = maMay,
-                                TenMay = "",
-                                ViTri = "",
-                                Main = mainState.value,
-                                CPU = cpuState.value,
-                                RAM =  ramState.value,
-                                VGA = vgaState.value,
-                                ManHinh = manHinhState.value,
-                                BanPhim = banPhimState.value,
-                                Chuot = chuotState.value,
-                                HDD = hddState.value,
-                                SSD = ssdState.value,
-                                QRCode = qrBase64,
-                                TrangThai = 0,
-                                MaPhong = phonkho.MaPhong,
-                            )
-                            danhSachMay.add(may)
-                        }
-
-                        // Gọi ViewModel để thêm đơn nhập và máy
+                    if (parsedDate == null) {
+                        dialogMessage.value = "Ngày nhập không hợp lệ!"
+                        openDialog.value = true
+                    } else if (soLuong <= 0) {
+                        dialogMessage.value = "Số lượng máy phải lớn hơn 0!"
+                        openDialog.value = true
+                    } else if (nhaCungCap.isBlank()) {
+                        dialogMessage.value = "Vui lòng nhập nhà cung cấp!"
+                        openDialog.value = true
+                    } else if (fields.any { it.isBlank() }) {
+                        dialogMessage.value = "Vui lòng nhập đầy đủ thông tin linh kiện. Nếu không có thì nhập trống"
+                        openDialog.value = true
+                    } else {
                         loadingState.value = true
-                        coroutineScope.launch {
-                            val donNhap = DonNhap(
-                                maDonNhap = maDonNhap,
-                                ngayNhap = ngayNhapState.value,
-                                nhaCungCap = nhacungcapState.value
-                            )
-                            donNhapyViewModel.createDonNhap(donNhap)
-                            danhSachMay.forEach { mayTinhViewModel.createMayTinh(it) }
 
-                            dialogMessage.value = "Tạo đơn nhập $maDonNhap với $soLuong máy thành công!"
-                            openDialog.value = true
+                        coroutineScope.launch {
+                            withContext(Dispatchers.IO) {
+                                val ngayNhap = sdfNgayNhap.format(parsedDate)
+                                val dateMaMay = sdfMaMay.format(parsedDate)
+                                val dateMaDon = sdfMaDon.format(parsedDate)
+                                val randomSuffix = (1000..9999).random().toString()
+
+                                val maDonNhap = "$dateMaDon$randomSuffix"
+
+                                val danhSachMay = mutableListOf<MayTinh>()
+
+                                for (i in 1..soLuong) {
+                                    val stt = i.toString().padStart(2, '0')
+                                    val maMay = "MAY$stt${randomSuffix}"
+                                    val qrBase64 = bitmapToBase64(generateQRCode(maMay, 512))
+
+                                    danhSachMay.add(
+                                        MayTinh(
+                                            MaMay = maMay,
+                                            TenMay = "PC_$stt",
+                                            ViTri = "",
+                                            Main = mainState.value,
+                                            CPU = cpuState.value,
+                                            RAM = ramState.value,
+                                            VGA = vgaState.value,
+                                            ManHinh = manHinhState.value,
+                                            BanPhim = banPhimState.value,
+                                            Chuot = chuotState.value,
+                                            HDD = hddState.value,
+                                            SSD = ssdState.value,
+                                            QRCode = qrBase64,
+                                            TrangThai = 0,
+                                            MaPhong = phonkho.MaPhong
+                                        )
+                                    )
+                                }
+
+                                val danhSachChiTiet = danhSachMay.map { mayTinh ->
+                                    ChiTietDonNhap(
+                                        MaDonNhap = maDonNhap,
+                                        MaMay = mayTinh.MaMay
+                                    )
+                                }
+
+                                try {
+                                    donNhapyViewModel.createDonNhap(donNhap = DonNhap(
+                                        MaDonNhap = maDonNhap,
+                                        NgayNhap = ngayNhap,
+                                        SoLuong = soLuong,
+                                        NhaCungCap = nhaCungCap
+                                    ))
+                                    mayTinhViewModel.createNhieuMayTinh(danhSachMay)
+                                    chiTietDonNhapyViewModel.createNhieuChiTietDonNhap(danhSachChiTiet)
+
+                                    withContext(Dispatchers.Main) {
+                                        dialogMessage.value = "Tạo đơn nhập $maDonNhap với $soLuong máy thành công!"
+                                        openDialog.value = true
+                                    }
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        dialogMessage.value = "Lỗi khi tạo đơn nhập. Vui lòng thử lại!"
+                                        openDialog.value = true
+                                    }
+                                }
+                            }
+
                             loadingState.value = false
                         }
-                    },
-
-                            modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
-                ) {
-                    Text("Nhập đơn hàng", color = Color.White, fontWeight = FontWeight.Bold)
-                }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
+            ) {
+                Text("Nhập đơn hàng", color = Color.White, fontWeight = FontWeight.Bold)
             }
 
 
             if (openDialog.value) {
                 AlertDialog(
+                    containerColor = Color.White,
+                    modifier = Modifier.background(Color.Transparent),
                     onDismissRequest = { openDialog.value = false },
                     confirmButton = {
                         TextButton(onClick = {
                             openDialog.value = false
                         }) {
-                            Text("OK")
+                            Text("OK",color = Color(0XFF1B8DDE))
                         }
                     },
                     title = {
-                        Text(text = "Thông báo")
+                        Text(text = "Thông báo",color = Color.Black)
                     },
                     text = {
-                        Text(dialogMessage.value)
+                        Text(dialogMessage.value,color = Color.Black)
                     }
                 )
             }
-
         }
     }
 }

@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ckcitlabroom.models.CaHoc
-import com.example.lapstore.api.ITLabRoomRetrofitClient
+import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -43,7 +43,7 @@ class CaHocViewModel: ViewModel() {
         pollingJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
-                    val response = ITLabRoomRetrofitClient.cahocAPIService.getAllCaHoc()
+                    val response =ITLabRoomRetrofitClient.cahocAPIService.getAllCaHoc()
                     if (response.cahoc != null) {
                         danhSachAllCaHoc = response.cahoc!!
                     } else {

@@ -74,7 +74,7 @@ fun CardGiangVien(
     // Chọn màu trạng thái dựa trên giangVien.TrangThai (1: hoạt động, 0: không hoạt động)
     val (color, statusText) = when (giangVien.TrangThai) {
         1 -> Color(0xFF4CAF50) to "Hoạt động"
-        0 -> Color(0xFFF44336) to "Không hoạt động"
+        0 -> Color(0xFFF44336) to "Ngưng công tác"
         else -> Color.Gray to "Không xác định"
     }
 
@@ -216,7 +216,7 @@ fun CardGiangVien(
                                         shape = RoundedCornerShape(12.dp),
                                         colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
                                     ) {
-                                        Text("Không Hoạt Động", color = Color.White)
+                                        Text("Ngưng công tác", color = Color.White)
                                     }
                                 }
                             }

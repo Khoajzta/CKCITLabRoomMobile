@@ -191,6 +191,23 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun updateLoaiTKGiangVien(giangVien: GiangVien) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.giangVienAPIService.updateLoaiTaiKhoanGiangVien(giangVien)
+                }
+                giangvienUpdateResult = response.message
+            } catch (e: Exception) {
+                giangvienUpdateResult = "Lỗi khi cập nhật loại tài khoản giảng viên: ${e.message}"
+                Log.e("GiangVienViewModel", "Lỗi khi cập nhật loại tài khoản giảng viên: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
 
     fun deleteGiangVien(magv: String) {
         viewModelScope.launch {
