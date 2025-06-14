@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lapstore.viewmodels.ChiTietPhieuMuonViewModel
@@ -36,61 +37,44 @@ fun ChiTietPhieuMuonMay(
     phongMayViewModel: PhongMayViewModel
 ) {
     val danhSachChiTiet by remember { derivedStateOf { chiTietPhieuMuonViewModel.danhSachChiTietPhieuMuonTheoMaPhieu } }
-    val danhSachMayTinh by remember { derivedStateOf { mayTinhViewModel.danhSachAllMayTinh } }
-
-    val mayTinhDaMuon = remember(danhSachChiTiet, danhSachMayTinh) {
-        danhSachMayTinh.filter { may ->
-            danhSachChiTiet.any { ct -> ct.MaMay == may.MaMay }
-        }
-    }
 
     LaunchedEffect(maphieumuon) {
         chiTietPhieuMuonViewModel.getChiTietPhieuMuonTheoMaPhieuOnce(maphieumuon)
-        mayTinhViewModel.getAllMayTinh()
     }
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Danh Sách Máy Cho Mượn",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-        }
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(
+            "Danh Sách Máy Cho Mượn",
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp),
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            color = Color(0xFF1B8DDE)
+        )
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            if (mayTinhDaMuon.isEmpty()) {
+            if (danhSachChiTiet.isEmpty()) {
                 item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "Không có máy tính nào",
-                            color = Color.Black,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
+                    Text(
+                        "Không có máy tính nào",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
                 }
             } else {
-                items(mayTinhDaMuon) { mayTinh ->
-                    CardMayTinhLichSu(mayTinh, phongMayViewModel, click = {})
+                items(danhSachChiTiet) { chitiet ->
+                    CardMayTinhMuon(
+                        chiTietPhieuMuon = chitiet,
+                        mayTinhViewModel = mayTinhViewModel,
+                        phongMayViewModel = phongMayViewModel,
+                        click = {}
+                    )
                 }
             }
         }
     }
 }
+
 
 

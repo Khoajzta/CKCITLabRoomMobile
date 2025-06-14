@@ -4,6 +4,6 @@ data class PhieuMuonMay(
     var NgayTra:String,
     var NguoiMuon:String,
     var MaPhong:String,
-    var SoLuong:String,
+    var SoLuong: Int,
     var TrangThai:Int,
 )

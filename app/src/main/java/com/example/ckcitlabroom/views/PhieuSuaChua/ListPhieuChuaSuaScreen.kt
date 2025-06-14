@@ -32,7 +32,8 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 fun ListPhieuChuaSua(
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
     mayTinhViewModel: MayTinhViewModel,
-    lichSuSuaMayViewModel: LichSuSuaMayViewModel
+    lichSuSuaMayViewModel: LichSuSuaMayViewModel,
+    giangVienViewModel: GiangVienViewModel
 ){
     val danhsachAllPhieuSuaChua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChua
 
@@ -101,7 +102,8 @@ fun ListPhieuChuaSua(
                         phieusuachua,
                         phieuSuaChuaViewModel,
                         lichSuSuaMayViewModel,
-                        mayTinhViewModel
+                        mayTinhViewModel,
+                        giangVienViewModel
                     )
                 }
             }

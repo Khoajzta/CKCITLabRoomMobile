@@ -40,6 +40,11 @@ fun ListPhieuMuonChuaChuyen(
     mayTinhViewModel: MayTinhViewModel,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
 ){
+
+    LaunchedEffect(Unit) {
+        mayTinhViewModel.clearDanhSachMayTinhDuocChon()
+    }
+
     val danhsachAllPhieuMuonMay = phieuMuonMayViewModel.danhSachAllPhieuMuonMay
 
     LaunchedEffect(Unit) {

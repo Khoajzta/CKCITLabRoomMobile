@@ -7,11 +7,14 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,10 +22,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -83,7 +89,12 @@ fun ChiTietDonNhapChuyenMuonScreen(
 
     LaunchedEffect(Unit) {
         phongMayViewModel.getPhongMayByMaPhong(maphongmuon)
+        phieuMuonMayViewModel.getPhieuMuonByMaPhieu(maphieumuon)
     }
+
+    val phieuMuon = phieuMuonMayViewModel.phieuMuonMay
+
+    Log.d("phieumuon", phieuMuon.toString())
 
     val danhSachMayTinhTheoDon = remember(danhSachChiTiet, danhSachMayTinh) {
         val maMayTheoDon = danhSachChiTiet.map { it.MaMay }
@@ -106,13 +117,17 @@ fun ChiTietDonNhapChuyenMuonScreen(
         }
     }
 
-    val selectedMayTinhs = remember { mutableStateListOf<MayTinh>() }
+    val selectedMayTinhs = mayTinhViewModel.danhSachMayTinhDuocChon
+
 
     var showDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
     var isExpanded by remember { mutableStateOf(false) }
 
+    var errorMessage by remember { mutableStateOf("Vui lòng chọn ít nhất một máy tính để chuyển.") }
+
     Column(
+        modifier = Modifier.fillMaxSize()
     ) {
         Row(
             modifier = Modifier
@@ -122,23 +137,21 @@ fun ChiTietDonNhapChuyenMuonScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Máy Tính Chưa chuyển Theo Đơn",
+                "Danh Sách Máy Tính Phòng",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
-
         }
 
         LazyColumn(
-            modifier = Modifier.height(550.dp)
+            modifier = Modifier.weight(1f)
         ) {
-            if (danhSachMayTinhTrongKhoTheoDon == null || danhSachMayTinhTrongKhoTheoDon.isEmpty()) {
+            if (danhSachMayTinhTrongKhoTheoDon.isNullOrEmpty()) {
                 item {
-                    Row(
+                    Box(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             "Chưa có máy tính nào",
@@ -146,43 +159,146 @@ fun ChiTietDonNhapChuyenMuonScreen(
                             modifier = Modifier.padding(16.dp)
                         )
                     }
-
                 }
             } else {
                 items(danhSachMayTinhTrongKhoTheoDon) { maytinh ->
-                    CardMayTinhChuyenMuon(
-                        maytinh,
-                        phongMayViewModel,
-                        selectedMayTinhs,
+                    CardMayTinhChuyenMuon2(
+                        maytinh = maytinh,
+                        phongMayViewModel = phongMayViewModel,
+                        selectedMayTinhs = selectedMayTinhs,
+                        onLongPress = {
+                            if (!selectedMayTinhs.contains(maytinh)) {
+                                selectedMayTinhs.add(maytinh)
+                            } else {
+                                selectedMayTinhs.remove(maytinh)
+                            }
+                        }
                     )
+                }
+
+
+            }
+        }
+
+
+        Card(
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .fillMaxWidth()
+                .shadow(8.dp, shape = RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+            ) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Danh sách máy được chọn:",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp,
+                        color = Color.Black
+                    )
+
+                    Text(
+                        selectedMayTinhs.count().toString(),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp,
+                        color = Color.Black
+                    )
+                }
+
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 150.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    items(selectedMayTinhs) { mayTinh ->
+
+                        Column {
+                            Row (
+                            ) {
+                                Text(
+                                    text = "Mã máy:",
+                                    color = Color.Black,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+
+                                Text(
+                                    text = " ${mayTinh.MaMay}",
+                                    color = Color.Black,
+                                    fontSize = 16.sp,
+                                )
+                            }
+
+                            Row {
+                                Text(
+                                    text = "Tên máy:",
+                                    color = Color.Black,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = " ${mayTinh.TenMay}",
+                                    color = Color.Black,
+                                    fontSize = 16.sp,
+                                )
+                            }
+
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                                thickness = 2.dp,
+                                color = Color(0xFFDDDDDD),
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        val soLuongChoPhep = phieuMuon?.SoLuong ?: 0
+                        val soLuongDangChon = selectedMayTinhs.size
+
+                        when {
+                            soLuongDangChon == 0 -> {
+                                errorMessage = "Vui lòng chọn ít nhất một máy tính để chuyển."
+                                showErrorDialog = true
+                            }
+                            soLuongDangChon > soLuongChoPhep -> {
+                                errorMessage = "Phiếu mượn chỉ mượn $soLuongChoPhep máy tính."
+                                showErrorDialog = true
+                            }
+                            soLuongDangChon < soLuongChoPhep -> {
+                                errorMessage = "Không đủ số lượng máy để chuyển. Cần $soLuongChoPhep máy."
+                                showErrorDialog = true
+                            }
+                            else -> {
+                                showDialog = true
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
+                ) {
+                    Text("Chuyển máy", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
         }
 
-        AnimatedVisibility(
-            visible = selectedMayTinhs.isNotEmpty(),
-            enter = fadeIn(animationSpec = tween(durationMillis = 300)) + slideInVertically(initialOffsetY = { it }),
-            exit = fadeOut(animationSpec = tween(durationMillis = 200)) + slideOutVertically(targetOffsetY = { it })
-        ) {
-            Button(
-                modifier = Modifier
-                    .padding(top = 12.dp)
-                    .fillMaxWidth()
-                    .height(55.dp),
-                onClick = {
-                    if (selectedMayTinhs.isEmpty()) {
-                        showErrorDialog = true
-                    } else {
-                        showDialog = true
-                    }
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(Color.White),
-                elevation = ButtonDefaults.elevatedButtonElevation(7.dp)
-            ) {
-                Text("Chuyển máy", color = Color.Black, fontWeight = FontWeight.ExtraBold)
-            }
-        }
 
 
         // Dialog xác nhận chuyển máy
@@ -202,20 +318,19 @@ fun ChiTietDonNhapChuyenMuonScreen(
                 text = {
                     Column {
                         Text(
-                            text = "Chuyển đến phòng ${phongmaymuon.TenPhong}",
+                            text = "Chuyển ${selectedMayTinhs.size} máy đến phòng ${phongmaymuon.TenPhong}",
                             color = Color.Black,
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp
                         )
-
-
                     }
                 },
+
                 confirmButton = {
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(55.dp)
+                            .height(50.dp)
                             .shadow(4.dp, shape = RoundedCornerShape(12.dp)),
                         onClick = {
                             coroutineScope.launch {
@@ -246,7 +361,9 @@ fun ChiTietDonNhapChuyenMuonScreen(
                                         ChiTietPhieuMuon(
                                             MaChiTiet = 0,
                                             MaPhieuMuon = maphieumuon,
-                                            MaMay = mayTinh.MaMay
+                                            MaMay = mayTinh.MaMay,
+                                            TinhTrangMuon = "Hoạt động",
+                                            TinhTrangTra = "",
                                         )
                                     )
                                 }
@@ -260,7 +377,8 @@ fun ChiTietDonNhapChuyenMuonScreen(
                                     phieuMuonMayViewModel.updateTrangThaiPhieuMuon(maphieumuon, 1)
 
                                     // Xoá danh sách máy đã chọn và đóng dialog
-                                    selectedMayTinhs.clear()
+                                    mayTinhViewModel.clearDanhSachMayTinhDuocChon()
+
                                     showDialog = false
                                 }.onFailure {
                                     // Hiển thị lỗi nếu cần
@@ -277,11 +395,26 @@ fun ChiTietDonNhapChuyenMuonScreen(
                     ) {
                         Text("Chuyển máy", color = Color.White, fontWeight = FontWeight.Bold)
                     }
-                }
-            )
+                })
         }
 
         // Dialog báo lỗi khi chưa chọn máy
+        if (showErrorDialog) {
+            AlertDialog(onDismissRequest = { showErrorDialog = false }, title = {
+                Text("Thông báo", fontWeight = FontWeight.Bold, color = Color.Black)
+            }, containerColor = Color.White, text = {
+                Text("Vui lòng chọn ít nhất một máy tính để chuyển.", color = Color.Black)
+            }, confirmButton = {
+                Button(
+                    onClick = { showErrorDialog = false },
+                    colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("OK", color = Color.White)
+                }
+            })
+        }
+
         if (showErrorDialog) {
             AlertDialog(
                 onDismissRequest = { showErrorDialog = false },
@@ -290,7 +423,7 @@ fun ChiTietDonNhapChuyenMuonScreen(
                 },
                 containerColor = Color.White,
                 text = {
-                    Text("Vui lòng chọn ít nhất một máy tính để chuyển.", color = Color.Black)
+                    Text(errorMessage, color = Color.Black)
                 },
                 confirmButton = {
                     Button(

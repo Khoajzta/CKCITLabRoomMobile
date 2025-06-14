@@ -1,27 +1,37 @@
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
+import androidx.compose.material.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,6 +70,10 @@ fun CreateLichHocScreen(
 ) {
     val context = LocalContext.current
 
+    var showDialog by remember { mutableStateOf(false) }
+    var conflictMessage by remember { mutableStateOf("") }
+
+
     // Load dữ liệu khi khởi chạy
     LaunchedEffect(Unit) {
         namHocViewModel.getAllNamHoc()
@@ -69,6 +83,7 @@ fun CreateLichHocScreen(
         monHocViewModel.getAllMonHoc()
         lopHocViewModel.getAllLopHoc()
         caHocViewModel.getAllCaHoc()
+        lichhocViewModel.getAllLichHoc()
     }
 
     // State dropdown
@@ -83,13 +98,14 @@ fun CreateLichHocScreen(
     var ghiChu by remember { mutableStateOf("") }
 
     // Dữ liệu nguồn
-    val danhSachGiangVien = giangvienViewModel.danhSachAllGiangVien
-    val danhSachPhong = phongMayViewModel.danhSachAllPhongMay
-    val danhSachNamHoc = namHocViewModel.danhSachAllNamHoc
+    val danhSachGiangVien = giangvienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }
+    val danhSachPhong = phongMayViewModel.danhSachAllPhongMay.filter { it.TrangThai == 1 }
+    val danhSachNamHoc = namHocViewModel.danhSachAllNamHoc.filter { it.TrangThai == 1 }
     val danhSachTuan = tuanViewModel.danhSachAllTuan
     val danhSachMonHoc = monHocViewModel.danhSachAllMonHoc.filter { it.TrangThai == 1 }
     val danhsachlophoc = lopHocViewModel.danhSachAllLopHoc.filter { it.TrangThai == 1 }
     val danhsachcahoc = caHocViewModel.danhSachAllCaHoc.filter { it.TrangThai == 1 }
+    val danhsachAllLichHoc = lichhocViewModel.danhSachLichHoc.filter { it.TrangThai == 1 }
 
     val danhSachThu  = listOf(
         "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"
@@ -238,26 +254,26 @@ fun CreateLichHocScreen(
                     )
                 }
 
-                item {
-                    Text("Ghi chú", fontWeight = FontWeight.Bold, color = Color.Black)
-                    OutlinedTextField(
-                        value = ghiChu,
-                        onValueChange = { ghiChu = it },
-                        placeholder = { Text("Nhập ghi chú (nếu có)") },
-                        modifier = Modifier
-                            .padding(bottom = 16.dp)
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White,
-                            focusedBorderColor = Color.Black,
-                            unfocusedBorderColor = Color.Black
-                        )
-                    )
-                }
+//                item {
+//                    Text("Ghi chú", fontWeight = FontWeight.Bold, color = Color.Black)
+//                    OutlinedTextField(
+//                        value = ghiChu,
+//                        onValueChange = { ghiChu = it },
+//                        placeholder = { Text("Nhập ghi chú (nếu có)") },
+//                        modifier = Modifier
+//                            .padding(bottom = 16.dp)
+//                            .fillMaxWidth(),
+//                        shape = RoundedCornerShape(12.dp),
+//                        colors = OutlinedTextFieldDefaults.colors(
+//                            focusedTextColor = Color.Black,
+//                            unfocusedTextColor = Color.Black,
+//                            unfocusedContainerColor = Color.White,
+//                            focusedContainerColor = Color.White,
+//                            focusedBorderColor = Color.Black,
+//                            unfocusedBorderColor = Color.Black
+//                        )
+//                    )
+//                }
             }
 
 
@@ -287,8 +303,23 @@ fun CreateLichHocScreen(
                                 }
 
                                 if (ngayDay != null) {
+                                    val isTrungCaTrongPhong = danhsachAllLichHoc.any {
+                                        it.NgayDay == ngayDay &&
+                                                it.MaPhong == selectedPhong!!.MaPhong &&
+                                                it.MaCaHoc == selectedCaHoc!!.MaCaHoc
+                                    }
+
+                                    if (isTrungCaTrongPhong) {
+                                        conflictMessage =
+                                            "Trùng lịch:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, phòng ${selectedPhong?.TenPhong}, ca ${selectedCaHoc?.TenCa} đã có lịch dạy!"
+                                        showDialog = true
+                                        return@Button
+                                    }
+
+
+
                                     val lichHoc = LichHoc(
-                                        MaLichHoc = 0, // server tự sinh
+                                        MaLichHoc = 0,
                                         MaGV = selectedGiangVien!!.MaGV,
                                         MaPhong = selectedPhong!!.MaPhong,
                                         MaLopHoc = selectedLop!!.MaLopHoc,
@@ -297,11 +328,12 @@ fun CreateLichHocScreen(
                                         MaTuan = tuan.MaTuan.toInt(),
                                         Thu = selectedThu!!,
                                         NgayDay = ngayDay,
-                                        GhiChu = ghiChu,
+                                        GhiChu = "",
                                         TrangThai = 1
                                     )
                                     lichHocList.add(lichHoc)
                                 }
+
                             }
 
                             lichhocViewModel.createListLichHoc(lichHocList)
@@ -322,6 +354,57 @@ fun CreateLichHocScreen(
             ) {
                 Text("Thêm Lịch Dạy", color = Color.White, fontWeight = FontWeight.Bold)
             }
+
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = Color(0xFFD32F2F), // Red color
+                                modifier = Modifier.size(28.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Trùng lịch học",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFD32F2F)
+                                )
+                            )
+                        }
+                    },
+                    text = {
+                        Text(
+                            text = conflictMessage,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = { showDialog = false },
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .background(Color(0xFFD32F2F), shape = RoundedCornerShape(8.dp))
+                        ) {
+                            Text(
+                                "Đóng",
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(16.dp),
+                    containerColor = Color.White,
+                    tonalElevation = 8.dp
+                )
+            }
+
         }
     }
 }
@@ -334,51 +417,63 @@ fun <T> CustomDropdownSelector(
     selectedItem: T?,
     itemLabel: (T) -> String,
     onItemSelected: (T) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true // ✅ thêm tham số enabled
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
+        onExpandedChange = { if (enabled) expanded = !expanded }, // ✅ chỉ cho mở khi enabled
         modifier = modifier
     ) {
         OutlinedTextField(
             value = selectedItem?.let { itemLabel(it) } ?: "",
             onValueChange = {},
             readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            enabled = enabled, // ✅ điều khiển bằng enabled
+            trailingIcon = {
+                if (enabled) {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+            },
             modifier = Modifier
                 .padding(bottom = 16.dp)
                 .fillMaxWidth(),
-            placeholder = { Text("$label") },
+            placeholder = { Text(label) },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = Color.White,
                 focusedContainerColor = Color.White,
+                disabledContainerColor = Color(0xFFF0F0F0), // màu nền khi disable
                 focusedBorderColor = Color.Black,
                 unfocusedBorderColor = Color.Black,
+                disabledBorderColor = Color.Gray,
                 focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
+                unfocusedTextColor = Color.Black,
+                disabledTextColor = Color.Gray // ✅ màu chữ khi disable
             )
         )
 
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            items.forEach { item ->
-                DropdownMenuItem(
-                    text = { Text(itemLabel(item)) },
-                    onClick = {
-                        onItemSelected(item)
-                        expanded = false
-                    }
-                )
+        if (enabled) {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                items.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(itemLabel(item)) },
+                        onClick = {
+                            onItemSelected(item)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
 }
+
 
 
 

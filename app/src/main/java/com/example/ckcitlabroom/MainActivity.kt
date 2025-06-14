@@ -54,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.work.Constraints
@@ -154,15 +155,41 @@ fun MainScreen() {
 
     // AppBar logic dùng rõ ràng theo route thay vì index
     @Composable
-    fun TopBar() {
+    fun TopBar(
+        navController: NavController,
+        mayTinhViewModel: MayTinhViewModel,
+        currentRoute: String?
+    ) {
         when (currentRoute) {
             NavRoute.LOGINSINHVIEN.route,
             NavRoute.LOGINGIANGVIEN.route -> {}
 
+            NavRoute.CHUYENMAYPHIEUMUON.route -> {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    title = {
+                        Text("Trở lại", fontWeight = FontWeight.Bold, color = Color(0xFF1B8DDE))
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                mayTinhViewModel.clearDanhSachMayTinhDuocChon()
+                                navController.popBackStack()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBackIosNew,
+                                contentDescription = "Back",
+                                tint = Color(0xFF1B8DDE)
+                            )
+                        }
+                    }
+                )
+            }
+
             NavRoute.HOME.route,
             NavRoute.QUANLY.route,
             NavRoute.ACCOUNT.route -> {
-
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                     title = {
@@ -191,7 +218,11 @@ fun MainScreen() {
                         Text("Trở lại", fontWeight = FontWeight.Bold, color = Color(0xFF1B8DDE))
                     },
                     navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
+                        IconButton(
+                            onClick = {
+                                navController.popBackStack()
+                            }
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBackIosNew,
                                 contentDescription = "Back",
@@ -204,8 +235,10 @@ fun MainScreen() {
         }
     }
 
+
+
     Scaffold(
-        topBar = { TopBar() },
+        topBar = { TopBar(navController,mayTinhViewModel,currentRoute) },
         bottomBar = {
             when (currentRoute) {
                 NavRoute.LOGINSINHVIEN.route,

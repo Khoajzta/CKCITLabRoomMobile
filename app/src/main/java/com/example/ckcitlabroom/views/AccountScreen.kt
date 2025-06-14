@@ -17,6 +17,21 @@ fun AccountScreen(
     var giangvien = giangVienViewModel.giangvienSet
     var sinhvien = sinhVienViewModel.sinhvienSet
 
+    var sinhviennew = sinhVienViewModel.sinhvien
+    var giangviennew = giangVienViewModel.giangvien
+
+    if(sinhvien!=null){
+        LaunchedEffect(sinhvien) {
+            sinhVienViewModel.getSinhVienByMaGOrEmail(sinhvien.MaSinhVien)
+        }
+    }
+
+    if(giangvien!=null){
+        LaunchedEffect(giangvien) {
+            giangVienViewModel.getGiangVienByMaGOrEmail(giangvien.MaGV)
+        }
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -24,10 +39,10 @@ fun AccountScreen(
         verticalArrangement = Arrangement.Top
     ) {
 
-        if(giangvien!=null)
-            CardGiangVienInfo(giangvien,navController,giangVienViewModel)
-        if(sinhvien!=null)
-            CardSinhVienInfo(sinhvien, navController, sinhVienViewModel)
+        if(giangviennew!=null)
+            CardGiangVienInfo(giangviennew,navController,giangVienViewModel)
+        if(sinhviennew!=null)
+            CardSinhVienInfo(sinhviennew, navController, sinhVienViewModel)
     }
 }
 

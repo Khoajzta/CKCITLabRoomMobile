@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
@@ -50,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -201,6 +203,7 @@ fun CreatePhieuMuonMayScreen(
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 placeholder = { Text("Nhập thông tin") },
                 shape = RoundedCornerShape(12.dp),
             )
@@ -304,7 +307,7 @@ fun CreatePhieuMuonMayScreen(
                             NgayTra = "",
                             NguoiMuon = tenNguoiMuon,
                             MaPhong = maPhong,
-                            SoLuong = soLuongText,
+                            SoLuong = soLuong,
                             TrangThai = 0
                         )
 

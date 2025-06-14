@@ -1,4 +1,4 @@
-package com.example.ckcitlabroom.views.GiangVien
+package com.example.ckcitlabroom.components.GiangVien
 import GiangVien
 import GiangVienViewModel
 import InfoRow
@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +31,6 @@ import com.composables.icons.lucide.BadgeCheck
 import com.composables.icons.lucide.Key
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Mail
-import com.composables.icons.lucide.Phone
 import com.composables.icons.lucide.ShieldCheck
 import com.composables.icons.lucide.User
 
@@ -44,14 +44,32 @@ fun CardGiangVienPhanQuyen(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(7.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
+            Text(
+                text = "Thông tin giảng viên",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                thickness = 2.dp,
+                color = Color(0xFFDDDDDD),
+            )
             InfoRow(icon = Lucide.User, label = "Mã GV", value = giangVien.MaGV.toString())
+            Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.BadgeCheck, label = "Họ tên", value = giangVien.TenGiangVien)
+            Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.Mail, label = "Email", value = giangVien.Email)
+            Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.Key, label = "Mật Khẩu", value = giangVien.MatKhau)
+            Spacer(modifier = Modifier.height(8.dp))
             InfoRow(
                 icon = Lucide.ShieldCheck,
                 label = "Vai trò",
@@ -64,7 +82,7 @@ fun CardGiangVienPhanQuyen(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { showDialog = true },
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE))
             ) {
                 Text("Phân Quyền", color = Color.White, fontWeight = FontWeight.Bold)
             }
@@ -88,7 +106,7 @@ fun CardGiangVienPhanQuyen(
                                     .weight(1f)
                                     .padding(end = 8.dp),
                                 onClick = {
-                                    giangVienViewModel.updateLoaiTKGiangVien(
+                                    giangVienViewModel.updateGiangVien(
                                         giangVien.copy(MaLoaiTaiKhoan = 1) // 1 = Admin
                                     )
                                     showDialog = false
@@ -102,7 +120,7 @@ fun CardGiangVienPhanQuyen(
                             Button(
                                 modifier = Modifier.weight(1f),
                                 onClick = {
-                                    giangVienViewModel.updateLoaiTKGiangVien(
+                                    giangVienViewModel.updateGiangVien(
                                         giangVien.copy(MaLoaiTaiKhoan = 2) // 2 = Giảng viên
                                     )
                                     showDialog = false

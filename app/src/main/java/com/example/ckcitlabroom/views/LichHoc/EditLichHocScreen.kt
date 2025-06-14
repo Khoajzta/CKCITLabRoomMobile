@@ -66,6 +66,10 @@ fun EditLichHocScreen(
 ) {
     val context = LocalContext.current
 
+    val giangvien = giangvienViewModel.giangvienSet
+
+    val choPhepChinhSua = giangvien?.MaLoaiTaiKhoan == 1
+
     var lichhoc by remember { mutableStateOf<LichHoc?>(null) }
     var originalMaLopHoc by remember { mutableStateOf<String?>(null) }
 
@@ -143,10 +147,6 @@ fun EditLichHocScreen(
         }
     }
 
-    Log.d("DanhSachToken", "Danh sách token: $danhSachTokenSinhVienTheoLop")
-
-
-
     // UI hiển thị
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -191,7 +191,8 @@ fun EditLichHocScreen(
                         items = danhSachGiangVien,
                         selectedItem = selectedGiangVien,
                         itemLabel = { it.TenGiangVien },
-                        onItemSelected = { selectedGiangVien = it }
+                        onItemSelected = { selectedGiangVien = it },
+                        enabled = choPhepChinhSua
                     )
                 }
 
@@ -202,7 +203,8 @@ fun EditLichHocScreen(
                         items = danhSachPhong,
                         selectedItem = selectedPhong,
                         itemLabel = { it.TenPhong },
-                        onItemSelected = { selectedPhong = it }
+                        onItemSelected = { selectedPhong = it },
+                        enabled = choPhepChinhSua
                     )
                 }
 
@@ -213,7 +215,8 @@ fun EditLichHocScreen(
                         items = danhSachLopHoc,
                         selectedItem = selectedLop,
                         itemLabel = { it.TenLopHoc },
-                        onItemSelected = { selectedLop = it }
+                        onItemSelected = { selectedLop = it },
+                        enabled = choPhepChinhSua
                     )
                 }
 
@@ -224,7 +227,8 @@ fun EditLichHocScreen(
                         items = danhSachTuanTheoNam.filter { it.MaNam == selectedNamHoc?.MaNam },
                         selectedItem = selectedTuanTu,
                         itemLabel = { it.TenTuan },
-                        onItemSelected = { selectedTuanTu = it }
+                        onItemSelected = { selectedTuanTu = it },
+                        enabled = choPhepChinhSua
                     )
                 }
 
@@ -235,7 +239,8 @@ fun EditLichHocScreen(
                         items = danhSachTuanTheoNam.filter { it.MaNam == selectedNamHoc?.MaNam },
                         selectedItem = selectedTuanDen,
                         itemLabel = { it.TenTuan },
-                        onItemSelected = { selectedTuanDen = it }
+                        onItemSelected = { selectedTuanDen = it },
+                        enabled = choPhepChinhSua
                     )
                 }
 
@@ -246,7 +251,8 @@ fun EditLichHocScreen(
                         items = danhSachThu,
                         selectedItem = selectedThu,
                         itemLabel = { it },
-                        onItemSelected = { selectedThu = it }
+                        onItemSelected = { selectedThu = it },
+                        enabled = choPhepChinhSua
                     )
                 }
 
@@ -257,7 +263,8 @@ fun EditLichHocScreen(
                         items = danhSachCaHoc,
                         selectedItem = selectedCaHoc,
                         itemLabel = { it.TenCa },
-                        onItemSelected = { selectedCaHoc = it }
+                        onItemSelected = { selectedCaHoc = it },
+                        enabled = choPhepChinhSua
                     )
                 }
 
@@ -268,16 +275,17 @@ fun EditLichHocScreen(
                         items = danhSachMonHoc,
                         selectedItem = selectedMonHoc,
                         itemLabel = { it.TenMonHoc },
-                        onItemSelected = { selectedMonHoc = it }
+                        onItemSelected = { selectedMonHoc = it },
+                        enabled = choPhepChinhSua
                     )
                 }
 
                 item {
-                    Text("Ghi chú", fontWeight = FontWeight.Bold, color = Color.Black)
+                    Text("Thông báo", fontWeight = FontWeight.Bold, color = Color.Black)
                     OutlinedTextField(
                         value = ghiChu,
                         onValueChange = { ghiChu = it },
-                        placeholder = { Text("Nhập ghi chú (nếu có)") },
+                        placeholder = { Text("Nhập thông báo (nếu có)") },
                         modifier = Modifier
                             .padding(bottom = 16.dp)
                             .fillMaxWidth(),

@@ -1,9 +1,13 @@
 data class LichHocRP(
     var MaLichHoc: Int,
+    var MaGV: String,
     var TenGiangVien: String,
+    var MaMonHoc: String,
     var TenMonHoc: String,
+    var MaPhong: String,
     var TenPhong: String,
     var NgayDay: String,
+    var MaCaHoc: Int,
     var TenCa: String,
     var GioBatDau: String,
     var GioKetThuc: String,

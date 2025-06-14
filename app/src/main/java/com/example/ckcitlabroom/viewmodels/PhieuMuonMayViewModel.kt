@@ -14,16 +14,15 @@ import kotlinx.coroutines.withContext
 
 class PhieuMuonMayViewModel : ViewModel() {
 
-    var phieuMuonMay = PhieuMuonMay(0, "", "", "", "", "", 0)
-
     var danhSachAllPhieuMuonMay by mutableStateOf<List<PhieuMuonMay>>(emptyList())
         private set
 
     var danhSachAllPhieuSuaChuaTheoMa by mutableStateOf<List<PhieuSuaChuaRp>>(emptyList())
         private set
 
-    var phieuMuonMap by mutableStateOf<Map<String, PhieuMuonMay>>(emptyMap())
+    var phieuMuonMay by mutableStateOf<PhieuMuonMay?>(null)
         private set
+
 
     private var pollingAllPhieuMuonMayJob: Job? = null
 
@@ -63,9 +62,7 @@ class PhieuMuonMayViewModel : ViewModel() {
             isLoading = true
             try {
                 val result = ITLabRoomRetrofitClient.phieuMuonMayAPIService.getPhieuMuonMayByMaPhieuMuon(maphieumuon)
-                phieuMuonMap = phieuMuonMap.toMutableMap().apply {
-                    put(maphieumuon, result)
-                }
+                phieuMuonMay = result
             } catch (e: Exception) {
                 errorMessage = e.message
                 Log.e("PhieuMuonMayViewModel", "Lỗi khi lấy phiếu mượn", e)
@@ -74,6 +71,7 @@ class PhieuMuonMayViewModel : ViewModel() {
             }
         }
     }
+
 
 
     fun createPhieuMuonMay(phieuMuonMay: PhieuMuonMay) {

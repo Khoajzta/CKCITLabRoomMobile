@@ -4,8 +4,10 @@ import MayTinh
 import MayTinhTrangThaiUpdateRequest
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
@@ -24,6 +26,28 @@ class MayTinhViewModel : ViewModel() {
 
     var danhSachAllMayTinhtheophong by mutableStateOf<List<MayTinh>>(emptyList())
         private set
+
+    private val _danhSachMayTinhDuocChon = mutableStateListOf<MayTinh>()
+    val danhSachMayTinhDuocChon: SnapshotStateList<MayTinh> get() = _danhSachMayTinhDuocChon // ✅
+
+
+
+    fun addMayTinhDuocChon(mayTinh: MayTinh) {
+        // Chỉ thêm nếu chưa có trong danh sách (dựa vào MaMay)
+        if (_danhSachMayTinhDuocChon.none { it.MaMay == mayTinh.MaMay }) {
+            _danhSachMayTinhDuocChon.add(mayTinh)
+        }
+    }
+
+    fun clearDanhSachMayTinhDuocChon() {
+        _danhSachMayTinhDuocChon.clear()
+        Log.d("Clear", "clear rồi")
+    }
+
+    fun removeMayTinhDuocChon(mayTinh: MayTinh) {
+        _danhSachMayTinhDuocChon.removeAll { it.MaMay == mayTinh.MaMay }
+    }
+
 
     private var pollingAllMayTinhJob: Job? = null
     private var pollingMayTinhTheoPhongJob: Job? = null
@@ -62,11 +86,12 @@ class MayTinhViewModel : ViewModel() {
         pollingAllMayTinhJob = null
     }
 
-    fun getMayTinhByMaMay(mamay: String) {
+    // Version A: Gán kết quả vào biến `maytinh`
+    fun getMayTinhByMaMay(maMay: String) {
         viewModelScope.launch(Dispatchers.IO) {
             isLoading = true
             try {
-                maytinh = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaMay(mamay)
+                maytinh = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaMay(maMay)
             } catch (e: Exception) {
                 errorMessage = e.message
                 Log.e("MayTinhViewModel", "Lỗi khi lấy thông tin máy tính", e)
@@ -75,6 +100,27 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
+
+    // Version B: Trả kết quả qua callback
+    fun getMayTinhByMaMay(maMay: String, onResult: (MayTinh?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                val result = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaMay(maMay)
+                withContext(Dispatchers.Main) {
+                    onResult(result)
+                }
+            } catch (e: Exception) {
+                Log.e("MayTinhViewModel", "Lỗi khi lấy máy theo mã: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    onResult(null)
+                }
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
 
     fun getMayTinhByPhong(maphong: String) {
         if (pollingMayTinhTheoPhongJob != null) return

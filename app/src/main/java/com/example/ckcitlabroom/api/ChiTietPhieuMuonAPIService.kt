@@ -21,4 +21,9 @@ interface ChiTietPhieuMuonAPIService {
     suspend fun getChiTietPhieuMuonByMaPhieu(
         @Query("MaPhieuMuon") maPhieuMuon: String
     ): ChiTietPhieuMuonResponse
+
+    @POST("ChiTietPhieuMuon/updateListChiTiet.php")
+    suspend fun updateChiTietPhieuMuonList(
+        @Body chiTietPhieuMuonList: List<ChiTietPhieuMuon>
+    ): CreateResponse
 }

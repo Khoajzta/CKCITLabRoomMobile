@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.Build
 
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.LaptopChromebook
 import androidx.compose.material.icons.outlined.MeetingRoom
 import androidx.compose.material.icons.outlined.MenuBook
@@ -73,7 +74,8 @@ fun QuanLyScreen(
         }
         sinhvien != null -> {
             listOf(
-                ChucNang("Danh Sách Lịch Học", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.QUANLYLICHHOC.route) })
+                ChucNang("Danh Sách Lịch Học", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.QUANLYLICHHOC.route) }),
+                ChucNang("Lịch Sử Báo Hỏng", Icons.Outlined.History, Click = { navController.navigate(NavRoute.LISTPHIEUBYSINHVIEN.route) })
 
             )
         }

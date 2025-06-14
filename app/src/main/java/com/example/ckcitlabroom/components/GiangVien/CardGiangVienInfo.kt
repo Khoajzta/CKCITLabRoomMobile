@@ -70,11 +70,20 @@ fun CardGiangVienInfo(
                 fontSize = 22.sp,
             )
             Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = "Giảng Viên",
-                fontSize = 20.sp,
-                color = Color.Gray
-            )
+            if(giangVien.MaLoaiTaiKhoan!=1){
+                Text(
+                    text = "Giảng Viên",
+                    fontSize = 20.sp,
+                    color = Color.Gray
+                )
+            }else{
+                Text(
+                    text = "Admin",
+                    fontSize = 20.sp,
+                    color = Color.Gray
+                )
+            }
+
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = giangVien.MaGV,

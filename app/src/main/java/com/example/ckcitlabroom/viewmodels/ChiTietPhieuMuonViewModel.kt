@@ -23,6 +23,14 @@ class ChiTietPhieuMuonViewModel : ViewModel() {
     var danhSachChiTietPhieuMuonTheoMaPhieu by mutableStateOf<List<ChiTietPhieuMuon>>(emptyList())
         private set
 
+    var isLoading by mutableStateOf(false)
+        private set
+
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
+
+    var chiTietPhieuMuonUpdateResult by mutableStateOf("")
+
     private var pollingChiTietPhieuMuonTheoMaPhieuJob: Job? = null
 
     suspend fun createNhieuChiTietPhieuMuon(danhSach: List<ChiTietPhieuMuon>): Result<String> {
@@ -47,6 +55,24 @@ class ChiTietPhieuMuonViewModel : ViewModel() {
             }
         }
     }
+
+    fun updateNhieuChiTietPhieuMuon(list: List<ChiTietPhieuMuon>) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.chiteitieuMuonMayAPIService.updateChiTietPhieuMuonList(list)
+                }
+                chiTietPhieuMuonUpdateResult = response.message
+            } catch (e: Exception) {
+                chiTietPhieuMuonUpdateResult = "Lỗi khi cập nhật danh sách chi tiết phiếu mượn: ${e.message}"
+                Log.e("ChiTietPhieuMuonVM", "Lỗi khi cập nhật danh sách chi tiết phiếu mượn", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
 }
 
 

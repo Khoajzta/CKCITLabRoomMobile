@@ -83,6 +83,21 @@ class PhongMayViewModel : ViewModel() {
         }
     }
 
+    fun getPhongMayByMaPhong(maPhong: String, onResult: (PhongMay?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val phong = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.phongmayAPIService.getPhongMayByMaPhong(maPhong)
+                }
+                onResult(phong)
+            } catch (e: Exception) {
+                Log.e("PhongMayViewModel", "Lỗi khi lấy phòng máy theo mã: $maPhong", e)
+                onResult(null)
+            }
+        }
+    }
+
+
     fun getPhongMayMoi(maphong: String) {
         viewModelScope.launch(Dispatchers.IO) {
             isLoading = true

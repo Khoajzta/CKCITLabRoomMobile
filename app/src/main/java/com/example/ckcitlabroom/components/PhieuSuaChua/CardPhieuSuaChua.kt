@@ -59,8 +59,11 @@ fun CardPhieuSuaChua(
     phieuSuaChuarp: PhieuSuaChuaRp,
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
     lichSuSuaMayViewModel: LichSuSuaMayViewModel,
-    mayTinhViewModel: MayTinhViewModel
+    mayTinhViewModel: MayTinhViewModel,
+    giangVienViewModel: GiangVienViewModel
 ) {
+    var giangVien = giangVienViewModel.giangvienSet
+
     var showDialog by remember { mutableStateOf(false) }
 
     val lichSuSuaMay = lichSuSuaMayViewModel.lichSuSuaMayMap[phieuSuaChuarp.MaPhieuSuaChua.toString()]
@@ -169,7 +172,7 @@ fun CardPhieuSuaChua(
                 Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-            if(phieuSuaChuarp.TrangThai == 0){
+            if (phieuSuaChuarp.TrangThai == 0 && giangVien != null) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { showDialog = true },
@@ -179,6 +182,7 @@ fun CardPhieuSuaChua(
                     Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
+
 
             if (showDialog) {
                 AlertDialog(

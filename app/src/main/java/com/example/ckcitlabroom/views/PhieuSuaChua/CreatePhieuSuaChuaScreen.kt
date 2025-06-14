@@ -54,6 +54,7 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
@@ -484,39 +485,6 @@ fun CreatePhieuSuaChuaScreen(
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
-
-                item {
-                    Text(
-                        text = "Ngày Báo Hỏng",
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        value = formatNgay(ngayBaoHongState.value),
-                        onValueChange = { ngayBaoHongState.value = it },
-                        readOnly = true,
-                        trailingIcon = {
-                            IconButton(onClick = { showDatePicker = true }) {
-                                Icon(Icons.Default.DateRange, contentDescription = "Chọn ngày", tint = Color.Black)
-                            }
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White,
-                            focusedBorderColor = Color.Black,
-                            unfocusedBorderColor = Color.Black,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
-                        ),
-                        placeholder = { Text("Chọn ngày") },
-                        shape = RoundedCornerShape(12.dp),
-                    )
-                }
-
-
             }
 
             val context = LocalContext.current
@@ -524,9 +492,9 @@ fun CreatePhieuSuaChuaScreen(
             Button(
                 onClick = {
                     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val today = LocalDate.now().format(formatter)
 
                     val isEmpty = mamay.isBlank() ||
-                            ngayBaoHongState.value.toString().isBlank() ||
                             moTaLoiState.value.isBlank() ||
                             maNguoiBaoHong.value.isBlank()
 
@@ -543,7 +511,7 @@ fun CreatePhieuSuaChuaScreen(
                             val phieuSuaChua = PhieuSuaChua(
                                 MaPhieuSuaChua = 0,
                                 MaMay = mamay,
-                                NgayBaoHong = ngayBaoHongState.value.format(formatter),
+                                NgayBaoHong = today,
                                 MoTaLoi = moTaLoiState.value,
                                 MaPhong = maytinh.MaPhong,
                                 MaNguoiBaoHong = maNguoiBaoHong.value,

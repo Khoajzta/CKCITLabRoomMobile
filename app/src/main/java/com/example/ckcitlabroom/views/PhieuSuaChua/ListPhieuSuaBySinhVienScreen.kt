@@ -4,11 +4,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -19,22 +16,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.isEmpty
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.composables.icons.lucide.History
-import com.composables.icons.lucide.Lucide
 import com.example.lapstore.viewmodels.MayTinhViewModel
 
 @Composable
-fun ListPhieuDaSua(
+fun ListPhieuSuaBySinhVienScreen(
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
     mayTinhViewModel: MayTinhViewModel,
     lichSuSuaMayViewModel: LichSuSuaMayViewModel,
-    gioHangViewModel: GiangVienViewModel
+    sinhVienViewModel: SinhVienViewModel,
+    giangVienViewModel: GiangVienViewModel
 ){
+    var sinhVien = sinhVienViewModel.sinhvienSet
+
     val danhsachAllPhieuSuaChua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChua
 
     LaunchedEffect(Unit) {
@@ -47,11 +44,14 @@ fun ListPhieuDaSua(
         }
     }
 
-    val danhSachPhieuDaSuaChua by remember(danhsachAllPhieuSuaChua) {
+    val danhSachPhieuBySinhVien by remember(danhsachAllPhieuSuaChua, sinhVien) {
         derivedStateOf {
-            danhsachAllPhieuSuaChua.filter { it.TrangThai == 1 }
+            danhsachAllPhieuSuaChua.filter {
+                it.MaNguoiBaoHong == sinhVien?.MaSinhVien
+            }
         }
     }
+
 
     Column(
         modifier = Modifier
@@ -65,7 +65,7 @@ fun ListPhieuDaSua(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Phiếu Đã Sửa",
+                "Danh Sách Phiếu Đã Tạo",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
@@ -81,7 +81,7 @@ fun ListPhieuDaSua(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (danhSachPhieuDaSuaChua.isEmpty()) {
+            if (danhSachPhieuBySinhVien.isEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -89,7 +89,7 @@ fun ListPhieuDaSua(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Không có phiếu nào đã sửa",
+                            "Không có phiếu nào",
                             color = Color.Black,
                             modifier = Modifier.padding(16.dp)
                         )
@@ -97,13 +97,13 @@ fun ListPhieuDaSua(
 
                 }
             } else {
-                items(danhSachPhieuDaSuaChua) { phieusuachua ->
+                items(danhSachPhieuBySinhVien) { phieusuachua ->
                     CardPhieuSuaChua(
                         phieusuachua,
                         phieuSuaChuaViewModel,
                         lichSuSuaMayViewModel,
                         mayTinhViewModel,
-                        gioHangViewModel
+                        giangVienViewModel
                     )
                 }
             }

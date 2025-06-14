@@ -118,7 +118,7 @@ fun CardPhieuMuonMay(
 
 
 
-            InfoRow(icon = Lucide.CalendarDays, label = "Số lượng", value = phieuMuonMay.SoLuong)
+            InfoRow(icon = Lucide.CalendarDays, label = "Số lượng", value = phieuMuonMay.SoLuong.toString())
 
             val (color, statusText, statusIcon) = when (phieuMuonMay.TrangThai) {
                 0 -> Triple(Color(0xFF1B8DDE), "Chưa Chuyển Máy", Lucide.CircleCheck)
@@ -165,13 +165,17 @@ fun CardPhieuMuonMay(
             if(phieuMuonMay.TrangThai == 1){
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { showDialog = true },
+                    onClick = {
+                        navController.navigate(NavRoute.UPDATETRAMAY.route + "?maphieumuon=${phieuMuonMay.MaPhieuMuon}")
+                    },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff0b9adc))
                 ) {
-                    Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("Cập nhật trả máy", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
+
+
 
             if (showDialog) {
                 AlertDialog(

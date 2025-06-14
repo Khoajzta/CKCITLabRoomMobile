@@ -20,6 +20,7 @@ import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.LichHocViewModel
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
+import org.checkerframework.checker.units.qual.g
 
 
 sealed class NavRoute(val route: String) {
@@ -83,13 +84,12 @@ sealed class NavRoute(val route: String) {
     object ADDLOPHOC : NavRoute("addlophoc_screen")
     object EDITLOPHOC : NavRoute("editlophoc_screen")
 
-    //Sua May
-
+    //CaHoc
     object QUANLYCAHOC : NavRoute("quanlycahoc_screen")
     object ADDCAHOC : NavRoute("addcahoc_screen")
     object EDITCAHOC : NavRoute("editcahoc_screen")
 
-
+    //Sua May
     object ADDPHIEUSUACHUA : NavRoute("addphieusuachua_screen")
     object QUANLYPHIEUSUACHUA : NavRoute("quanlyphieusuachua_screen")
     object LICHSUSUAMAY : NavRoute("lichsusuamay_screen")
@@ -97,6 +97,7 @@ sealed class NavRoute(val route: String) {
     object DETAILLICHSUSUAMAY : NavRoute("chitietlichsusuamay_screen")
     object LISTPHIEUCHUASUA : NavRoute("danhsachphieuchuasua_screen")
     object LISTPHIEUDASUA : NavRoute("danhsachphieudasua_screen")
+    object LISTPHIEUBYSINHVIEN : NavRoute("danhsachphieubysinhvien_screen")
 
     //Màn hình bắt đầu
     object STARTSCREEN : NavRoute("start_screen")
@@ -118,6 +119,7 @@ sealed class NavRoute(val route: String) {
     object LISTPHIEUMUONMAYCHUACHUYEN : NavRoute("danhsachphieumuonmaychuachuyen_screen")
     object CHUYENMAYPHIEUMUON : NavRoute("chuyenmayphieumuon_screen")
     object CHITIETPHIEUMUON : NavRoute("chitietphieumuon_screen")
+    object UPDATETRAMAY : NavRoute("updatetramay_screen")
 
     //Lịch Học
     object QUANLYLICHHOC : NavRoute("quanlylichhoc_screen")
@@ -125,6 +127,7 @@ sealed class NavRoute(val route: String) {
     object EDITLICHHOC : NavRoute("editlichhoc_screen")
     object LISTLICHHOC : NavRoute("danhsachlichhoc_screen")
     object LISTLICHHOCDADAY : NavRoute("danhsachlichhocdaday_screen")
+    object CHITIETLICHHOCTHEOTUAN : NavRoute("chitietlichhoctheotuuan_screen")
 
     //Môn Học
     object QUANLYMONHOC : NavRoute("quanlymonhoc_screen")
@@ -182,7 +185,7 @@ fun NavgationGraph(
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
-            HomeScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel,navController)
+            HomeScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel,navController,namHocViewModel,tuanViewModel)
         }
 
 
@@ -695,7 +698,7 @@ fun NavgationGraph(
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
-            ListPhieuChuaSua(phieuSuaChuaViewModel,mayTinhViewModel,lichSuSuaMayViewModel)
+            ListPhieuChuaSua(phieuSuaChuaViewModel,mayTinhViewModel,lichSuSuaMayViewModel,giangVienViewModel)
         }
 
         composable(
@@ -703,7 +706,15 @@ fun NavgationGraph(
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
-            ListPhieuDaSua(phieuSuaChuaViewModel,mayTinhViewModel,lichSuSuaMayViewModel)
+            ListPhieuDaSua(phieuSuaChuaViewModel,mayTinhViewModel,lichSuSuaMayViewModel,giangVienViewModel)
+        }
+
+        composable(
+            route = NavRoute.LISTPHIEUBYSINHVIEN.route,
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) {
+            ListPhieuSuaBySinhVienScreen(phieuSuaChuaViewModel,mayTinhViewModel,lichSuSuaMayViewModel,sinhVienViewModel,giangVienViewModel)
         }
 
         composable(
@@ -849,6 +860,18 @@ fun NavgationGraph(
         }
 
         composable(
+            NavRoute.UPDATETRAMAY.route + "?maphieumuon={maphieumuon}",
+            arguments = listOf(
+                navArgument("maphieumuon") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) { navBackStackEntry ->
+            val maphieumuon = navBackStackEntry.arguments?.getString("maphieumuon") ?: ""
+            UpdateTraMayScreen(maphieumuon,mayTinhViewModel,phieuMuonMayViewModel,chitetPhieuMuonViewModel,lichSuChuyenMayViewModel)
+        }
+
+        composable(
             route = NavRoute.QUANLYLICHHOC.route,
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
@@ -914,6 +937,19 @@ fun NavgationGraph(
         ) {
             ListLichHocDaDayScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel,namHocViewModel,tuanViewModel,navController)
         }
+
+        composable(
+            NavRoute.CHITIETLICHHOCTHEOTUAN.route + "?matuan={matuan}",
+            arguments = listOf(
+                navArgument("matuan") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) { navBackStackEntry ->
+            val matuan = navBackStackEntry.arguments?.getString("matuan") ?: ""
+            ChiTietLichHocScreen(matuan,navController,sinhVienViewModel, giangVienViewModel,lichHocViewModel)
+        }
+
 
         //Môn Học
         composable(
