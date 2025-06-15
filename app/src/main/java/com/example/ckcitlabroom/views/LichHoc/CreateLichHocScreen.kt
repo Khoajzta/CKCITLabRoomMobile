@@ -431,7 +431,7 @@ fun <T> CustomDropdownSelector(
             value = selectedItem?.let { itemLabel(it) } ?: "",
             onValueChange = {},
             readOnly = true,
-            enabled = enabled, // ✅ điều khiển bằng enabled
+            enabled = enabled,
             trailingIcon = {
                 if (enabled) {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -445,15 +445,16 @@ fun <T> CustomDropdownSelector(
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = Color.White,
                 focusedContainerColor = Color.White,
-                disabledContainerColor = Color(0xFFF0F0F0), // màu nền khi disable
+                disabledContainerColor = Color.White,
                 focusedBorderColor = Color.Black,
                 unfocusedBorderColor = Color.Black,
-                disabledBorderColor = Color.Gray,
+                disabledBorderColor = Color.Black,
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Black,
-                disabledTextColor = Color.Gray // ✅ màu chữ khi disable
+                disabledTextColor = Color.Black
             )
         )
+
 
         if (enabled) {
             ExposedDropdownMenu(

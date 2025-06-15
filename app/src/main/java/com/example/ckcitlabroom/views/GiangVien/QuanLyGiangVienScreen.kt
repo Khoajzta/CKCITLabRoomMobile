@@ -32,8 +32,11 @@ fun QuanLyGiangVien(
             ChucNang("Giảng Viên Ngừng Công Tác", Icons.Outlined.Article, Click = {
                 navController.navigate(NavRoute.LISTGIANGVIENNGUNGCONGTAC.route)
             }),
-            ChucNang("Phân Quyền Giảng Viên", Icons.Outlined.ManageAccounts, Click = {
-                navController.navigate(NavRoute.PHANQUYEN.route)
+            ChucNang("Phân Quyền Admin", Icons.Outlined.ManageAccounts, Click = {
+                navController.navigate(NavRoute.PHANQUYENADMIN.route)
+            }),
+            ChucNang("Phân Quyền Giang Viên", Icons.Outlined.ManageAccounts, Click = {
+                navController.navigate(NavRoute.PHANQUYENGIANGVIEN.route)
             }),
             ChucNang("Thêm Giảng Viên", Icons.Outlined.AddCircle, Click = {
                 navController.navigate(NavRoute.ADDGIANGVIEN.route)

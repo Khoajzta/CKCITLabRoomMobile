@@ -43,7 +43,7 @@ fun CardGiangVienInfo(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth().height(600.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(7.dp)
@@ -172,7 +172,7 @@ fun CardGiangVienInfo(
             ) {
                 Button(
                     modifier = Modifier.width(170.dp),
-                    onClick = { /* TODO */ },
+                    onClick = { navController.navigate(NavRoute.DOIMATKHAUGV.route + "?magv=${giangVien.MaGV}")},
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE)),
                     shape = RoundedCornerShape(12.dp)
                 ) {

@@ -5,7 +5,7 @@ import retrofit2.http.Query
 
 data class ChiTietSuDungMayResponse(
     val message: String? = null,
-    val chitietdonnhap: List<ChiTietDonNhap>? = null
+    val chitietsudung: List<ChiTietSuDungMayRP>? = null
 )
 
 
@@ -15,12 +15,6 @@ interface ChiTietSuDungMayAPIService {
         @Body chiTietDonNhap: ChiTietSuDungMay
     ): CreateResponse
 
-
-    @GET("ChiTietDonNhap/getChiTietDonNhapTheoMaDon.php")
-    suspend fun getChiTietDonNhapTheoMaDon(
-        @Query("MaDonNhap") MaDonNhap: String
-    ): ChiTietDonNhapResponse
-
-    @GET("ChiTietdonnhap/read.php")
-    suspend fun getAllChiTietDonNhap(): ChiTietDonNhapResponse
+    @GET("ChiTietSuDungMay/read.php")
+    suspend fun getAllChItietSuDungMay(): ChiTietSuDungMayResponse
 }

@@ -4,15 +4,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -24,23 +18,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.ckcitlabroom.components.CardCaHoc
-import com.example.ckcitlabroom.viewmodels.CaHocViewModel
+import com.example.ckcitlabroom.components.GiangVien.CardGiangVienPhanQuyen
 
 @Composable
-fun QuanLyCaHoc(
+fun PhanQuyenGiangVienScreen(
     navController: NavHostController,
-    caHocViewModel: CaHocViewModel
+    giangVienViewModel: GiangVienViewModel
 ) {
-    val danhSachCaHoc = caHocViewModel.danhSachAllCaHoc
+
+    var giangvien = giangVienViewModel.giangvienSet
+    val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien.filter { it.MaLoaiTaiKhoan == 1 && it.MaGV != giangvien!!.MaGV}
 
     LaunchedEffect(Unit) {
-        caHocViewModel.getAllCaHoc()
+        giangVienViewModel.getAllGiangVien()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            caHocViewModel.stopPollingCaHoc()
+            giangVienViewModel.stopPollingGiangVien()
         }
     }
 
@@ -51,32 +46,20 @@ fun QuanLyCaHoc(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Ca Học",
+                "Phân Quyền Giảng Viên",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 color = Color(0xFF1B8DDE)
             )
-            IconButton(
-                onClick = {
-                    navController.navigate(NavRoute.ADDCAHOC.route)
-                }
-            ) {
-                Icon(
-                    modifier = Modifier.size(35.dp),
-                    imageVector = Icons.Outlined.AddCircle,
-                    contentDescription = "Thêm ca học",
-                    tint = Color(0xFF1B8DDE)
-                )
-            }
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
             thickness = 2.dp,
             color = Color(0xFF1B8DDE),
         )
@@ -84,7 +67,7 @@ fun QuanLyCaHoc(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (danhSachCaHoc == null || danhSachCaHoc.isEmpty()) {
+            if (danhSachGiangVien.isEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -92,15 +75,15 @@ fun QuanLyCaHoc(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Chưa có ca học nào",
-                            color = Color.White,
+                            "Chưa có giảng viên nào hoạt động",
+                            color = Color.Black,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
                 }
             } else {
-                items(danhSachCaHoc) { cahoc ->
-                    CardCaHoc(cahoc, navController, caHocViewModel)
+                items(danhSachGiangVien) { giangvien ->
+                    CardGiangVienPhanQuyen(giangvien, giangVienViewModel)
                 }
             }
         }

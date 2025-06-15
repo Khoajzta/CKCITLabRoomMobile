@@ -192,7 +192,7 @@ fun EditLichHocScreen(
                         selectedItem = selectedGiangVien,
                         itemLabel = { it.TenGiangVien },
                         onItemSelected = { selectedGiangVien = it },
-                        enabled = choPhepChinhSua
+                        enabled = choPhepChinhSua,
                     )
                 }
 

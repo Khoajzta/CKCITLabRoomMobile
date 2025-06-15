@@ -144,7 +144,7 @@ fun ChiTietDonNhapChuyenScreen(
         )
 
         LazyColumn(
-            modifier = Modifier.height(550.dp)
+            modifier = Modifier.height(500.dp)
         ) {
             if (danhSachMayTinhTrongKhoTheoDon == null || danhSachMayTinhTrongKhoTheoDon.isEmpty()) {
                 item {

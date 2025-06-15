@@ -113,15 +113,17 @@ fun HomeScreen(
 
     val lichHocTheoNgay = remember(danhSachLichGV, danhSachLichSV, todayDate) {
         val danhSach = if (giangVien != null) danhSachLichGV else danhSachLichSV
-        danhSach.filter {
-            it.TrangThai == 1 &&
-                    try {
-                        LocalDate.parse(it.NgayDay, formatterDate) == todayDate
-                    } catch (e: Exception) {
-                        false
-                    }
-        }
+        danhSach
+            .filter {
+                try {
+                    LocalDate.parse(it.NgayDay, formatterDate) == todayDate
+                } catch (e: Exception) {
+                    false
+                }
+            }
+            .sortedBy { it.MaCaHoc }
     }
+
 
     Column(
         modifier = Modifier
@@ -173,7 +175,39 @@ fun HomeScreen(
 
 
         LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Top
         ) {
+            if(lichHocTheoNgay.isEmpty()){
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if(giangVien!= null){
+                            Text(
+                                text = "Không có lịch dạy hôm nay",
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
+                                color = Color.DarkGray,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }else{
+                            Text(
+                                text = "Không có lịch học hôm nay",
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
+                                color = Color.DarkGray,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                    }
+                }
+
+            }
+
             items(lichHocTheoNgay) { lichhoc->
                 CardLichHoc(lichHoc = lichhoc, giangVien = giangVien, sinhvien = sinhvien, navController = navController)
                 Spacer(modifier = Modifier.width(8.dp))

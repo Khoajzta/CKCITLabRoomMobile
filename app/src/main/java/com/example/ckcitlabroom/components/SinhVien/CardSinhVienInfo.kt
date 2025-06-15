@@ -53,7 +53,7 @@ fun CardSinhVienInfo(
     val loginState by sinhVienPreferences.loginStateFlow.collectAsState(initial = LoginSinhVienState())
     Card(
         modifier = Modifier
-            .fillMaxWidth().height(640.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
@@ -205,7 +205,7 @@ fun CardSinhVienInfo(
             ) {
                 Button(
                     modifier = Modifier.width(170.dp),
-                    onClick = { /* TODO */ },
+                    onClick = { navController.navigate(NavRoute.DOIMATKHAUSV.route + "?masv=${sinhvien.MaSinhVien}") },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -224,8 +224,6 @@ fun CardSinhVienInfo(
                         sinhVienViewModel.resetLoginResult()
                         sinhVienViewModel.logout()
 
-                        Log.d("Thông báo","Xóa thành công")
-                        Log.d("SV",loginState.tenSinhVien.toString())
                         navController.navigate(NavRoute.LOGINSINHVIEN.route) {
                             popUpTo(NavRoute.HOME.route) { inclusive = true }
                         }

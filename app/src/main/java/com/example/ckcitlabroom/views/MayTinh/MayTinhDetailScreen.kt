@@ -1,4 +1,5 @@
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -40,30 +41,49 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
 import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
 import com.example.lapstore.viewmodels.DonNhapViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
 import okhttp3.internal.format
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MayTinhDetailScreen(
     maMay: String,
     phongMayViewModel:PhongMayViewModel,
     giangVienViewModel: GiangVienViewModel,
-    navController: NavHostController
+    sinhVienViewModel: SinhVienViewModel,
+    navController: NavHostController,
+    namHocViewModel: NamHocViewModel,
+    tuanViewModel: TuanViewModel,
+    cahocViewModel: CaHocViewModel,
+    chitietsudungmayViewModel: ChiTietSuDungMayViewModel
 ){
+
+    val context = LocalContext.current
+    val result = chitietsudungmayViewModel.chitietsudungmayCreateResult
+
+    LaunchedEffect(result) {
+        if (result.isNotBlank()) {
+            Toast.makeText(context, "Điểm danh thành công", Toast.LENGTH_SHORT).show()
+            chitietsudungmayViewModel.chitietsudungmayCreateResult = ""
+        }
+    }
 
     var donNhapViewModel: DonNhapViewModel = viewModel()
     var chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel = viewModel()
     var mayTinhViewModel: MayTinhViewModel = viewModel()
-
 
     val giangVien = giangVienViewModel.giangvienSet
     val maytinh = mayTinhViewModel.maytinh
@@ -78,8 +98,6 @@ fun MayTinhDetailScreen(
     val donNhap = danhSachDonNhap.find { it.MaDonNhap == maDonNhap }
 
     val ngayNhap = donNhap?.NgayNhap
-
-    Log.d("MaDonNhap",danhSachDonNhap.toString())
 
     val maMayState = remember { mutableStateOf("") }
     val tenMayState = remember { mutableStateOf("") }
@@ -130,6 +148,61 @@ fun MayTinhDetailScreen(
             trangThaiState.value = it.TrangThai.toString()
         }
     }
+
+    //=============================================================================
+
+    var sinhvien = sinhVienViewModel.sinhvienSet
+
+    LaunchedEffect(Unit) {
+        namHocViewModel.getAllNamHoc()
+        tuanViewModel.getAllTuan()
+        cahocViewModel.getAllCaHoc()
+    }
+
+    val danhSachNamHoc = namHocViewModel.danhSachAllNamHoc
+    val danhSachTuan = tuanViewModel.danhSachAllTuan
+    val danhSachCa = cahocViewModel.danhSachAllCaHoc
+
+    val formatterDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val todayDate = LocalDate.now()
+
+    val formatterTime = DateTimeFormatter.ofPattern("HH:mm:ss")
+    val currentTime = LocalTime.now()
+
+    val selectedNamHoc = remember(danhSachNamHoc) {
+        danhSachNamHoc.firstOrNull { it.TrangThai == 1 }
+    }
+
+    val danhSachTuanTheoNam = remember(selectedNamHoc, danhSachTuan) {
+        danhSachTuan.filter { it.MaNam == selectedNamHoc?.MaNam }
+    }
+
+    var selectedTuan by remember { mutableStateOf<Tuan?>(null) }
+
+    val caHocHienTai = remember(danhSachCa) {
+        danhSachCa.firstOrNull { ca ->
+            try {
+                val gioBatDau = LocalTime.parse(ca.GioBatDau, formatterTime)
+                val gioKetThuc = LocalTime.parse(ca.GioKetThuc, formatterTime)
+                currentTime in gioBatDau..gioKetThuc
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
+
+    LaunchedEffect(danhSachTuanTheoNam) {
+        if (selectedTuan == null && danhSachTuanTheoNam.isNotEmpty()) {
+            val tuanHienTai = danhSachTuanTheoNam.firstOrNull { tuan ->
+                val ngayBatDau = LocalDate.parse(tuan.NgayBatDau, formatterDate)
+                val ngayKetThuc = LocalDate.parse(tuan.NgayKetThuc, formatterDate)
+                todayDate in ngayBatDau..ngayKetThuc
+            }
+            selectedTuan = tuanHienTai ?: danhSachTuanTheoNam.first()
+        }
+    }
+
+
 
 
     Card(
@@ -607,7 +680,22 @@ fun MayTinhDetailScreen(
                     Button(
                         modifier = Modifier.width(170.dp),
                         onClick = {
-                            navController.navigate(NavRoute.ADDDIEMDANH.route + "?mamay=${maytinh.MaMay}")
+                            val formatterDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                            val todayDate = LocalDate.now()
+
+                            if(caHocHienTai!=null){
+                                var chitiet = ChiTietSuDungMay(
+                                    MaSV = sinhvien!!.MaSinhVien,
+                                    MaCa = caHocHienTai?.MaCaHoc ?: 0,
+                                    MaTuan = selectedTuan?.MaTuan ?: 0,
+                                    NgaySuDung = todayDate.format(formatterDate),
+                                    MaMay = maytinh.MaMay,
+                                    MaPhong = maytinh.MaPhong
+                                )
+                                chitietsudungmayViewModel.createChiTietSuDungMay(chitiet)
+                            }else{
+                                Toast.makeText(context, "Ngoài giờ học không được điểm danh", Toast.LENGTH_SHORT).show()
+                            }
                         },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))

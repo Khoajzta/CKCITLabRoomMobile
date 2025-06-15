@@ -42,7 +42,7 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 @Composable
 fun InfoRow(icon: ImageVector, label: String, value: String) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.Start
     ) {
         Icon(

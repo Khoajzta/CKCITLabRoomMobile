@@ -59,7 +59,9 @@ sealed class NavRoute(val route: String) {
     object EDITGIANGVIEN : NavRoute("editgiangvien_screen")
     object LISTGIANGVIENCONGTAC : NavRoute("danhsachgiangvien_screen")
     object LISTGIANGVIENNGUNGCONGTAC : NavRoute("danhsachgiangvienngungcongtac_screen")
-    object PHANQUYEN : NavRoute("phanquyen_screen")
+    object PHANQUYENADMIN : NavRoute("phanquyenadmin_screen")
+    object PHANQUYENGIANGVIEN : NavRoute("phanquyengiangvien_screen")
+    object DOIMATKHAUGV : NavRoute("doimatkhaugv_screen")
 
 
     //Chuyển Máy
@@ -78,6 +80,7 @@ sealed class NavRoute(val route: String) {
     object EDITSINHVIEN : NavRoute("editsinhvien_screen")
     object LISTSINHVIENTHEOLOP : NavRoute("sinhviendanghoc_screen")
     object LISTSINHVIENDINHCHI : NavRoute("sinhvientheolop_screen")
+    object DOIMATKHAUSV : NavRoute("doimatkhausv_screen")
 
     //Lớp Học
     object QUANLYLOPHOC : NavRoute("quanlylophoc_screen")
@@ -110,6 +113,7 @@ sealed class NavRoute(val route: String) {
 
     //DiemDanh
     object ADDDIEMDANH : NavRoute("adddiemdanh_screen")
+    object LISTMAYTINHDIEMDANH : NavRoute("iistmaytinhdiemdanh_screen")
 
     //Mượn Máy
     object QUANLYPHIEUMUONMAY : NavRoute("quanlyphieumuonmay_screen")
@@ -135,6 +139,10 @@ sealed class NavRoute(val route: String) {
     object EDITMONHOC : NavRoute("editmonhoc_screen")
     object LISTMONHOCDANGDAY : NavRoute("listmonhocdangday_screen")
     object LISTMONHOCNGUNGDAY : NavRoute("listmonhocngungday_screen")
+
+    //Chi tiết sử dụng máy
+    object LISTLICHHOCSUDUNGMAY : NavRoute("listlichhocsudungmay_screen")
+    object LISTSVSUDUNGMAYTHEOCA : NavRoute("listSinhViensudungmaytheoca_screen")
 
 }
 
@@ -292,7 +300,7 @@ fun NavgationGraph(
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
-            MayTinhDetailScreen(mamay,phongMayViewModel,giangVienViewModel,navController)
+            MayTinhDetailScreen(mamay,phongMayViewModel,giangVienViewModel,sinhVienViewModel,navController,namHocViewModel,tuanViewModel,caHocViewModel,chiTietSuDungMayViewModel)
         }
 
         composable(
@@ -337,11 +345,19 @@ fun NavgationGraph(
         }
 
         composable(
-            route = NavRoute.PHANQUYEN.route,
+            route = NavRoute.PHANQUYENADMIN.route,
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
-            QuanLyPhanQuyen(navController,giangVienViewModel)
+            PhanQuyenAdminGVScreen(navController,giangVienViewModel)
+        }
+
+        composable(
+            route = NavRoute.PHANQUYENGIANGVIEN.route,
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) {
+            PhanQuyenGiangVienScreen(navController,giangVienViewModel)
         }
 
         composable(
@@ -350,6 +366,18 @@ fun NavgationGraph(
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
             CreateGiangVienScreen(navController, giangVienViewModel)
+        }
+
+        composable(
+            NavRoute.DOIMATKHAUGV.route + "?magv={magv}",
+            arguments = listOf(
+                navArgument("magv") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) { navBackStackEntry ->
+            val magv = navBackStackEntry.arguments?.getString("magv") ?: ""
+            DoiMatKhauGVScreen(magv,giangVienViewModel,navController)
         }
 
         composable(
@@ -407,6 +435,18 @@ fun NavgationGraph(
         ) { navBackStackEntry ->
             val masv = navBackStackEntry.arguments?.getString("masv") ?: ""
             EditSinhVienScreen(sinhVienViewModel,lopHocViewModel, masv)
+        }
+
+        composable(
+            NavRoute.DOIMATKHAUSV.route + "?masv={masv}",
+            arguments = listOf(
+                navArgument("masv") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) { navBackStackEntry ->
+            val masv = navBackStackEntry.arguments?.getString("masv") ?: ""
+            DoiMatKhauSvScreen(masv,sinhVienViewModel,navController)
         }
 
         composable(
@@ -682,7 +722,7 @@ fun NavgationGraph(
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
-            CreatePhieuSuaChuaScreen(mamay,phieuSuaChuaViewModel,giangVienViewModel,sinhVienViewModel,navController)
+            CreatePhieuSuaChuaScreen(mamay,phieuSuaChuaViewModel,giangVienViewModel,sinhVienViewModel,navController,notificationViewModel)
         }
 
         composable(
@@ -781,15 +821,23 @@ fun NavgationGraph(
         //DiemDanh
 
         composable(
-            NavRoute.ADDDIEMDANH.route + "?mamay={mamay}",
+            NavRoute.ADDDIEMDANH.route,
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) { navBackStackEntry ->
+            DiemDanhScreen(chiTietSuDungMayViewModel,lichHocViewModel,sinhVienViewModel,caHocViewModel,navController)
+        }
+
+        composable(
+            NavRoute.LISTMAYTINHDIEMDANH.route + "?malichhoc={malichhoc}",
             arguments = listOf(
-                navArgument("mamay") { type = NavType.StringType; nullable = true }
+                navArgument("malichhoc") { type = NavType.StringType; nullable = true }
             ),
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
-            val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
-            DiemDanhScreen(mamay,namHocViewModel,tuanViewModel,chiTietSuDungMayViewModel)
+            val malichhoc = navBackStackEntry.arguments?.getString("malichhoc") ?: ""
+            ListMayTinhDiemDanh(navController,malichhoc,lichHocViewModel,mayTinhViewModel,chiTietSuDungMayViewModel,sinhVienViewModel)
         }
 
         //Mượn Máy
@@ -876,7 +924,7 @@ fun NavgationGraph(
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
-            QuanLyLichHocScreen(navController,sinhVienViewModel)
+            QuanLyLichHocScreen(navController,giangVienViewModel)
         }
 
         composable(
@@ -994,6 +1042,34 @@ fun NavgationGraph(
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
             ListMonHocNgungDayScreen(navController,monhocViewModel)
+        }
+
+        //Chi tiết sử dụng máy
+        composable(
+            route = NavRoute.LISTLICHHOCSUDUNGMAY.route,
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) {
+            ListLichHocSuDungMay(lichHocViewModel,giangVienViewModel,namHocViewModel,tuanViewModel,navController)
+        }
+
+        composable(
+            NavRoute.LISTSVSUDUNGMAYTHEOCA.route + "?maCa={maCa}&maTuan={maTuan}&maphong={maphong}&ngaySuDung={ngaySuDung}",
+            arguments = listOf(
+                navArgument("maCa") { type = NavType.StringType; nullable = true },
+                navArgument("maTuan") { type = NavType.StringType; nullable = true },
+                navArgument("maphong") { type = NavType.StringType; nullable = true },
+                navArgument("ngaySuDung") { type = NavType.StringType; nullable = true }
+            ),
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) { navBackStackEntry ->
+            val maCa = navBackStackEntry.arguments?.getString("maCa") ?: ""
+            val maTuan = navBackStackEntry.arguments?.getString("maTuan") ?: ""
+            val maphong = navBackStackEntry.arguments?.getString("maphong") ?: ""
+            val ngaySuDung = navBackStackEntry.arguments?.getString("ngaySuDung") ?: ""
+
+            ListSinhVienTheoCa(maCa,maTuan,maphong,ngaySuDung,chiTietSuDungMayViewModel)
         }
     }
 }

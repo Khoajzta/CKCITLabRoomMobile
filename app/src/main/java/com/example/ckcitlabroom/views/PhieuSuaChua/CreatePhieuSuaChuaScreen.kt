@@ -1,4 +1,5 @@
 import android.app.DatePickerDialog
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -63,13 +64,14 @@ import java.util.Locale
 fun CreatePhieuSuaChuaScreen(
     mamay:String,
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
-    giaoDichViewModel: GiangVienViewModel,
+    giangvienViewmodel: GiangVienViewModel,
     sinhVienViewModel: SinhVienViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    notificationViewModel: NotificationViewModel
 ){
 
     var sinhvien = sinhVienViewModel.sinhvienSet
-    var giangvien = giaoDichViewModel.giangvienSet
+    var giangvien = giangvienViewmodel.giangvienSet
 
     val maNguoiBaoHong = remember {
         mutableStateOf(
@@ -82,6 +84,7 @@ fun CreatePhieuSuaChuaScreen(
     }
 
     var danhsachphieusuachua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChua
+    var danhsachTokenAdmin = giangvienViewmodel.danhSachTokenAdmin
 
     var mayTinhViewModel: MayTinhViewModel = viewModel()
     var maytinh = mayTinhViewModel.maytinh
@@ -89,6 +92,7 @@ fun CreatePhieuSuaChuaScreen(
     LaunchedEffect(Unit) {
         mayTinhViewModel.getMayTinhByMaMay(mamay)
         phieuSuaChuaViewModel.getAllPhieuSuaChua()
+        giangvienViewmodel.getTokenAdmin()
     }
 
     DisposableEffect(Unit) {
@@ -96,6 +100,7 @@ fun CreatePhieuSuaChuaScreen(
             phieuSuaChuaViewModel.stopPollingPhieuSuaChua()
         }
     }
+
 
     val loadingState = remember { mutableStateOf(false) }
 
@@ -164,27 +169,23 @@ fun CreatePhieuSuaChuaScreen(
                 Text("Tạo Phiếu Sửa Chữa ", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             }
 
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Cấu hình chuẩn của máy",
+                    color = Color.Black,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
+
             LazyColumn(
                 modifier = Modifier
                     .weight(1f).height(550.dp)
                     .fillMaxWidth()
             ) {
-
-
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Điền Thông Tin Cấu Hình Hiện Tại",
-                            color = Color.Black,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    }
-
-                }
 
                 item {
                     Text(
@@ -263,10 +264,15 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
+
+                            disabledTextColor = Color.Black,
+                            disabledBorderColor = Color.White,
+                            disabledContainerColor = Color.White,
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
 
@@ -287,10 +293,15 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
+
+                            disabledTextColor = Color.Black,
+                            disabledBorderColor = Color.White,
+                            disabledContainerColor = Color.White,
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
 
@@ -311,10 +322,15 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
+
+                            disabledTextColor = Color.Black,
+                            disabledBorderColor = Color.White,
+                            disabledContainerColor = Color.White,
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
 
@@ -335,10 +351,15 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
+
+                            disabledTextColor = Color.Black,
+                            disabledBorderColor = Color.White,
+                            disabledContainerColor = Color.White,
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
 
@@ -359,10 +380,15 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
+
+                            disabledTextColor = Color.Black,
+                            disabledBorderColor = Color.White,
+                            disabledContainerColor = Color.White,
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
 
@@ -383,10 +409,15 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
+
+                            disabledTextColor = Color.Black,
+                            disabledBorderColor = Color.White,
+                            disabledContainerColor = Color.White,
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
 
@@ -407,10 +438,15 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
+
+                            disabledTextColor = Color.Black,
+                            disabledBorderColor = Color.White,
+                            disabledContainerColor = Color.White,
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
 
@@ -431,10 +467,15 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
+                            disabledTextColor = Color.Black,
+                            disabledBorderColor = Color.White,
+                            disabledContainerColor = Color.White,
+
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
 
@@ -455,10 +496,15 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
+
+                            disabledTextColor = Color.Black,
+                            disabledBorderColor = Color.White,
+                            disabledContainerColor = Color.White,
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
+                        readOnly = true
                     )
                 }
 
@@ -479,7 +525,7 @@ fun CreatePhieuSuaChuaScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black,
                             focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            unfocusedTextColor = Color.Black,
                         ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
@@ -523,9 +569,16 @@ fun CreatePhieuSuaChuaScreen(
                             val maytinhnew = maytinh.copy(TrangThai = 0)
                             mayTinhViewModel.updateMayTinh(maytinhnew)
 
+                            val uniqueTokens = danhsachTokenAdmin.distinct()
+                            if (uniqueTokens.isNotEmpty()) {
+                                val title = "Thông báo phiếu sửa chữa"
+                                val body = "Máy tính ${maytinh.ViTri} ở phòng ${maytinh.MaPhong} bị ${moTaLoiState.value}"
+                                notificationViewModel.sendNotificationToTokens(uniqueTokens, title, body)
+                            }
+
                             coroutineScope.launch {
                                 snackbarData.value = CustomSnackbarData(
-                                    message = "Thêm phòng máy thành công",
+                                    message = "Tạo phiếu sửa chữa thành công",
                                     type = SnackbarType.SUCCESS
                                 )
                                 snackbarHostState.showSnackbar("Thông báo")

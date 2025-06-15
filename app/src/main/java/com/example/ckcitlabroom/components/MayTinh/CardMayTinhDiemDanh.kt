@@ -1,6 +1,4 @@
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,10 +10,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -41,37 +37,11 @@ import com.composables.icons.lucide.ClipboardList
 import com.composables.icons.lucide.Cpu
 import com.composables.icons.lucide.Lucide
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardMayTinhLichSu(
+fun CardMayTinhDiemDanh(
     maytinh: MayTinh,
-    phongMayViewModel: PhongMayViewModel,
-    click:() -> Unit
-) {
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
-    var selectdMaPhong by remember { mutableStateOf("") }
-    var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
-    val maPhongState = remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        phongMayViewModel.getAllPhongMay()
-    }
-
-    LaunchedEffect(maytinh.MaPhong) {
-        phongMayCard = phongMayViewModel.fetchPhongMayByMaPhong(maytinh.MaPhong)
-    }
-
-    LaunchedEffect(selectdMaPhong) {
-        maPhongState.value = selectdMaPhong
-    }
-
-    LaunchedEffect(danhSachPhongMay) {
-        if (danhSachPhongMay.isNotEmpty() && selectdMaPhong.isEmpty()) {
-            selectdMaPhong = danhSachPhongMay[0].MaPhong
-        }
-    }
-
+    click:()->Unit
+){
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -101,62 +71,16 @@ fun CardMayTinhLichSu(
             )
 
             InfoRow(
-                icon = Lucide.ClipboardList,
-                label = "Mã Máy",
-                value = maytinh?.MaMay ?: "Đang tải..."
-            )
-            Spacer(Modifier.height(6.dp))
-            InfoRow(
                 icon = Lucide.Cpu,
                 label = "Tên Máy",
                 value = maytinh?.TenMay ?: "Đang tải..."
             )
             Spacer(Modifier.height(6.dp))
-
             InfoRow(
-                icon = Lucide.Building2,
-                label = "Phòng hiện tại",
-                value = phongMayCard?.TenPhong ?: "Đang tải..."
+                icon = Lucide.Cpu,
+                label = "Vị Trí Máy",
+                value = maytinh?.ViTri ?: "Đang tải..."
             )
-            Spacer(Modifier.height(6.dp))
-
-            val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFFF44336), "Đang bảo trì", Lucide.CircleX)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = statusIcon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = "Trạng thái:",
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.width(6.dp))
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = statusText,
-                    color = color,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp
-                )
-            }
         }
     }
 }
-
-

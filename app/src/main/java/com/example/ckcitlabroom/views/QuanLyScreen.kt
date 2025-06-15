@@ -54,6 +54,7 @@ fun QuanLyScreen(
 
                 ChucNang("Quản Lý Giảng Viên", Icons.Outlined.SupervisorAccount, Click = { navController.navigate(NavRoute.QUANLYGIANGVIEN.route) }),
                 ChucNang("Quản Lý Sinh Viên", Icons.Outlined.Person, Click = { navController.navigate(NavRoute.QUANLYSINHVIEN.route) }),
+                ChucNang("Quản Lý Điểm Danh", Icons.Outlined.Build, Click = {navController.navigate(NavRoute.LISTLICHHOCSUDUNGMAY.route) }),
 
                 ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.QUANLYLICHHOC.route) }),
                 ChucNang("Quản Lý Lớp Học", Icons.Outlined.MeetingRoom, Click = { navController.navigate(NavRoute.QUANLYLOPHOC.route) }),
@@ -68,15 +69,14 @@ fun QuanLyScreen(
             listOf(
                 ChucNang("Quản Lý Lịch Dạy", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.QUANLYLICHHOC.route) }),
                 ChucNang("Quản Lý Phiếu Sửa Chữa", Icons.Outlined.Build, Click = { navController.navigate(NavRoute.QUANLYPHIEUSUACHUA.route) }),
-                ChucNang("Quản Lý Phiếu Mượn May", Icons.Outlined.Article, Click = { navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route) }),
-                ChucNang("Chuyển Máy", Icons.Outlined.SwapHoriz, Click = { navController.navigate(NavRoute.QUANLYCHUYENMAY.route) }),
+                ChucNang("Quản Lý Điểm Danh", Icons.Outlined.Build, Click = {navController.navigate(NavRoute.LISTLICHHOCSUDUNGMAY.route) }),
             )
         }
         sinhvien != null -> {
             listOf(
                 ChucNang("Danh Sách Lịch Học", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.QUANLYLICHHOC.route) }),
-                ChucNang("Lịch Sử Báo Hỏng", Icons.Outlined.History, Click = { navController.navigate(NavRoute.LISTPHIEUBYSINHVIEN.route) })
-
+                ChucNang("Lịch Sử Báo Hỏng", Icons.Outlined.History, Click = { navController.navigate(NavRoute.LISTPHIEUBYSINHVIEN.route) }),
+                ChucNang("Điểm Danh", Icons.Outlined.History, Click = { navController.navigate(NavRoute.ADDDIEMDANH.route) }),
             )
         }
         else -> emptyList()

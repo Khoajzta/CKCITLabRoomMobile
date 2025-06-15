@@ -78,9 +78,10 @@ fun CardCaHoc(
                 expanded = !expanded
             }
             .animateContentSize(
-                animationSpec = tween(durationMillis = 20, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(12.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

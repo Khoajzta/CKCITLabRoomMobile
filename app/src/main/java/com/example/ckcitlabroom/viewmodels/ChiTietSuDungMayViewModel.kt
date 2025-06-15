@@ -3,13 +3,16 @@ package com.example.lapstore.viewmodels
 import ChiTietDonNhap
 import ChiTietDonNhapAPIService
 import ChiTietSuDungMay
+import ChiTietSuDungMayRP
 import DonNhap
 import LichSuChuyenMay
 import MayTinh
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
@@ -22,44 +25,37 @@ import kotlinx.coroutines.withContext
 
 class ChiTietSuDungMayViewModel : ViewModel() {
 
-
-    var danhSachChiTietDonNhaptheoMaDonNhap by mutableStateOf<List<ChiTietDonNhap>>(emptyList())
+    var danhSachAllChiTiet by mutableStateOf<List<ChiTietSuDungMayRP>>(emptyList())
         private set
 
-    var danhSachAllChiTietDonNhap by mutableStateOf(listOf<ChiTietDonNhap>())
-
-    private var pollingAllChiTietDonNhapJob: Job? = null
-
     var chitietsudungmayCreateResult by mutableStateOf("")
-    var chitietdonnhapUpdateResult by mutableStateOf("")
-    var chitietdonnhapDeleteResult by mutableStateOf("")
+
+    private var pollingAllChiTietJob: Job? = null
 
     var isLoading by mutableStateOf(false)
         private set
 
-    private var pollingChiTietTheoMaDonNhapJob: Job? = null
+    fun getAllChiTietSuDungMay() {
+        if (pollingAllChiTietJob != null) return
 
-
-    fun getAllChiTietDonNhap() {
-        if (pollingAllChiTietDonNhapJob != null) return
-
-        pollingAllChiTietDonNhapJob = viewModelScope.launch(Dispatchers.IO) {
+        pollingAllChiTietJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
-                    val response = ITLabRoomRetrofitClient.chitietdonnhapAPIService.getAllChiTietDonNhap()
-                    danhSachAllChiTietDonNhap = response.chitietdonnhap ?: emptyList()
+                    val response = ITLabRoomRetrofitClient.chiTietSuDungMayAPIService.getAllChItietSuDungMay()
+                    danhSachAllChiTiet = response.chitietsudung ?: emptyList()
                 } catch (e: Exception) {
-                    Log.e("ChiTietDonNhapViewModel", "Polling all chi tiết lỗi", e)
+                    Log.e("ChiTietSuDungMayViewModel", "Polling all chi tiet lỗi", e)
                 }
                 delay(500)
             }
         }
     }
 
-    fun stopPollingAllChiTietDonNhap() {
-        pollingAllChiTietDonNhapJob?.cancel()
-        pollingAllChiTietDonNhapJob = null
+    fun stopPollingAllChiTiet() {
+        pollingAllChiTietJob?.cancel()
+        pollingAllChiTietJob = null
     }
+
 
     fun createChiTietSuDungMay(chiTietSuDungMay: ChiTietSuDungMay) {
         viewModelScope.launch {
@@ -69,6 +65,7 @@ class ChiTietSuDungMayViewModel : ViewModel() {
                     ITLabRoomRetrofitClient.chiTietSuDungMayAPIService.createChiTietSuDungMay(chiTietSuDungMay)
                 }
                 chitietsudungmayCreateResult = response.message
+
             } catch (e: Exception) {
                 chitietsudungmayCreateResult = "Lỗi khi thêm máy tính: ${e.message}"
                 Log.e("ChiTietSuDungMayViewModel", "Lỗi khi thêm máy tính: ${e.message}")
@@ -77,41 +74,6 @@ class ChiTietSuDungMayViewModel : ViewModel() {
             }
         }
     }
-
-
-    fun getChiTietDonNhapTheoMaDonNhap(madon: String) {
-        if (pollingChiTietTheoMaDonNhapJob != null) return
-
-        pollingChiTietTheoMaDonNhapJob = viewModelScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                try {
-                    val response = ITLabRoomRetrofitClient.chitietdonnhapAPIService.getChiTietDonNhapTheoMaDon(madon)
-                    danhSachChiTietDonNhaptheoMaDonNhap = response.chitietdonnhap ?: emptyList()
-                } catch (e: Exception) {
-                    Log.e("PhongMayViewModel", "Polling theo phòng lỗi", e)
-                }
-                delay(500)
-            }
-        }
-    }
-
-    fun stopPollingChiTietTheoMaDonNhap() {
-        pollingChiTietTheoMaDonNhapJob?.cancel()
-        pollingChiTietTheoMaDonNhapJob = null
-    }
-
-    suspend fun getChiTietDonNhapListOnce(maDonNhap: String): List<ChiTietDonNhap> {
-        return try {
-            val response = withContext(Dispatchers.IO) {
-                ITLabRoomRetrofitClient.chitietdonnhapAPIService.getChiTietDonNhapTheoMaDon(maDonNhap)
-            }
-            response.chitietdonnhap ?: emptyList()
-        } catch (e: Exception) {
-            Log.e("ChiTietViewModel", "Lỗi: ${e.message}")
-            emptyList()
-        }
-    }
-
 }
 
 

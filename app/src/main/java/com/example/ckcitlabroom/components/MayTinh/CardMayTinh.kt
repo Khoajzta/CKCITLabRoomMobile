@@ -129,7 +129,7 @@ fun CardMayTinh(
             // Basic info
             InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = maytinh.TenMay)
             Spacer(Modifier.height(8.dp))
-            InfoRow(icon = Lucide.MapPin, label = "Vị Trí", value = maytinh.ViTri)
+            InfoRow(icon = Lucide.MapPin, label = "Vị Trí Máy", value = maytinh.ViTri)
             Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.Building2, label = "Phòng", value = phongMayCard?.TenPhong ?: "Đang tải...")
 

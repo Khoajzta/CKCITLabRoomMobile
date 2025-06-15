@@ -115,6 +115,9 @@ dependencies {
 
     implementation ("com.google.accompanist:accompanist-navigation-animation:0.34.0")
 
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:<version>")
+
+
 
     // Google Maps & Other Libs
     implementation(libs.play.services.maps)

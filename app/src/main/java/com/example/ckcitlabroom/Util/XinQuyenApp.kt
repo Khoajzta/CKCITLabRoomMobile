@@ -12,13 +12,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationManagerCompat
 import android.provider.Settings
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Text
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 
 @Composable
@@ -68,43 +76,60 @@ fun RequestPermissionsOnFirstLaunch() {
 
     if (showNotificationDialog) {
         AlertDialog(
-            shape = RoundedCornerShape(16.dp),
             onDismissRequest = { showNotificationDialog = false },
-            title = { Text("Bật thông báo") },
-            text = { Text("Ứng dụng cần quyền gửi thông báo. Bạn có muốn bật không?") },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = Color.White,
+            tonalElevation = 8.dp,
+            title = {
+                Text(
+                    text = "Bật thông báo",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = Color(0xFF1B8DDE)
+                )
+            },
+            text = {
+                Text(
+                    text = "Ứng dụng cần quyền gửi thông báo. Bạn có muốn bật không?",
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.Black,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    showNotificationDialog = false
-
-                    // Chỉ mở intent nếu có activity xử lý
-                    try {
-                        val intent = Intent().apply {
-                            action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
-                            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                Button(
+                    onClick = {
+                        showNotificationDialog = false
+                        try {
+                            val intent = Intent().apply {
+                                action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                            }
+                            if (intent.resolveActivity(context.packageManager) != null) {
+                                context.startActivity(intent)
+                            } else {
+                                Log.w("Permission", "Không mở được cài đặt thông báo")
+                            }
+                        } catch (e: Exception) {
+                            Log.e("Permission", "Lỗi khi mở cài đặt thông báo", e)
                         }
-
-                        // Kiểm tra nếu intent có thể xử lý
-                        if (intent.resolveActivity(context.packageManager) != null) {
-                            context.startActivity(intent)
-                        } else {
-                            Log.w("Permission", "Không mở được cài đặt thông báo")
-                        }
-                    } catch (e: Exception) {
-                        Log.e("Permission", "Lỗi khi mở cài đặt thông báo", e)
-                    }
-
-                }) {
-                    Text("Đồng ý")
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1B8DDE)),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Đồng ý", color = Color.White)
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showNotificationDialog = false
-                }) {
-                    Text("Hủy")
+                TextButton(
+                    onClick = { showNotificationDialog = false }
+                ) {
+                    Text("Hủy", color = Color.Gray)
                 }
             }
         )
+
     }
 }
 

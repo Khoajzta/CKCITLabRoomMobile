@@ -34,7 +34,6 @@ interface SinhVienAPIService {
     @GET("LichHoc/read.php")
     suspend fun getAllLichHoc(): LichHocResponse
 
-
     @POST("SinhVien/checkLogin.php")
     suspend fun CheckLogin(@Body request: LoginRequest): LoginResponse
 

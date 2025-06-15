@@ -87,7 +87,7 @@ fun CreateGiangVienScreen(
                 calendar.set(year, month, dayOfMonth)
 
                 // Format hiển thị: dd-MM-yyyy
-                val sdfHienThi = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                val sdfHienThi = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                 ngaySinhHienThi.value = sdfHienThi.format(calendar.time)
 
                 // Format lưu DB: yyyy-MM-dd
@@ -123,7 +123,7 @@ fun CreateGiangVienScreen(
                     .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text("Thêm Giảng Viên", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                Text("Thêm Giảng Viên", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp,color = Color.Black)
             }
 
             LazyColumn(
@@ -172,7 +172,7 @@ fun CreateGiangVienScreen(
 
                     Text("Ngày Sinh", fontWeight = FontWeight.Bold, color = Color.Black)
                     OutlinedTextField(
-                        value = formatNgay(ngaySinhHienThi.value),
+                        value = ngaySinhHienThi.value,
                         onValueChange = {},
                         readOnly = true,
                         placeholder = { Text("Chọn ngày sinh") },

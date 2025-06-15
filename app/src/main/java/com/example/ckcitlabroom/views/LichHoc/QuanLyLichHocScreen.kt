@@ -26,24 +26,34 @@ import androidx.navigation.NavHostController
 @Composable
 fun QuanLyLichHocScreen(
     navController: NavHostController,
-    sinhVienViewModel: SinhVienViewModel
+    giangVienViewModel: GiangVienViewModel
 ){
+    val giangvien = giangVienViewModel.giangvienSet
 
-    val sinhvien = sinhVienViewModel.sinhvienSet
+    val dsChucNang = buildList {
+        if (giangvien != null) {
+            add(ChucNang("Danh Sách Lịch Dạy Theo Tuần", Icons.Outlined.CalendarMonth) {
+                navController.navigate(NavRoute.LISTLICHHOC.route)
+            })
+            add(ChucNang("Danh Sách Lịch Đã Dạy", Icons.Outlined.CalendarMonth) {
+                navController.navigate(NavRoute.LISTLICHHOCDADAY.route)
+            })
 
-    val dsChucNang = if (sinhvien != null) {
-        listOf(
-            ChucNang("Danh Sách Lịch Học Theo Tuần", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.LISTLICHHOC.route) }),
-            ChucNang("Danh Sách Lịch Đã Học", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.LISTLICHHOCDADAY.route) })
-            // Không có nút thêm
-        )
-    } else {
-        listOf(
-            ChucNang("Danh Sách Lịch Dạy Theo Tuần", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.LISTLICHHOC.route) }),
-            ChucNang("Danh Sách Lịch Đã Dạy", Icons.Outlined.CalendarMonth, Click = { navController.navigate(NavRoute.LISTLICHHOCDADAY.route) }),
-            ChucNang("Thêm Mới Lịch Dạy", Icons.Outlined.AddCircle, Click = { navController.navigate(NavRoute.ADDLICHHOC.route) })
-        )
+            if (giangvien.MaLoaiTaiKhoan == 1) {
+                add(ChucNang("Thêm Mới Lịch Dạy", Icons.Outlined.AddCircle) {
+                    navController.navigate(NavRoute.ADDLICHHOC.route)
+                })
+            }
+        } else {
+            add(ChucNang("Danh Sách Lịch Học Theo Tuần", Icons.Outlined.CalendarMonth) {
+                navController.navigate(NavRoute.LISTLICHHOC.route)
+            })
+            add(ChucNang("Danh Sách Lịch Đã Học", Icons.Outlined.CalendarMonth) {
+                navController.navigate(NavRoute.LISTLICHHOCDADAY.route)
+            })
+        }
     }
+
 
 
     Column(

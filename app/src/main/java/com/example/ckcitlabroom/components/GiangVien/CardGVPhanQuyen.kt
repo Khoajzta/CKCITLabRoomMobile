@@ -68,8 +68,8 @@ fun CardGiangVienPhanQuyen(
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.Mail, label = "Email", value = giangVien.Email)
             Spacer(modifier = Modifier.height(8.dp))
-            InfoRow(icon = Lucide.Key, label = "Mật Khẩu", value = giangVien.MatKhau)
-            Spacer(modifier = Modifier.height(8.dp))
+//            InfoRow(icon = Lucide.Key, label = "Mật Khẩu", value = giangVien.MatKhau)
+//            Spacer(modifier = Modifier.height(8.dp))
             InfoRow(
                 icon = Lucide.ShieldCheck,
                 label = "Vai trò",
@@ -94,41 +94,42 @@ fun CardGiangVienPhanQuyen(
                         Text("Phân quyền", color = Color.Black, fontWeight = FontWeight.Bold)
                     },
                     text = {
-                        Text("Giảng viên: ${giangVien.TenGiangVien}", color = Color.Black)
+                        Text("Giảng viên: ${giangVien.TenGiangVien}", fontWeight = FontWeight.SemiBold, color = Color.Black)
                     },
                     confirmButton = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Button(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(end = 8.dp),
-                                onClick = {
-                                    giangVienViewModel.updateGiangVien(
-                                        giangVien.copy(MaLoaiTaiKhoan = 1) // 1 = Admin
-                                    )
-                                    showDialog = false
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                            ) {
-                                Text("Admin", color = Color.White)
-                            }
-
-                            Button(
-                                modifier = Modifier.weight(1f),
-                                onClick = {
-                                    giangVienViewModel.updateGiangVien(
-                                        giangVien.copy(MaLoaiTaiKhoan = 2) // 2 = Giảng viên
-                                    )
-                                    showDialog = false
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFF2196F3))
-                            ) {
-                                Text("Giảng viên", color = Color.White)
+                            if(giangVien.MaLoaiTaiKhoan == 1){
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = {
+                                        giangVienViewModel.updateGiangVien(
+                                            giangVien.copy(MaLoaiTaiKhoan = 2) // 2 = Giảng viên
+                                        )
+                                        showDialog = false
+                                    },
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF2196F3))
+                                ) {
+                                    Text("Giảng viên", color = Color.White)
+                                }
+                            }else{
+                                Button(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    onClick = {
+                                        giangVienViewModel.updateGiangVien(
+                                            giangVien.copy(MaLoaiTaiKhoan = 1) // 1 = Admin
+                                        )
+                                        showDialog = false
+                                    },
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                                ) {
+                                    Text("Admin", color = Color.White)
+                                }
                             }
                         }
                     }

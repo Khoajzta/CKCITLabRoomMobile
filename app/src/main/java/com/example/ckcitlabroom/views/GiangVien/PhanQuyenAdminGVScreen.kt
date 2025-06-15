@@ -21,7 +21,7 @@ import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.components.GiangVien.CardGiangVienPhanQuyen
 
 @Composable
-fun QuanLyPhanQuyen(
+fun PhanQuyenAdminGVScreen(
     navController: NavHostController,
     giangVienViewModel: GiangVienViewModel
 ) {

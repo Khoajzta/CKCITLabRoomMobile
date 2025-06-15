@@ -33,6 +33,10 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
     var danhSachAllGiangVien by mutableStateOf<List<GiangVien>>(emptyList())
         private set
 
+    var danhSachTokenAdmin by mutableStateOf<List<String>>(emptyList())
+        private set
+
+
     var giangvienCreateResult by mutableStateOf("")
     var giangvienUpdateResult by mutableStateOf("")
     var giangvienDeleteResult by mutableStateOf("")
@@ -174,6 +178,23 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun updateToken(maGiangVien: String, token: String) {
+        viewModelScope.launch {
+            try {
+                val request = TokenGVUpdateRequest(
+                    MaGV = maGiangVien,
+                    Token = token
+                )
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.giangVienAPIService.updateToken(request)
+                }
+                Log.d("TokenUpdate", "Token updated: ${response.message}")
+            } catch (e: Exception) {
+                Log.e("TokenUpdate", "Lỗi khi cập nhật token: ${e.message}")
+            }
+        }
+    }
+
     fun updateTrangThaiGiangVien(giangVien: GiangVien) {
         viewModelScope.launch {
             isLoading = true
@@ -236,27 +257,27 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun getTokenAdmin() {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.giangVienAPIService.getToKenAdmin()
+                }
 
-    fun setGVFromPrefs(state: LoginGiangVienState) {
-        giangvien = GiangVien(
-            MaGV = state.maGiangVien.toString(),
-            TenGiangVien = state.tenGiangVien.toString(),
-            NgaySinh = "",
-            GioiTinh = "",
-            Email = "",
-            MatKhau = "",
-            MaLoaiTaiKhoan = 3,
-            TrangThai = 0
-        )
-    }
-
-    suspend fun getGiangVienByMaGOrEmailSync(key: String): GiangVien? {
-        return try {
-            ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByEmailOrMaGV(key)
-        } catch (e: Exception) {
-            Log.e("GiangVienViewModel", "Lỗi khi lấy giảng viên (sync): ${e.localizedMessage}", e)
-            null
+                if (response.status == "success" && response.tokens.isNotEmpty()) {
+                    danhSachTokenAdmin = response.tokens
+                    Log.d("GiangVienViewModel", "Lấy token admin thành công: ${response.tokens}")
+                } else {
+                    danhSachTokenAdmin = emptyList()
+                    Log.w("GiangVienViewModel", "Không có token admin hoặc lỗi API: ${response.status}")
+                }
+            } catch (e: Exception) {
+                errorMessage = "Lỗi khi lấy token admin: ${e.message}"
+                Log.e("GiangVienViewModel", "Lỗi khi gọi getTokenAdmin", e)
+            } finally {
+                isLoading = false
+            }
         }
     }
-
 }

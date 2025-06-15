@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -59,6 +60,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.R
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 
 @Composable
@@ -301,6 +303,14 @@ fun LoginGVScreen(
                 if (loginResult?.result == true && giangVien != null) {
                     giangVienViewModel.setGV(giangVien)
                     userPreferences.saveLoginForGiangVien(giangVien)
+
+                    FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                        Log.d("FirebaseToken", "Token: $token")
+
+                        val maGV = giangVienViewModel.giangvien?.MaGV ?: return@addOnSuccessListener
+                        giangVienViewModel.updateToken(maGV, token)
+                    }
+
                     navController.navigate(NavRoute.HOME.route) {
                         popUpTo(NavRoute.LOGINSINHVIEN.route) { inclusive = true }
                     }

@@ -25,6 +25,11 @@ data class LoginResponse(
     val message: String? = null
 )
 
+data class TokenGVUpdateRequest(
+    val MaGV: String,
+    val Token: String
+)
+
 interface GiangVienAPIService {
 
     @POST("GiangVien/checkLogin.php")
@@ -52,6 +57,9 @@ interface GiangVienAPIService {
         @Body giangVien: GiangVien
     ): UpdateResponse
 
+    @POST("GiangVien/updatetoken.php")
+    suspend fun updateToken(@Body request: TokenGVUpdateRequest): UpdateResponse
+
     @PUT("GiangVien/updateTrangThaiGiangVien.php")
     suspend fun updateTrangThaiGiangVien(
         @Body giangVien: GiangVien
@@ -66,5 +74,8 @@ interface GiangVienAPIService {
     suspend fun deleteGiangVien(
         @Body body: Map<String, String>
     ): DeleteResponse
+
+    @GET("GiangVien/getTokenCuaAdmin.php")
+    suspend fun getToKenAdmin(): TokenResponse
 }
 

@@ -147,12 +147,14 @@ fun AnimatedNavigationBar(
             modifier = Modifier
                 .padding(bottom = 18.dp, start = 12.dp, end = 12.dp)
                 .height(95.dp)
-                .graphicsLayer {
-                    shape = barShape
-                    clip = true
-                }
-                .fillMaxWidth()
-                .background(barColor),
+                .shadow( // 👈 Thêm bóng ở đây
+                    elevation = 12.dp,
+                    shape = barShape,
+                    clip = false // để bóng không bị cắt
+                )
+                .clip(barShape) // bo góc thật sự
+                .background(barColor)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {

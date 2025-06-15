@@ -44,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -83,6 +84,7 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.User
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
@@ -102,6 +104,21 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
+
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = true
+
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = Color.Transparent,
+            darkIcons = useDarkIcons
+        )
+
+        systemUiController.setNavigationBarColor(
+            color = Color.Transparent,
+            darkIcons = false
+        )
+    }
 
     RequestPermissionsOnFirstLaunch()
 
@@ -161,6 +178,7 @@ fun MainScreen() {
         currentRoute: String?
     ) {
         when (currentRoute) {
+            NavRoute.STARTSCREEN.route,
             NavRoute.LOGINSINHVIEN.route,
             NavRoute.LOGINGIANGVIEN.route -> {}
 
@@ -241,6 +259,7 @@ fun MainScreen() {
         topBar = { TopBar(navController,mayTinhViewModel,currentRoute) },
         bottomBar = {
             when (currentRoute) {
+                NavRoute.STARTSCREEN.route,
                 NavRoute.LOGINSINHVIEN.route,
                 NavRoute.LOGINGIANGVIEN.route -> {}
                 else -> {

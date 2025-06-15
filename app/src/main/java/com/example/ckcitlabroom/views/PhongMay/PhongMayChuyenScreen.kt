@@ -109,7 +109,7 @@ fun PhongMayChuyenScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp),
+                .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -131,7 +131,7 @@ fun PhongMayChuyenScreen(
             // Khi có máy chọn, đặt chiều cao LazyColumn cố định 550.dp
             LazyColumn(
                 modifier = Modifier
-                    .height(550.dp)
+                    .height(500.dp)
             ) {
                 if (danhSachMayTinhtheophong.isNullOrEmpty()) {
                     item {
