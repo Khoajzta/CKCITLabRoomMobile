@@ -178,7 +178,7 @@ fun CardGiangVienInfo(
                 ) {
                     Icon(Icons.Default.Key, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Đổi mật khẩu", color = Color.White)
+                    Text("Đổi mật khẩu", color = Color.White, fontSize = 15.sp)
                 }
 
                 Button(
@@ -200,7 +200,7 @@ fun CardGiangVienInfo(
                 ) {
                     Icon(Icons.Default.Logout, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Đăng xuất", color = Color.White)
+                    Text("Đăng xuất", color = Color.White,fontSize = 15.sp)
                 }
             }
         }

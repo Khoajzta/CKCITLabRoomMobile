@@ -43,3 +43,4 @@ fun QRCodeImage(base64Str: String, modifier: Modifier = Modifier) {
         // Hiển thị placeholder hoặc thông báo lỗi
     }
 }
+

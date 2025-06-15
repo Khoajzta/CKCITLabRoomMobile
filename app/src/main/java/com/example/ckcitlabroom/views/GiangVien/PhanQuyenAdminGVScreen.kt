@@ -25,7 +25,7 @@ fun PhanQuyenAdminGVScreen(
     navController: NavHostController,
     giangVienViewModel: GiangVienViewModel
 ) {
-    val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien.filter { it.MaLoaiTaiKhoan == 2}
+    val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien.filter { it.MaLoaiTaiKhoan == 2 && it.TrangThai == 1}
 
     LaunchedEffect(Unit) {
         giangVienViewModel.getAllGiangVien()

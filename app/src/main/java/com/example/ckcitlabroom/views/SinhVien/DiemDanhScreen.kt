@@ -1,5 +1,8 @@
+import android.text.Layout
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -69,20 +73,35 @@ fun DiemDanhScreen(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Điểm danh hôm nay",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF1B8DDE),
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
         if (caHienTai == null) {
-            Text("Hiện tại không có ca học nào đang diễn ra", color = Color.Red)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text("Hiện tại không có ca học nào đang diễn ra", fontWeight = FontWeight.Bold,color = Color.Black)
+            }
         } else if (danhSachLichHocHienTai.isEmpty()) {
-            Text("Không có lịch học nào trong ca hiện tại")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text("Không có lịch học nào trong ca hiện tại", fontWeight = FontWeight.Bold,color = Color.Black)
+            }
         } else {
             LazyColumn {
                 items(danhSachLichHocHienTai) { lichhoc ->

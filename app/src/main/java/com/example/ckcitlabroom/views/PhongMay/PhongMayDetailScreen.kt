@@ -1,4 +1,5 @@
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +46,8 @@ fun PhongMayDetailScreen(
     phongMayViewModel: PhongMayViewModel,
     mayTinhViewModel: MayTinhViewModel
 ) {
+
+    val context = LocalContext.current
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinhtheophong
     val phongmay = phongMayViewModel.phongmay
 
@@ -126,22 +130,22 @@ fun PhongMayDetailScreen(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { showDialog = true },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                    Text("Chỉnh sửa", color = Color.Black, fontWeight = FontWeight.ExtraBold)
                 }
             }else{
                 Button(
-                    modifier = Modifier.width(180.dp),
+                    modifier = Modifier.width(120.dp),
                     onClick = { showDialog = true },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                    Text("Chỉnh sửa", color = Color.Black, fontWeight = FontWeight.ExtraBold)
                 }
 
                 Button(
-                    modifier = Modifier.width(180.dp),
+                    modifier = Modifier.width(120.dp),
                     onClick = {
                         if (danhSachMayTinh.isNullOrEmpty()) {
                             showConfirmDeleteDialog = true
@@ -153,6 +157,21 @@ fun PhongMayDetailScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
                 ) {
                     Text("Xóa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                }
+
+                Button(
+                    modifier = Modifier.width(120.dp),
+                    onClick = {
+                        if(danhSachMayTinh.isNullOrEmpty()){
+                            Toast.makeText(context, "Phòng máy hiện hưa có máy tính nào", Toast.LENGTH_SHORT).show()
+                        }else{
+                            createPdfWithQRCodeBase64(context, phongmay.TenPhong , danhSachMayTinh)
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                ) {
+                    Text("In QR", color = Color.Black, fontWeight = FontWeight.ExtraBold)
                 }
             }
         }

@@ -46,6 +46,8 @@ fun RequestPermissionsOnFirstLaunch() {
         Log.d("Permission", "Camera permission granted: $granted")
     }
 
+
+
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->

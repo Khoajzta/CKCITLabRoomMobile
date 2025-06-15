@@ -54,7 +54,7 @@ fun QuanLyLichHocScreen(
         }
     }
 
-
+    var text = if(giangvien != null) "Quản Lý Lịch Dạy" else "Quản Lý Lịch Học"
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -62,7 +62,7 @@ fun QuanLyLichHocScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Quản Lý Lịch Dạy",
+            text = text,
             color = Color(0xFF1B8DDE),
             fontWeight = FontWeight.ExtraBold,
             fontSize = 20.sp

@@ -77,6 +77,7 @@ fun CardSinhVien(
                 animationSpec = tween(durationMillis = 20, easing = FastOutSlowInEasing)
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(12.dp),
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
 

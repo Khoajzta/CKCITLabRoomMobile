@@ -37,8 +37,6 @@ fun ListSinhVienDinhCHi(
     var sinhVienDinhChi = danhsachsinhvien.filter { it.MaLop == selectedLop?.MaLopHoc && it.TrangThai == 0 }
 
     Column {
-
-        Text("Lớp", fontWeight = FontWeight.Bold, color = Color.Black)
         CustomDropdownSelector(
             label = "Chọn lớp",
             items = danhsachlophoc,

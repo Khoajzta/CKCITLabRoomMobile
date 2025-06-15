@@ -1,4 +1,4 @@
-import androidx.compose.foundation.layout.Arrangement
+ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +27,7 @@ fun PhanQuyenGiangVienScreen(
 ) {
 
     var giangvien = giangVienViewModel.giangvienSet
-    val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien.filter { it.MaLoaiTaiKhoan == 1 && it.MaGV != giangvien!!.MaGV}
+    val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien.filter { it.MaLoaiTaiKhoan == 1 && it.MaGV != giangvien!!.MaGV && it.TrangThai == 1}
 
     LaunchedEffect(Unit) {
         giangVienViewModel.getAllGiangVien()

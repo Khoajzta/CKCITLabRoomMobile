@@ -62,7 +62,7 @@ fun CardPhongMay(
             .padding(bottom = 12.dp)
             .fillMaxWidth()
             .clickable {
-                val route = if (phongmay.MaPhong.contains("KHO", ignoreCase = true)) {
+                val route = if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)) {
                     NavRoute.PHONGMAYDONNHAP.route
                 } else {
                     NavRoute.PHONGMAYDETAIL.route

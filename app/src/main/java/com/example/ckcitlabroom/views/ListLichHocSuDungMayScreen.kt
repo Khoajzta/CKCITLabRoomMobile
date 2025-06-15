@@ -121,7 +121,6 @@ fun ListLichHocSuDungMay(
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text("Tuần", fontWeight = FontWeight.Bold)
                 CustomDropdownSelector(
                     label = "Tuần",
                     items = danhSachTuanTheoNam,
@@ -147,16 +146,16 @@ fun ListLichHocSuDungMay(
                     ) {
                         Text(
                             text = thu,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                             fontSize = 18.sp,
-                            color = Color(0xFF1B8DDE),
+                            color = Color.Black,
                             modifier = Modifier.padding(horizontal = 12.dp)
                         )
 
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp, start = 12.dp),
+                                .padding(top = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(lichTrongThu) { lichhoc ->

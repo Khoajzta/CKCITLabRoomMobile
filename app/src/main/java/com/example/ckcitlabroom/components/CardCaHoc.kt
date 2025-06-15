@@ -78,7 +78,7 @@ fun CardCaHoc(
                 expanded = !expanded
             }
             .animateContentSize(
-                animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 20, easing = FastOutSlowInEasing)
             ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(12.dp),
@@ -134,15 +134,6 @@ fun CardCaHoc(
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-//                    Button(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        onClick = { showConfirmDialog = true },
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffAC0808)),
-//                        shape = RoundedCornerShape(12.dp)
-//                    ) {
-//                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
-//                    }
-
                     Button(
                         onClick = {
                             navController.navigate(NavRoute.EDITCAHOC.route + "?maca=${caHoc.MaCaHoc}")

@@ -155,18 +155,18 @@ fun PhongMayDonNhapScreen(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { showDialog = true },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                    Text("Chỉnh sửa", color = Color.Black, fontWeight = FontWeight.ExtraBold)
                 }
             }else{
                 Button(
                     modifier = Modifier.width(180.dp),
                     onClick = { showDialog = true },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff369f3d))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                    Text("Chỉnh sửa", color = Color.Black, fontWeight = FontWeight.ExtraBold)
                 }
 
                 Button(

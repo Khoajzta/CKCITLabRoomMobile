@@ -1,6 +1,14 @@
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +48,7 @@ import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Mail
 import com.composables.icons.lucide.User
 import com.composables.icons.lucide.Users
+import com.example.ckcitlabroom.models.CaHoc
 
 @Composable
 fun CardGiangVien(
@@ -59,15 +68,19 @@ fun CardGiangVien(
 
     Card(
         modifier = Modifier
+            .padding(bottom = 8.dp)
             .fillMaxWidth()
-            .padding(bottom = 12.dp)
-            .clickable {
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
                 expanded = !expanded
             }
-            .animateContentSize(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(7.dp),
+            .animateContentSize(
+                animationSpec = tween(durationMillis = 20, easing = FastOutSlowInEasing)
+            ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(12.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -109,29 +122,33 @@ fun CardGiangVien(
                 Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-            if (expanded) {
-                Spacer(modifier = Modifier.height(12.dp))
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { showDialog = true },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
+                    ) {
+                        Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
 
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { showDialog = true },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
-                ) {
-                    Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
-                }
-
-                Button(
-                    onClick = {
-                        navController.navigate(NavRoute.EDITGIANGVIEN.route + "?magv=${giangVien.MaGV}")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE))
-                ) {
-                    Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
+                    Button(
+                        onClick = {
+                            navController.navigate(NavRoute.EDITGIANGVIEN.route + "?magv=${giangVien.MaGV}")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE))
+                    ) {
+                        Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
                 }
             }
         }

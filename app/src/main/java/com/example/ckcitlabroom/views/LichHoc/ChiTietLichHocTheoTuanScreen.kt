@@ -140,7 +140,7 @@ fun ChiTietLichHocScreen(
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp, start = 12.dp),
+                                .padding(top = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(lichTrongThu) { lichHoc ->

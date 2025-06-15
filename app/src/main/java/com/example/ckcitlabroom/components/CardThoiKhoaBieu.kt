@@ -50,7 +50,7 @@ fun CardThoiKhoaBieuTuan(
     }
 
     val caHocList = caHocViewModel.danhSachAllCaHoc
-    val thuList = listOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN")
+    val thuList = listOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật")
 
     val lichHocTheoCaThu = remember(lichHocList, caHocList) {
         caHocList.associate { ca ->
