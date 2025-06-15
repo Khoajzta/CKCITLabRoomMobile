@@ -381,7 +381,5 @@ fun CreatePhieuMuonMayScreen(
             datePickerDialog.setOnDismissListener { showDatePicker = false }
             datePickerDialog.show()
         }
-
-
     }
 }

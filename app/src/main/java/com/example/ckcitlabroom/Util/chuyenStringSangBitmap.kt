@@ -84,7 +84,7 @@ fun createPdfWithQRCodeBase64(
 
             // Vẽ tên máy dưới QR
             canvas.drawText(
-                may.TenMay,
+                may.ViTri,
                 (currentX + qrSize / 2).toFloat(),
                 (currentY + qrSize + 20).toFloat(),
                 paintTenMay

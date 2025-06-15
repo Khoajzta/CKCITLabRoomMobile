@@ -37,7 +37,13 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 @Composable
 fun QuanLyChuyenMayScreen(
     navController: NavHostController,
+    mayTinhViewModel: MayTinhViewModel
 ) {
+
+    LaunchedEffect (Unit) {
+        mayTinhViewModel.clearDanhSachMayTinhDuocChon()
+    }
+
     val dsChucNang =
         listOf(
             ChucNang("Danh Sách Phòng Máy", iconComputer, Click = { navController.navigate(NavRoute.LISTPHONGMAYCHUYEN.route) }),

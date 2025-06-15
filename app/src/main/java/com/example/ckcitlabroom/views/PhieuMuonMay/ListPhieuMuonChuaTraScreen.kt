@@ -42,9 +42,7 @@ fun ListPhieuMuonChuaTra(
 ){
 
     LaunchedEffect (Unit) {
-
-            mayTinhViewModel.clearDanhSachMayTinhDuocChon()
-
+        mayTinhViewModel.clearDanhSachMayTinhDuocChon()
     }
     val danhsachAllPhieuMuonMay = phieuMuonMayViewModel.danhSachAllPhieuMuonMay
 

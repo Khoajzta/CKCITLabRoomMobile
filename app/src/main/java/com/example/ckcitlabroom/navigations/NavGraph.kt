@@ -585,7 +585,7 @@ fun NavgationGraph(
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
             val maphong = navBackStackEntry.arguments?.getString("maphong") ?: ""
-            PhongMayChuyenScreen(maphong,navController,phongMayViewModel,mayTinhViewModel,lichSuChuyenMayViewModel)
+            PhongMayChuyenScreen(maphong,phongMayViewModel,mayTinhViewModel,lichSuChuyenMayViewModel)
         }
 
         composable(
@@ -618,9 +618,8 @@ fun NavgationGraph(
             val maphong = navBackStackEntry.arguments?.getString("maphong") ?: ""
 
             ChiTietDonNhapChuyenScreen(
-                maphong,
                 madonnhap,
-                navController,
+                maphong,
                 chiTietDonNhapyViewModel,
                 phongMayViewModel,
                 mayTinhViewModel,
@@ -674,7 +673,7 @@ fun NavgationGraph(
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
-            QuanLyChuyenMayScreen(navController)
+            QuanLyChuyenMayScreen(navController,mayTinhViewModel)
         }
 
         composable(
