@@ -58,13 +58,6 @@ fun QuanLyPhieuMuonMayScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Quản Lý Phiếu Mượn Máy",
-            color = Color(0xFF1B8DDE),
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 20.sp
-        )
-
         HorizontalDivider(
             modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
             thickness = 2.dp,

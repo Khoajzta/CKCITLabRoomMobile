@@ -84,12 +84,31 @@ fun CardCaHoc(
         shape = RoundedCornerShape(12.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Thông tin ca học",
-                color = Color(0xFF1B8DDE),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = caHoc.TenCa,
+                    color = Color(0xFF1B8DDE),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+
+                val (color, statusText, statusIcon) = when (caHoc.TrangThai) {
+                    1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
+                    0 -> Triple(Color(0xFFF44336), "Bận", Lucide.CircleX)
+                    else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(statusText, color = color, fontWeight = FontWeight.SemiBold)
+                }
+            }
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
@@ -97,36 +116,10 @@ fun CardCaHoc(
                 color = Color(0xFFDDDDDD),
             )
 
-            InfoRow(icon = Lucide.Hash, label = "Mã ca học", value = caHoc.MaCaHoc.toString())
-            Spacer(Modifier.height(8.dp))
-            InfoRow(icon = Lucide.Clock, label = "Tên ca", value = caHoc.TenCa)
-            Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.Timer, label = "Giờ bắt đầu", value = caHoc.GioBatDau)
             Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.TimerOff, label = "Giờ kết thúc", value = caHoc.GioKetThuc)
 
-            val (color, statusText, statusIcon) = when (caHoc.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFFF44336), "Bận", Lucide.CircleX)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ", fontWeight = FontWeight.Medium)
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
-            }
 
             AnimatedVisibility(
                 visible = expanded,
@@ -159,18 +152,19 @@ fun CardCaHoc(
                             containerColor = Color.White,
                             onDismissRequest = { showDialog = false },
                             title = {
-                                Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
+                                Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.SemiBold)
                             },
                             text = {
-                                Text("Ca: ${caHoc.TenCa}", color = Color.Black)
+                                Text("${caHoc.TenCa}", color = Color.Black,fontWeight = FontWeight.Bold, fontSize = 20.sp)
                             },
                             confirmButton = {
-                                Row(
+                                Column (
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Button(
-                                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                                        modifier = Modifier.fillMaxWidth(),
                                         onClick = {
                                             caHocViewModel.updateTrangThaiCaHoc(
                                                 CaHoc(caHoc.MaCaHoc, caHoc.TenCa, caHoc.GioBatDau, caHoc.GioKetThuc, 1)
@@ -184,7 +178,7 @@ fun CardCaHoc(
                                     }
 
                                     Button(
-                                        modifier = Modifier.weight(1f),
+                                        modifier = Modifier.fillMaxWidth(),
                                         onClick = {
                                             caHocViewModel.updateTrangThaiCaHoc(
                                                 CaHoc(caHoc.MaCaHoc, caHoc.TenCa, caHoc.GioBatDau, caHoc.GioKetThuc, 0)
@@ -194,7 +188,7 @@ fun CardCaHoc(
                                         shape = RoundedCornerShape(12.dp),
                                         colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
                                     ) {
-                                        Text("Bận", color = Color.White)
+                                        Text("Ngừng Hoạt Động", color = Color.White)
                                     }
                                 }
                             }

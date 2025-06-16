@@ -117,12 +117,14 @@ fun PhongMayChuyenMuonScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Máy Tính Phòng",
+                "Danh Sách Máy Tính",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
         }
+
+
 
         LazyColumn(
             modifier = Modifier.weight(1f)

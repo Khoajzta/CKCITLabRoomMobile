@@ -50,9 +50,9 @@ fun ChiTietLichSuChuyenMay(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Lịch sử chuyển phòng" , fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1B8DDE))
+            Text("Lịch sử chuyển phòng" , fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1B8DDE))
 
-            Text("Số lần: ${danhsachlichsu.count()}" , fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1B8DDE))
+            Text("Số lần: ${danhsachlichsu.count()}" , fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1B8DDE))
         }
 
         HorizontalDivider(

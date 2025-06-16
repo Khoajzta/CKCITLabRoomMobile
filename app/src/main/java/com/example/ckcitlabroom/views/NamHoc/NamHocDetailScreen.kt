@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -40,24 +41,30 @@ fun NamHocDetailScreen(
     ) {
 
         Row (
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
                 text = "Danh sách tuần",
-                fontWeight = FontWeight.ExtraBold,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
 
             Text(
                 text = "Số Tuần: ${danhSachTuan.size}",
-                fontWeight = FontWeight.ExtraBold,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
+        )
 
 
         Spacer(modifier = Modifier.height(8.dp))

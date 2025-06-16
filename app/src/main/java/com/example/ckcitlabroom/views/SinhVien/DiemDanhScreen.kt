@@ -74,7 +74,7 @@ fun DiemDanhScreen(
     Column(
         modifier = Modifier
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
         Text(
             text = "Điểm danh hôm nay",

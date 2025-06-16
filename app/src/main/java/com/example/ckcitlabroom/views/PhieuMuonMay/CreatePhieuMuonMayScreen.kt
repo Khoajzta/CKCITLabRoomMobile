@@ -129,7 +129,7 @@ fun CreatePhieuMuonMayScreen(
                     .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text("Tạo Phiếu Sửa Chữa ", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                Text("Tạo Phiếu Mượn ", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             }
 
             Text(

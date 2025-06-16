@@ -112,15 +112,13 @@ fun CardDonNhap(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = "Thông tin đơn nhập",
+                text = "Đơn nhập: ${donNhap.MaDonNhap}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 color = Color(0xFF1B8DDE)
             )
 
             Divider(color = Color(0xFFDDDDDD), thickness = 1.dp)
-
-            InfoRow(icon = Lucide.ClipboardList, label = "Mã đơn", value = donNhap.MaDonNhap)
             InfoRow(icon = Lucide.CalendarDays, label = "Ngày nhập", value = formatNgay(donNhap.NgayNhap))
             InfoRow(icon = Lucide.Truck, label = "Nhà cung cấp", value = donNhap.NhaCungCap)
             InfoRow(icon = Lucide.PackagePlus, label = "Đã nhập", value = "${donNhap.SoLuong} máy")

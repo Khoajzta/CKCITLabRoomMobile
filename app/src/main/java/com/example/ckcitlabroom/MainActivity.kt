@@ -24,6 +24,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -177,6 +179,54 @@ fun MainScreen() {
         mayTinhViewModel: MayTinhViewModel,
         currentRoute: String?
     ) {
+        var textTopbar = "Trở lại"
+
+        when (currentRoute){
+            NavRoute.QUANLYDONNHAP.route -> {
+                textTopbar = "Quản Lý Đơn Nhập"
+            }
+            NavRoute.QUANLYPHONGMAY.route -> {
+                textTopbar = "Quản Lý Phòng Máy"
+            }
+            NavRoute.QUANLYCHUYENMAY.route -> {
+                textTopbar = "Quản Lý Chuyển Máy"
+            }
+            NavRoute.QUANLYPHIEUSUACHUA.route -> {
+                textTopbar = "Quản Lý Phiếu Sửa Chữa"
+            }
+            NavRoute.QUANLYPHIEUMUONMAY.route -> {
+                textTopbar = "Quản Lý Phiếu Mượn Máy"
+            }
+            NavRoute.QUANLYGIANGVIEN.route -> {
+                textTopbar = "Quản Lý Giảng Viên"
+            }
+            NavRoute.QUANLYSINHVIEN.route -> {
+                textTopbar = "Quản Lý Sinh Viên"
+            }
+            NavRoute.LISTLICHHOCSUDUNGMAY.route -> {
+                textTopbar = "Quản Lý Điểm Danh"
+            }
+            NavRoute.QUANLYLICHHOC.route -> {
+                if(giangVien!=null){
+                    textTopbar = "Quản Lý Lịch Dạy"
+                }else{
+                    textTopbar = "Quản Lý Lịch Học"
+                }
+            }
+            NavRoute.QUANLYLOPHOC.route -> {
+                textTopbar = "Quản Lý Lớp Học"
+            }
+            NavRoute.QUANLYNAMHOC.route -> {
+                textTopbar = "Quản Lý Năm Học"
+            }
+            NavRoute.QUANLYCAHOC.route -> {
+                textTopbar = "Quản Lý Ca Học"
+            }
+            NavRoute.QUANLYMONHOC.route -> {
+                textTopbar = "Quản Lý Môn Học"
+            }
+        }
+
         when (currentRoute) {
             NavRoute.STARTSCREEN.route,
             NavRoute.LOGINSINHVIEN.route,
@@ -233,22 +283,28 @@ fun MainScreen() {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                     title = {
-                        Text("Trở lại", fontWeight = FontWeight.Bold, color = Color(0xFF1B8DDE))
+                        Text(textTopbar, fontWeight = FontWeight.SemiBold, color = Color(0xFF1B8DDE),modifier = Modifier.padding(start = 15.dp))
                     },
                     navigationIcon = {
                         IconButton(
-                            onClick = {
-                                navController.popBackStack()
-                            }
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier
+                                .padding(start = 12.dp)
+                                .size(40.dp)
+                                .shadow(4.dp, shape = CircleShape)
+                                .background(Color.White, shape = CircleShape)
+                                .border(2.dp, Color.White, shape = CircleShape)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBackIosNew,
                                 contentDescription = "Back",
-                                tint = Color(0xFF1B8DDE)
+                                tint = Color(0xFF1B8DDE),
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }
                 )
+
             }
         }
     }

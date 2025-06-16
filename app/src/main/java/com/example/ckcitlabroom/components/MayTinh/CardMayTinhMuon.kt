@@ -62,11 +62,8 @@ fun CardMayTinhMuon(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Thông tin máy tính", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1B8DDE))
+            Text("Mã máy ${chiTietPhieuMuon.MaMay}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1B8DDE))
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 2.dp)
-
-            InfoRow(Lucide.Cpu, "Mã Máy", chiTietPhieuMuon.MaMay)
-            Spacer(Modifier.height(6.dp))
 
             InfoRow(Lucide.Monitor, "Tên Máy", mayTinh?.TenMay ?: "Đang tải...")
             Spacer(Modifier.height(6.dp))

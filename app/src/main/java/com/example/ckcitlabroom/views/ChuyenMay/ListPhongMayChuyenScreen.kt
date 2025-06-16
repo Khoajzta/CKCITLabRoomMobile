@@ -47,14 +47,14 @@ fun ListPhongMayChuyenScreen(
 
     Column(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
         Text(
             modifier = Modifier.padding(bottom = 16.dp),
             text = "Danh Sách Phòng Máy",
             color = Color(0xFF1B8DDE),
-            fontWeight = FontWeight.ExtraBold,
+            fontWeight = FontWeight.SemiBold,
             fontSize = 20.sp
         )
 
@@ -85,9 +85,8 @@ fun ListPhongMayChuyenScreen(
                 items(danhSachPhongMay) { phongmay ->
                     CardPhongMayChuyen(
                         phongmay,
-                        navController,
                         mayTinhViewModel,
-                        click = {
+                        onClick = {
                             val route =
                                 if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)) {
                                     NavRoute.PHONGKHOCHUYEN.route

@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,13 +50,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.composables.icons.lucide.Building2
-import com.composables.icons.lucide.CircleAlert
-import com.composables.icons.lucide.CircleCheck
-import com.composables.icons.lucide.CircleX
-import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.Monitor
+import com.composables.icons.lucide.*
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
 import java.text.SimpleDateFormat
@@ -132,7 +125,7 @@ fun CardMayTinhChuyen(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Thông tin máy tính",
+                text = "Mã máy: ${maytinh.MaMay}",
                 color = Color(0xFF1B8DDE),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
@@ -144,8 +137,6 @@ fun CardMayTinhChuyen(
                 color = Color(0xFFDDDDDD),
             )
 
-            InfoRow(icon = Lucide.Monitor, label = "Mã Máy", value = maytinh.MaMay)
-            Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = maytinh.TenMay)
             Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.Building2, label = "Phòng hiện tại", value = phongMayCard?.TenPhong ?: "Đang tải...")

@@ -47,13 +47,13 @@ fun ListGiangVienCongTac(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 "Quản Lý Giảng Viên Đang Dạy",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
         }

@@ -536,7 +536,7 @@ fun CreateDonNhapScreen(
                     val sdfInput = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                     val sdfNgayNhap = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                     val sdfMaMay = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
-                    val sdfMaDon = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+                    val sdfMaDon = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
 
                     val parsedDate = try {
                         sdfInput.parse(ngayNhapState.value)

@@ -55,14 +55,6 @@ fun QuanLyChuyenMayScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            modifier = Modifier.padding(bottom = 16.dp),
-            text = "Quản Lý Chuyển Máy",
-            color = Color(0xFF1B8DDE),
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 20.sp
-        )
-
         HorizontalDivider(
             modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
             thickness = 2.dp,

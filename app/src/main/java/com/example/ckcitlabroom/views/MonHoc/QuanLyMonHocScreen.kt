@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.composables.icons.lucide.*
 
 @Composable
 fun QuanLyMonHocScreen(
@@ -28,23 +29,23 @@ fun QuanLyMonHocScreen(
 
     val dsChucNang =
         listOf(
-            ChucNang("Danh Sách Môn Học Đang Dạy", Icons.Outlined.MenuBook, Click = {navController.navigate(NavRoute.LISTMONHOCDANGDAY.route)}),
-            ChucNang("Danh Sách Môn Học Ngừng Dạy", Icons.Outlined.MenuBook, Click = {navController.navigate(NavRoute.LISTMONHOCNGUNGDAY.route)}),
-            ChucNang("Thêm Môn Học", Icons.Outlined.AddCircle, Click = {navController.navigate(NavRoute.ADDMONHOC.route)}),
+            ChucNang("Danh Sách Môn Học Đang Dạy", Lucide.BookOpen, Click = {
+                navController.navigate(NavRoute.LISTMONHOCDANGDAY.route)
+            }),
+            ChucNang("Danh Sách Môn Học Ngừng Dạy", Lucide.BookX, Click = {
+                navController.navigate(NavRoute.LISTMONHOCNGUNGDAY.route)
+            }),
+            ChucNang("Thêm Môn Học", Lucide.BookPlus, Click = {
+                navController.navigate(NavRoute.ADDMONHOC.route)
+            })
         )
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Quản Lý Môn Học",
-            color = Color(0xFF1B8DDE),
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 20.sp
-        )
-
         HorizontalDivider(
             modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
             thickness = 2.dp,

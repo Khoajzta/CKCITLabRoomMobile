@@ -46,8 +46,10 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.unit.sp
+import com.composables.icons.lucide.CircleX
 
 @Composable
 fun CardNamHoc(
@@ -79,12 +81,30 @@ fun CardNamHoc(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            Text(
-                text = "Thông tin năm học",
-                color = Color(0xFF1B8DDE),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Mã năm: ${namHoc.MaNam}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color(0xFF1B8DDE)
+                )
+
+                val (color, statusText, statusIcon) = when (namHoc.TrangThai) {
+                    0 -> Triple(Color(0xFF1B8DDE), "Đã Kết Thúc", Lucide.CircleCheck)
+                    1 -> Triple(Color(0xFF4CAF50), "Đang Diễn Ra", Lucide.Clock)
+                    else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(statusText, color = color, fontWeight = FontWeight.SemiBold)
+                }
+            }
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
@@ -92,36 +112,11 @@ fun CardNamHoc(
                 color = Color(0xFFDDDDDD),
             )
 
-            InfoRow(icon = Lucide.Tag, label = "Mã Năm Học", value = namHoc.MaNam)
-            Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.BookOpen, label = "Tên Năm Học", value = namHoc.TenNam)
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Icons.Default.CalendarToday, label = "Ngày Bắt Đầu", value = formatNgay(namHoc.NgayBatDau))
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Icons.Default.CalendarToday, label = "Ngày Kết Thúc", value = formatNgay(namHoc.NgayKetThuc))
-
-            val (color, statusText, statusIcon) = when (namHoc.TrangThai) {
-                0 -> Triple(Color(0xFF1B8DDE), "Đã Kết Thúc", Lucide.CircleCheck)
-                1 -> Triple(Color(0xFF4CAF50), "Đang Diễn Ra", Lucide.Clock)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold)
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
-            }
 
             // Chỉ hiển thị nút nếu trạng thái != 0
             AnimatedVisibility(

@@ -88,7 +88,7 @@ fun CardMonHoc(
         Column(modifier = Modifier.padding(16.dp)) {
 
             Text(
-                text = "Thông tin môn học",
+                text = monhoc.TenMonHoc,
                 color = Color(0xFF1B8DDE),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
@@ -103,8 +103,6 @@ fun CardMonHoc(
             )
 
             InfoRow(icon = Lucide.Hash, label = "Mã Môn Học", value = monhoc.MaMonHoc)
-            Spacer(modifier = Modifier.height(8.dp))
-            InfoRow(icon = Lucide.School, label = "Tên Môn Học", value = monhoc.TenMonHoc)
 
             val (color, statusText, statusIcon) = when (monhoc.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Đang Dạy", Lucide.CircleCheck)

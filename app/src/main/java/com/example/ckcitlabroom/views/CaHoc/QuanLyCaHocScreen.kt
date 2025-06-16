@@ -50,14 +50,13 @@ fun QuanLyCaHoc(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Ca Học",
-                fontWeight = FontWeight.ExtraBold,
+                "Danh Sách Ca Học",
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 22.sp,
                 color = Color(0xFF1B8DDE)
             )
@@ -67,7 +66,7 @@ fun QuanLyCaHoc(
                 }
             ) {
                 Icon(
-                    modifier = Modifier.size(35.dp),
+                    modifier = Modifier.size(30.dp),
                     imageVector = Icons.Outlined.AddCircle,
                     contentDescription = "Thêm ca học",
                     tint = Color(0xFF1B8DDE)

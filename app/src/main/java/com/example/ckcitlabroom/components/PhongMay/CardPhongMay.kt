@@ -35,6 +35,7 @@ import androidx.navigation.NavHostController
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
+import com.composables.icons.lucide.Cpu
 import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Warehouse
@@ -47,10 +48,8 @@ fun CardPhongMay(
     phongMayViewModel: PhongMayViewModel,
     mayTinhViewModel: MayTinhViewModel
 ) {
-
-    var danhsachmaytinh = mayTinhViewModel.danhSachAllMayTinh
-    val soLuongMay = danhsachmaytinh?.count { it.MaPhong == phongmay.MaPhong } ?: 0
-
+    val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
+    val soLuongMay = danhSachMayTinh?.count { it.MaPhong == phongmay.MaPhong } ?: 0
     var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -76,20 +75,21 @@ fun CardPhongMay(
         Column(modifier = Modifier.padding(16.dp)) {
 
             Text(
-                text = "Thông tin phòng máy",
-                color = Color(0xFF1B8DDE),
+                text = "Phòng Máy: ${phongmay.TenPhong}",
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                color = Color(0xFF1B8DDE)
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-                thickness = 2.dp,
+                modifier = Modifier.padding(vertical = 8.dp),
+                thickness = 1.5.dp,
                 color = Color(0xFFDDDDDD),
             )
-            InfoRow(icon = Lucide.Warehouse, label = "Phòng", value = phongmay.TenPhong)
-            Spacer(modifier = Modifier.height(8.dp))
-            InfoRow(icon = Lucide.Hash, label = "Số lượng máy", value = soLuongMay.toString())
+
+//            InfoRow(icon = Lucide.Warehouse, label = "Tên phòng", value = phongmay.TenPhong)
+//            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Lucide.Cpu, label = "Số lượng máy", value = "$soLuongMay máy")
 
             val (color, statusText, statusIcon) = when (phongmay.TrangThai) {
                 1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
@@ -99,11 +99,11 @@ fun CardPhongMay(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
             ) {
                 Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ", fontWeight = FontWeight.Medium)
+                Spacer(Modifier.width(8.dp))
+                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold)
                 Box(
                     modifier = Modifier
                         .size(10.dp)
@@ -111,14 +111,12 @@ fun CardPhongMay(
                         .background(color)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
+                Text(statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
             Button(
-                modifier = Modifier.fillMaxWidth(),
                 onClick = { showDialog = true },
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE))
             ) {
@@ -127,10 +125,10 @@ fun CardPhongMay(
 
             if (showDialog) {
                 AlertDialog(
-                    containerColor = Color.White,
                     onDismissRequest = { showDialog = false },
+                    containerColor = Color.White,
                     title = {
-                        Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
+                        Text("Cập nhật trạng thái", fontWeight = FontWeight.Bold, color = Color.Black)
                     },
                     text = {
                         Text("Phòng: ${phongmay.TenPhong}", color = Color.Black)
@@ -141,13 +139,13 @@ fun CardPhongMay(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Button(
-                                modifier = Modifier.weight(1f).padding(end = 8.dp),
                                 onClick = {
                                     phongMayViewModel.updateTrangThaiPhongMay(
                                         PhongMay(phongmay.MaPhong, phongmay.TenPhong, 1)
                                     )
                                     showDialog = false
                                 },
+                                modifier = Modifier.weight(1f).padding(end = 8.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
                             ) {
@@ -155,13 +153,13 @@ fun CardPhongMay(
                             }
 
                             Button(
-                                modifier = Modifier.weight(1f),
                                 onClick = {
                                     phongMayViewModel.updateTrangThaiPhongMay(
                                         PhongMay(phongmay.MaPhong, phongmay.TenPhong, 0)
                                     )
                                     showDialog = false
                                 },
+                                modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
                             ) {
@@ -173,7 +171,7 @@ fun CardPhongMay(
             }
         }
     }
-
 }
+
 
 

@@ -1,6 +1,7 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -87,12 +88,29 @@ fun CardMayTinhLichSu(
     ){
         Column(modifier = Modifier.padding(16.dp)) {
 
-            Text(
-                text = "Thông tin máy tính",
-                color = Color(0xFF1B8DDE),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Mã máy: ${maytinh.MaMay}",
+                    color = Color(0xFF1B8DDE),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+                val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
+                    1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
+                    0 -> Triple(Color(0xFFF44336), "Bảo trì", Lucide.CircleX)
+                    else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(statusText, color = color, fontWeight = FontWeight.SemiBold)
+                }
+            }
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
@@ -100,12 +118,6 @@ fun CardMayTinhLichSu(
                 color = Color(0xFFDDDDDD),
             )
 
-            InfoRow(
-                icon = Lucide.ClipboardList,
-                label = "Mã Máy",
-                value = maytinh?.MaMay ?: "Đang tải..."
-            )
-            Spacer(Modifier.height(6.dp))
             InfoRow(
                 icon = Lucide.Cpu,
                 label = "Tên Máy",
@@ -118,43 +130,6 @@ fun CardMayTinhLichSu(
                 label = "Phòng hiện tại",
                 value = phongMayCard?.TenPhong ?: "Đang tải..."
             )
-            Spacer(Modifier.height(6.dp))
-
-            val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFFF44336), "Đang bảo trì", Lucide.CircleX)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = statusIcon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = "Trạng thái:",
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.width(6.dp))
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = statusText,
-                    color = color,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp
-                )
-            }
         }
     }
 }

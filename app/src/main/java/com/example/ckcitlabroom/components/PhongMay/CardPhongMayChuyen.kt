@@ -21,6 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.*
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -38,15 +41,16 @@ import com.example.lapstore.viewmodels.MayTinhViewModel
 @Composable
 fun CardPhongMayChuyen(
     phongmay: PhongMay,
-    navController: NavHostController,
     mayTinhViewModel: MayTinhViewModel,
-    click:()-> Unit
+    onClick: () -> Unit
 ) {
-    val danhsachmaytinh = mayTinhViewModel.danhSachAllMayTinh
-    val soLuongMay = danhsachmaytinh?.count { it.MaPhong == phongmay.MaPhong } ?: 0
-
     LaunchedEffect(Unit) {
         mayTinhViewModel.getAllMayTinh()
+    }
+
+    val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
+    val soLuongMay by remember(danhSachMayTinh) {
+        mutableStateOf(danhSachMayTinh?.count { it.MaPhong == phongmay.MaPhong } ?: 0)
     }
 
     val (color, statusText, statusIcon) = when (phongmay.TrangThai) {
@@ -56,69 +60,61 @@ fun CardPhongMayChuyen(
     }
 
     Card(
+        onClick = onClick,
         modifier = Modifier
-            .padding(bottom = 8.dp)
             .fillMaxWidth()
-            .width(300.dp)
-            .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
-        onClick = {
-            click()
-        },
+            .padding(vertical = 8.dp)
+            .shadow(6.dp, shape = RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(10.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Thông tin phòng máy",
-                color = Color(0xFF1B8DDE),
+                text = "Phòng Máy: ${phongmay.TenPhong}",
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                color = Color(0xFF1B8DDE)
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-                thickness = 2.dp,
-                color = Color(0xFFDDDDDD),
+                modifier = Modifier.padding(vertical = 4.dp),
+                thickness = 1.dp,
+                color = Color(0xFFCCCCCC)
             )
 
-            InfoRow(
-                icon = Lucide.Warehouse, label = "Phòng", value = phongmay.TenPhong
-            )
+            InfoRow(icon = Lucide.Hash, label = "Số lượng máy", value = soLuongMay.toString())
 
-            InfoRow(
-                icon = Lucide.Hash, label = "Số lượng máy", value = soLuongMay.toString()
-            )
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
                 Icon(
                     imageVector = statusIcon,
-                    contentDescription = "Trạng thái",
+                    contentDescription = null,
                     tint = color,
                     modifier = Modifier.size(20.dp)
                 )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "Trạng thái: ", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp
-                )
+                Spacer(Modifier.width(6.dp))
+                Text("Trạng thái:", fontWeight = FontWeight.ExtraBold)
+                Spacer(Modifier.width(6.dp))
                 Box(
                     modifier = Modifier
                         .size(10.dp)
                         .clip(CircleShape)
                         .background(color)
                 )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = statusText, color = color, fontWeight = FontWeight.Bold, fontSize = 16.sp
-                )
+                Spacer(Modifier.width(4.dp))
+                Text(statusText, color = color, fontWeight = FontWeight.Bold)
             }
         }
     }
 }
+
+
 
 
 

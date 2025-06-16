@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -48,15 +50,14 @@ fun QuanLyLopHoc(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Lớp Học",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
+                "Danh Sách Lớp Học",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
             IconButton(
@@ -65,12 +66,19 @@ fun QuanLyLopHoc(
                 }
             ) {
                 Icon(
+                    modifier = Modifier.size(30.dp),
                     imageVector = Icons.Outlined.AddCircle,
                     contentDescription = "Thêm lớp học",
                     tint = Color(0xFF1B8DDE)
                 )
             }
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
+        )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()

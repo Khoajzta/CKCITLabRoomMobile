@@ -112,7 +112,7 @@ fun CardLichHoc(
             InfoRow(
                 icon = Icons.Filled.NoteAlt,
                 label = "Thông báo",
-                value = if (!lichHoc.GhiChu.isNullOrBlank()) lichHoc.GhiChu else "Không có ghi chú"
+                value = if (!lichHoc.GhiChu.isNullOrBlank()) lichHoc.GhiChu else "Không có thông báo"
             )
 
             val (color, statusText, statusIcon) = when (lichHoc.TrangThai) {

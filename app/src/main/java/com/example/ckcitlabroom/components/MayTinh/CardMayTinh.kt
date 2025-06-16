@@ -8,8 +8,8 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -42,29 +42,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.composables.icons.lucide.Building2
-import com.composables.icons.lucide.CircleAlert
-import com.composables.icons.lucide.CircleCheck
-import com.composables.icons.lucide.CircleX
-import com.composables.icons.lucide.Cpu
-import com.composables.icons.lucide.HardDrive
-import com.composables.icons.lucide.Keyboard
-import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.MapPin
-import com.composables.icons.lucide.MemoryStick
-import com.composables.icons.lucide.Monitor
-import com.composables.icons.lucide.MousePointer2
+import com.composables.icons.lucide.*
 import com.example.lapstore.viewmodels.MayTinhViewModel
-import android.graphics.Paint
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.ui.graphics.vector.ImageVector
-
-
 
 @Composable
 fun CardMayTinh(
@@ -73,20 +57,7 @@ fun CardMayTinh(
     maytinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel
 ) {
-
-
-//    val qrText = maytinh.QRCode
-//
-//    val qrBitmap = remember(qrText) {
-//        generateQRCode(qrText, 300)  // kích thước 300x300 px
-//    }
-
-
-
-
     var expanded by remember { mutableStateOf(false) }
-    var showConfirmDialog by remember { mutableStateOf(false) }
-
     var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
 
     LaunchedEffect(maytinh.MaPhong) {
@@ -95,139 +66,89 @@ fun CardMayTinh(
 
     Card(
         modifier = Modifier
-            .padding(bottom = 15.dp)
+            .padding(bottom = 12.dp)
             .fillMaxWidth()
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) { expanded = !expanded }
-            .animateContentSize(animationSpec = tween(20, easing = FastOutSlowInEasing)),
+            .border(1.dp, Color.White, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { expanded = !expanded }
+            .animateContentSize(tween(300)),
+        elevation = CardDefaults.cardElevation(6.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Thông tin máy tính",
-                color = Color(0xFF1B8DDE),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Mã máy: ${maytinh.MaMay}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color(0xFF1B8DDE)
+                )
+
+                val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
+                    1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
+                    0 -> Triple(Color(0xFFF44336), "Bảo trì", Lucide.CircleX)
+                    else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(statusText, color = color, fontWeight = FontWeight.SemiBold)
+                }
+            }
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-                thickness = 2.dp,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
+                thickness = 1.dp,
                 color = Color(0xFFDDDDDD),
             )
 
-            // QR Code
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                QRCodeImage(base64Str = maytinh.QRCode, modifier = Modifier.size(120.dp))
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Basic info
-            InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = maytinh.TenMay)
-            Spacer(Modifier.height(8.dp))
-            InfoRow(icon = Lucide.MapPin, label = "Vị Trí Máy", value = maytinh.ViTri)
-            Spacer(Modifier.height(8.dp))
+            InfoRow(icon = Lucide.QrCode, label = "Tên máy", value = maytinh.TenMay)
+            InfoRow(icon = Lucide.MapPin, label = "Vị trí", value = maytinh.ViTri)
             InfoRow(icon = Lucide.Building2, label = "Phòng", value = phongMayCard?.TenPhong ?: "Đang tải...")
 
-            val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Đang hoạt động", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFFF44336), "Đang bảo trì", Lucide.CircleX)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
+            if (expanded) {
+                Spacer(Modifier.height(12.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)) {
-                Icon(statusIcon, contentDescription = "Trạng thái", tint = color, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(8.dp))
-                Text("Trạng thái:", fontWeight = FontWeight.Medium)
-                Spacer(Modifier.width(6.dp))
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color, fontWeight = FontWeight.Bold)
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            AnimatedVisibility(
-                visible = expanded,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     InfoRow(icon = Lucide.Cpu, label = "Main", value = maytinh.Main)
                     InfoRow(icon = Lucide.Cpu, label = "CPU", value = maytinh.CPU)
                     InfoRow(icon = Lucide.MemoryStick, label = "RAM", value = maytinh.RAM)
-                    InfoRow(icon = Lucide.Monitor, label = "VGA", value = maytinh.VGA)
-                    InfoRow(icon = Lucide.Monitor, label = "Màn Hình", value = maytinh.ManHinh)
-                    InfoRow(icon = Lucide.Keyboard, label = "Bàn Phím", value = maytinh.BanPhim)
-                    InfoRow(icon = Lucide.MousePointer2, label = "Chuột", value = maytinh.Chuot)
                     InfoRow(icon = Lucide.HardDrive, label = "HDD", value = maytinh.HDD)
                     InfoRow(icon = Lucide.HardDrive, label = "SSD", value = maytinh.SSD)
+                    InfoRow(icon = Lucide.Monitor, label = "Màn hình", value = maytinh.ManHinh)
+                    InfoRow(icon = Lucide.Keyboard, label = "Bàn phím", value = maytinh.BanPhim)
+                    InfoRow(icon = Lucide.Mouse, label = "Chuột", value = maytinh.Chuot)
 
                     Spacer(modifier = Modifier.height(12.dp))
-
                     Button(
                         onClick = {
                             navController.navigate(NavRoute.EDITMAYTINH.route + "?mamay=${maytinh.MaMay}")
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE))
                     ) {
-                        Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
     }
-
-
-    // Dialog xác nhận xóa
-    if (showConfirmDialog) {
-        AlertDialog(
-            onDismissRequest = { showConfirmDialog = false },
-            title = { Text("Xác nhận", color = Color.Black, fontWeight = FontWeight.Bold) },
-            text = { Text("Bạn có chắc chắn muốn xóa máy tính này không?", fontWeight = FontWeight.Bold, color = Color.Black) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        maytinhViewModel.deleteMayTinh(maytinh.MaMay)
-                        showConfirmDialog = false
-                    }
-                ) {
-                    Text("Xóa", color = Color.Red)
-                }
-            },
-            dismissButton = {
-                Button(
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-                    onClick = { showConfirmDialog = false }
-                ) {
-                    Text("Hủy", color = Color.White)
-                }
-            },
-            containerColor = Color.White
-        )
-    }
 }
 
 
-//                    Button(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        onClick = {
-//                            showConfirmDialog = true
-//                        },
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336)),
-//                        shape = RoundedCornerShape(12.dp)
-//                    ) {
-//                        Text("Xóa", fontWeight = FontWeight.Bold, color = Color.White)
-//                    }
+
+//    val qrText = maytinh.QRCode
+//
+//    val qrBitmap = remember(qrText) {
+//        generateQRCode(qrText, 300)  // kích thước 300x300 px
+//    }
 

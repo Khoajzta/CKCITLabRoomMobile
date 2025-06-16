@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -46,14 +47,13 @@ fun QuanLyNamHocScreen(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Năm Học ",
-                fontWeight = FontWeight.ExtraBold,
+                "Danh Sách Năm Học ",
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
@@ -66,10 +66,16 @@ fun QuanLyNamHocScreen(
                     imageVector = Icons.Filled.AddCircle,
                     contentDescription = "Thêm năm học",
                     tint = Color(0xFF1B8DDE),
-                    modifier = Modifier.size(35.dp)
+                    modifier = Modifier.size(30.dp)
                 )
             }
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
+        )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()

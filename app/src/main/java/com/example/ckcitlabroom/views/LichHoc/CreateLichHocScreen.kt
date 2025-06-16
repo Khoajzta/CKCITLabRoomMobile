@@ -147,7 +147,7 @@ fun CreateLichHocScreen(
 
             Text(
                 modifier = Modifier.padding(bottom = 16.dp),
-                text = "Thêm Lịch Học",
+                text = "Thêm Lịch Dạy",
                 color = Color(0xFF1B8DDE),
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp

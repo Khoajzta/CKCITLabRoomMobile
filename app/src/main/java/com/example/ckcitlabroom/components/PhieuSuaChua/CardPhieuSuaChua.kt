@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,8 +63,7 @@ fun CardPhieuSuaChua(
     mayTinhViewModel: MayTinhViewModel,
     giangVienViewModel: GiangVienViewModel
 ) {
-    var giangVien = giangVienViewModel.giangvienSet
-
+    val giangVien = giangVienViewModel.giangvienSet
     var showDialog by remember { mutableStateOf(false) }
 
     val lichSuSuaMay = lichSuSuaMayViewModel.lichSuSuaMayMap[phieuSuaChuarp.MaPhieuSuaChua.toString()]
@@ -72,104 +72,73 @@ fun CardPhieuSuaChua(
         lichSuSuaMayViewModel.getLichSuTheoMaPhieu(phieuSuaChuarp.MaPhieuSuaChua.toString())
     }
 
-    val ngaysuaxong = remember(lichSuSuaMay) {
-        if (lichSuSuaMay == null || lichSuSuaMay.NgaySuaXong.isNullOrBlank()) {
-            "Chưa sửa xong"
-        } else {
-            formatNgay(lichSuSuaMay.NgaySuaXong)
-        }
+    val ngaySuaXong = remember(lichSuSuaMay) {
+        lichSuSuaMay?.NgaySuaXong?.takeIf { it.isNotBlank() }?.let { formatNgay(it) }
+            ?: "Chưa sửa xong"
     }
 
-
-    val nguoiBaoHongLabel = when (phieuSuaChuarp.MaLoaiTaiKhoan) {
-        1 -> "MaGV"     // Admin
-        2 -> "MaGV"    // Giảng viên
-        3 -> "MSSV"    // Sinh viên
-        else -> "Mã Người Báo Hỏng"
+    val (statusColor, statusText, statusIcon) = when (phieuSuaChuarp.TrangThai) {
+        1 -> Triple(Color(0xFF4CAF50), "Đã Sửa Chữa", Lucide.CircleCheck)
+        0 -> Triple(Color(0xFF1B8DDE), "Đang Sửa Chữa", Lucide.Clock)
+        else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
     }
 
     Card(
         modifier = Modifier
-            .padding(bottom = 12.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 7.dp),
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
             Text(
-                text = "Thông tin phiếu sửa chữa",
-                color = Color(0xFF1B8DDE),
+                text = "Phiếu Sửa Chữa: ${phieuSuaChuarp.MaPhieuSuaChua}",
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                color = Color(0xFF1B8DDE)
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-                thickness = 2.dp,
+                modifier = Modifier.padding(vertical = 8.dp),
+                thickness = 1.5.dp,
                 color = Color(0xFFDDDDDD),
             )
 
-            InfoRow(icon = Lucide.Cpu, label = "Mã Máy", value = phieuSuaChuarp.MaMay)
+            InfoRow(Lucide.Cpu, "Mã Máy", phieuSuaChuarp.MaMay)
             Spacer(modifier = Modifier.height(8.dp))
-
-            InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = phieuSuaChuarp.TenMay ?: "")
+            InfoRow(Lucide.Monitor, "Tên Máy", phieuSuaChuarp.TenMay ?: "")
             Spacer(modifier = Modifier.height(8.dp))
-
-            InfoRow(icon = Lucide.MapPin, label = "Vị Trí", value = phieuSuaChuarp.ViTri ?: "")
+            InfoRow(Lucide.MapPin, "Vị Trí", phieuSuaChuarp.ViTri ?: "")
             Spacer(modifier = Modifier.height(8.dp))
-
-            InfoRow(
-                icon = Lucide.CalendarDays,
-                label = "Ngày Báo Hỏng",
-                value = formatNgay(phieuSuaChuarp.NgayBaoHong)
-            )
+            InfoRow(Lucide.LayoutTemplate, "Phòng", phieuSuaChuarp.TenPhong ?: "")
             Spacer(modifier = Modifier.height(8.dp))
-
-            InfoRow(
-                icon = Lucide.CircleAlert,
-                label = "Mô Tả Lỗi",
-                value = phieuSuaChuarp.MoTaLoi
-            )
+            InfoRow(Lucide.CalendarDays, "Ngày Báo Hỏng", formatNgay(phieuSuaChuarp.NgayBaoHong))
             Spacer(modifier = Modifier.height(8.dp))
-
-            InfoRow(icon = Lucide.LayoutTemplate, label = "Phòng", value = phieuSuaChuarp.TenPhong ?: "")
+            InfoRow(Lucide.CircleAlert, "Mô Tả Lỗi", phieuSuaChuarp.MoTaLoi)
             Spacer(modifier = Modifier.height(8.dp))
-
-            InfoRow(icon = Lucide.User, label = "Người Báo Hỏng", value = phieuSuaChuarp.TenNguoiBaoHong ?: "")
+            InfoRow(Lucide.User, "Người Báo Hỏng", phieuSuaChuarp.TenNguoiBaoHong ?: "")
             Spacer(modifier = Modifier.height(8.dp))
-
-            InfoRow(icon = Lucide.BadgeInfo, label = nguoiBaoHongLabel, value = phieuSuaChuarp.MaNguoiBaoHong)
+            InfoRow(Lucide.BadgeInfo, "Mã Người Báo Hỏng", phieuSuaChuarp.MaNguoiBaoHong)
             Spacer(modifier = Modifier.height(8.dp))
-
-            InfoRow(icon = Lucide.CalendarDays, label = "Ngày Sửa Xong", value = ngaysuaxong)
-
-            val (color, statusText, statusIcon) = when (phieuSuaChuarp.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Đã Sửa Chữa", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFF1B8DDE), "Đang Sửa Chữa", Lucide.Clock)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
+            InfoRow(Lucide.CalendarDays, "Ngày Sửa Xong", ngaySuaXong)
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(vertical = 8.dp)
             ) {
-                Icon(
-                    statusIcon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(statusIcon, contentDescription = null, tint = statusColor, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold)
+                Text("Trạng thái: ", fontWeight = FontWeight.Medium)
                 Box(
                     modifier = Modifier
                         .size(10.dp)
                         .clip(CircleShape)
-                        .background(color)
+                        .background(statusColor)
                 )
                 Spacer(Modifier.width(4.dp))
-                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
+                Text(statusText, color = statusColor, fontWeight = FontWeight.Bold)
             }
 
             if (phieuSuaChuarp.TrangThai == 0 && giangVien != null) {
@@ -177,66 +146,61 @@ fun CardPhieuSuaChua(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { showDialog = true },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff0b9adc))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE))
                 ) {
                     Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
 
-
             if (showDialog) {
                 AlertDialog(
-                    containerColor = Color.White,
                     onDismissRequest = { showDialog = false },
+                    containerColor = Color.White,
                     title = {
-                        Row (
+                        Text(
+                            "Xác nhận cập nhật trạng thái",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ){
-                            Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
-                        }
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    text = {
+                        Text("Bạn có chắc muốn đánh dấu phiếu này là đã sửa chữa?", color = Color.Black)
                     },
                     confirmButton = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        Button(
+                            onClick = {
+                                val updatedPhieu = PhieuSuaChua(
+                                    MaPhieuSuaChua = phieuSuaChuarp.MaPhieuSuaChua,
+                                    MaMay = phieuSuaChuarp.MaMay,
+                                    NgayBaoHong = phieuSuaChuarp.NgayBaoHong,
+                                    MoTaLoi = phieuSuaChuarp.MoTaLoi,
+                                    MaPhong = phieuSuaChuarp.MaPhong,
+                                    MaNguoiBaoHong = phieuSuaChuarp.MaNguoiBaoHong,
+                                    TrangThai = 1
+                                )
+                                phieuSuaChuaViewModel.updatePhieuSuaChua(updatedPhieu)
+
+                                val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+
+                                val lichSu = LichSuSuaMay(
+                                    MaPhieuSuaChua = phieuSuaChuarp.MaPhieuSuaChua,
+                                    NgaySuaXong = today,
+                                    MaMay = phieuSuaChuarp.MaMay
+                                )
+                                lichSuSuaMayViewModel.createLichSuSuaMay(lichSu)
+
+                                mayTinhViewModel.updateTrangThaiMayTinh(
+                                    MayTinhTrangThaiUpdateRequest(phieuSuaChuarp.MaMay, 1)
+                                )
+
+                                showDialog = false
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
                         ) {
-                            Button(
-                                modifier = Modifier.weight(1f).padding(end = 8.dp),
-                                onClick = {
-
-                                    var phieuSuaChua = PhieuSuaChua(
-                                        MaPhieuSuaChua = phieuSuaChuarp.MaPhieuSuaChua,
-                                        MaMay = phieuSuaChuarp.MaMay,
-                                        NgayBaoHong = phieuSuaChuarp.NgayBaoHong,
-                                        MoTaLoi = phieuSuaChuarp.MoTaLoi,
-                                        MaPhong = phieuSuaChuarp.MaPhong,
-                                        MaNguoiBaoHong = phieuSuaChuarp.MaNguoiBaoHong,
-                                        TrangThai = 1
-                                    )
-                                    phieuSuaChuaViewModel.updatePhieuSuaChua(phieuSuaChua)
-
-                                    val today = LocalDate.now()
-                                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                                    val formattedDate = today.format(formatter)
-
-                                    var lichsusuamay = LichSuSuaMay(
-                                        phieuSuaChuarp.MaPhieuSuaChua,
-                                        today.toString(),
-                                        phieuSuaChuarp.MaMay,
-                                    )
-                                    lichSuSuaMayViewModel.createLichSuSuaMay(lichsusuamay)
-
-                                    var MayTinhTrangThaiUpdateRequest = MayTinhTrangThaiUpdateRequest(phieuSuaChuarp.MaMay,1)
-                                    mayTinhViewModel.updateTrangThaiMayTinh(MayTinhTrangThaiUpdateRequest)
-
-                                    showDialog = false
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                            ) {
-                                Text("Đã Sửa Chữa", color = Color.White)
-                            }
+                            Text("Xác nhận", color = Color.White)
                         }
                     }
                 )
@@ -244,3 +208,4 @@ fun CardPhieuSuaChua(
         }
     }
 }
+

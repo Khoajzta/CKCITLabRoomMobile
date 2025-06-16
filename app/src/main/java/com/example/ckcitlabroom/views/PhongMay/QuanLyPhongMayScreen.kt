@@ -57,8 +57,8 @@ fun QuanLyPhongMay(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Phòng Máy",
-                fontWeight = FontWeight.ExtraBold,
+                "Danh Sách Phòng Máy",
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
@@ -68,7 +68,7 @@ fun QuanLyPhongMay(
                 }
             ) {
                 Icon(
-                    modifier = Modifier.size(35.dp),
+                    modifier = Modifier.size(30.dp),
                     imageVector = Icons.Filled.AddCircle,
                     contentDescription = "Thêm cấu hình",
                     tint = Color(0xFF1B8DDE),

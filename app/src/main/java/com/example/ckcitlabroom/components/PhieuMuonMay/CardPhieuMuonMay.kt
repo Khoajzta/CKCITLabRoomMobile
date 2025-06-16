@@ -34,25 +34,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.composables.icons.lucide.BadgeInfo
-import com.composables.icons.lucide.CalendarDays
-import com.composables.icons.lucide.CircleAlert
-import com.composables.icons.lucide.CircleCheck
-import com.composables.icons.lucide.Clock
-import com.composables.icons.lucide.Cpu
-import com.composables.icons.lucide.LayoutTemplate
-import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.MapPin
-import com.composables.icons.lucide.Monitor
+import com.composables.icons.lucide.*
 import com.composables.icons.lucide.User
 import com.example.lapstore.viewmodels.ChiTietPhieuMuonViewModel
 import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
 import com.example.lapstore.viewmodels.MayTinhViewModel
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun CardPhieuMuonMay(
@@ -63,18 +49,15 @@ fun CardPhieuMuonMay(
     chiTietPhieuMuonViewModel: ChiTietPhieuMuonViewModel,
     mayTinhViewModel: MayTinhViewModel,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
-){
+) {
     var showDialog by remember { mutableStateOf(false) }
-
     var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
 
     val danhSachChiTiet by remember { derivedStateOf { chiTietPhieuMuonViewModel.danhSachChiTietPhieuMuonTheoMaPhieu } }
     val danhSachMayTinh by remember { derivedStateOf { mayTinhViewModel.danhSachAllMayTinh } }
 
     val mayTinhDaMuon = remember(danhSachChiTiet, danhSachMayTinh) {
-        danhSachMayTinh.filter { may ->
-            danhSachChiTiet.any { ct -> ct.MaMay == may.MaMay }
-        }
+        danhSachMayTinh.filter { may -> danhSachChiTiet.any { ct -> ct.MaMay == may.MaMay } }
     }
 
     LaunchedEffect(phieuMuonMay.MaPhieuMuon) {
@@ -86,12 +69,19 @@ fun CardPhieuMuonMay(
         phongMayCard = phongMayViewModel.fetchPhongMayByMaPhong(phieuMuonMay.MaPhong)
     }
 
+    val (color, statusText, statusIcon) = when (phieuMuonMay.TrangThai) {
+        0 -> Triple(Color(0xFFFF9800), "Chưa Chuyển Máy", Lucide.Truck)
+        1 -> Triple(Color(0xFF03A9F4), "Đang Mượn", Lucide.Clock)
+        2 -> Triple(Color(0xFF4CAF50), "Đã Trả Máy", Lucide.CircleCheck)
+        else -> Triple(Color.Gray, "Không xác định", Lucide.CircleHelp)
+    }
+
     Card(
         modifier = Modifier
-            .padding(bottom = 12.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 7.dp),
+        elevation = CardDefaults.cardElevation(7.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = {
             navController.navigate(NavRoute.CHITIETPHIEUMUON.route + "?maphieumuon=${phieuMuonMay.MaPhieuMuon}")
@@ -99,148 +89,70 @@ fun CardPhieuMuonMay(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Thông tin phiếu mượn máy",
-                color = Color(0xFF1B8DDE),
+                text = "Phiếu Mượn Máy",
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                color = Color(0xFF1B8DDE)
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                modifier = Modifier.padding(vertical = 8.dp),
                 thickness = 2.dp,
-                color = Color(0xFFDDDDDD),
+                color = Color(0xFFE0E0E0)
             )
 
-            InfoRow(icon = Lucide.Cpu, label = "Tên Người Mượn", value = phieuMuonMay.NguoiMuon)
+            InfoRow(icon = Lucide.User, label = "Người Mượn", value = phieuMuonMay.NguoiMuon)
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Lucide.MapPin, label = "Phòng", value = phongMayCard?.TenPhong.orEmpty())
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Lucide.Cpu, label = "Số lượng máy", value = phieuMuonMay.SoLuong.toString())
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(icon = Lucide.CalendarCheck, label = "Ngày Mượn", value = formatNgay(phieuMuonMay.NgayMuon))
+
+            if (phieuMuonMay.NgayTra != "0000-00-00" && phieuMuonMay.TrangThai == 2) {
+                Spacer(modifier = Modifier.height(8.dp))
+                InfoRow(icon = Lucide.CalendarX2, label = "Ngày Trả", value = formatNgay(phieuMuonMay.NgayTra))
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
-            InfoRow(icon = Lucide.Monitor, label = "Ngày Mượn", value = formatNgay(phieuMuonMay.NgayMuon))
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if(phieuMuonMay.NgayTra != "0000-00-00" && phieuMuonMay.TrangThai == 2){
-                InfoRow(icon = Lucide.CalendarDays, label = "Ngày Trả", value = formatNgay(phieuMuonMay.NgayTra))
-                Spacer(modifier = Modifier.height(8.dp))
+            // Trạng thái
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Trạng thái:", fontWeight = FontWeight.ExtraBold)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(statusText, color = color, fontWeight = FontWeight.Bold)
             }
 
-            if (phongMayCard != null) {
-                InfoRow(
-                    icon = Lucide.MapPin,
-                    label = "Khoa Mượn",
-                    value = phongMayCard?.TenPhong.orEmpty()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            Spacer(modifier = Modifier.height(12.dp))
 
-
-
-            InfoRow(icon = Lucide.CalendarDays, label = "Số lượng", value = phieuMuonMay.SoLuong.toString())
-
-            val (color, statusText, statusIcon) = when (phieuMuonMay.TrangThai) {
-                0 -> Triple(Color(0xFF1B8DDE), "Chưa Chuyển Máy", Lucide.CircleCheck)
-                1 -> Triple(Color(0xFF1B8DDE), "Chưa Trả Máy", Lucide.Clock)
-                2 -> Triple(Color(0xFF4CAF50), "Đã Trả Máy", Lucide.Clock)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Icon(
-                    statusIcon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold)
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
-            }
-
-            if(phieuMuonMay.TrangThai == 0){
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
+            // Nút chức năng
+            when (phieuMuonMay.TrangThai) {
+                0 -> Button(
                     onClick = {
-                        navController.navigate(NavRoute.CHUYENMAYPHIEUMUON.route + "?maphong=${phieuMuonMay.MaPhong}&maphieumuon=${phieuMuonMay.MaPhieuMuon}")
+                        navController.navigate(NavRoute.CHUYENMAYPHIEUMUON.route +
+                                "?maphong=${phieuMuonMay.MaPhong}&maphieumuon=${phieuMuonMay.MaPhieuMuon}")
                     },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff0b9adc))
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE)),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
+                    Icon(Lucide.Truck, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text("Chuyển Máy", color = Color.White, fontWeight = FontWeight.Bold)
                 }
-            }
 
-            if(phieuMuonMay.TrangThai == 1){
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
+                1 -> Button(
                     onClick = {
                         navController.navigate(NavRoute.UPDATETRAMAY.route + "?maphieumuon=${phieuMuonMay.MaPhieuMuon}")
                     },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff0b9adc))
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE)),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Cập nhật trả máy", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("Cập Nhật Trả Máy", color = Color.White, fontWeight = FontWeight.Bold)
                 }
-            }
-
-
-
-            if (showDialog) {
-                AlertDialog(
-                    containerColor = Color.White,
-                    onDismissRequest = { showDialog = false },
-                    title = {
-                        Row (
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ){
-                            Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
-                        }
-                    },
-                    confirmButton = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Button(
-                                modifier = Modifier.weight(1f).padding(end = 8.dp),
-                                onClick = {
-                                    val ngayHienTai = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                                    val phieuMuonCapNhat = phieuMuonMay.copy(NgayTra = ngayHienTai, TrangThai = 2)
-
-                                    phieuMuonMayViewModel.updatePhieuMuonMay(phieuMuonCapNhat)
-
-                                    mayTinhDaMuon.forEach { mayTinh ->
-                                        val mayTinhCapNhat = mayTinh.copy(MaPhong = "KHOLUUTRU", TenMay = "MAYKHOLUUTRU")
-                                        mayTinhViewModel.updateMayTinh(mayTinhCapNhat)
-
-                                        val lichSu = LichSuChuyenMay(
-                                            MaLichSu = 0,
-                                            MaMay = mayTinh.MaMay,
-                                            MaPhongCu = phieuMuonMay.MaPhong,
-                                            MaPhongMoi = "KHOLUUTRU",
-                                            NgayChuyen = ngayHienTai
-                                        )
-                                        lichSuChuyenMayViewModel.createLichSuChuyenMay(lichSu)
-                                    }
-
-                                    showDialog = false
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                            ) {
-                                Text("Đã Trả Máy", color = Color.White)
-                            }
-                        }
-                    }
-                )
             }
         }
     }

@@ -56,14 +56,13 @@ fun QuanLyDonNhap(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Quản Lý Đơn Nhập",
-                fontWeight = FontWeight.ExtraBold,
+                "Danh Sách Đơn Nhập",
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )

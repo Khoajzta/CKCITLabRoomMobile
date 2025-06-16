@@ -1,3 +1,4 @@
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -33,18 +34,10 @@ import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
-import com.composables.icons.lucide.Badge
-import com.composables.icons.lucide.Calendar
-import com.composables.icons.lucide.CircleAlert
-import com.composables.icons.lucide.CircleCheck
-import com.composables.icons.lucide.CircleX
-import com.composables.icons.lucide.Hash
-import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.Mail
-import com.composables.icons.lucide.User
-import com.composables.icons.lucide.Users
+import com.composables.icons.lucide.*
 
 @Composable
 fun CardSinhVien(
@@ -57,11 +50,8 @@ fun CardSinhVien(
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-    val (color, statusText, statusIcon) = when (sinhVien.TrangThai) {
-        1 -> Triple(Color(0xFF4CAF50), "Đang học", Lucide.CircleCheck)
-        0 -> Triple(Color(0xFFF44336), "Đình chỉ", Lucide.CircleX)
-        else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-    }
+    var context = LocalContext.current
+
 
     Card(
         modifier = Modifier
@@ -81,12 +71,30 @@ fun CardSinhVien(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
 
-            Text(
-                text = "Thông tin sinh viên",
-                color = Color(0xFF1B8DDE),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "SV: ${sinhVien.TenSinhVien}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color(0xFF1B8DDE)
+                )
+
+                val (color, statusText, statusIcon) = when (sinhVien.TrangThai) {
+                    1 -> Triple(Color(0xFF4CAF50), "Đang học", Lucide.CircleCheck)
+                    0 -> Triple(Color(0xFFF44336), "Đình chỉ", Lucide.CircleX)
+                    else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(statusText, color = color, fontWeight = FontWeight.SemiBold)
+                }
+            }
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
@@ -100,7 +108,7 @@ fun CardSinhVien(
             InfoRow(icon = Lucide.User, label = "Tên", value = sinhVien.TenSinhVien)
             Spacer(Modifier.height(8.dp))
 
-            InfoRow(icon = Lucide.Calendar, label = "Ngày sinh", value = formatNgay(sinhVien.NgaySinh))
+            InfoRow(icon = Lucide.CalendarClock, label = "Ngày sinh", value = formatNgay(sinhVien.NgaySinh))
             Spacer(Modifier.height(8.dp))
 
             InfoRow(icon = Lucide.Users, label = "Giới tính", value = sinhVien.GioiTinh)
@@ -109,22 +117,9 @@ fun CardSinhVien(
             InfoRow(icon = Lucide.Mail, label = "Email", value = sinhVien.Email)
             Spacer(Modifier.height(8.dp))
 
-            InfoRow(icon = Lucide.Badge, label = "Mã lớp", value = sinhVien.MaLop)
+            InfoRow(icon = Lucide.School, label = "Mã lớp", value = sinhVien.MaLop)
             Spacer(Modifier.height(8.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = statusIcon,
-                    contentDescription = "Trạng thái",
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
-                Text(text = statusText, color = color, fontWeight = FontWeight.Medium, fontSize = 16.sp)
-            }
-
-            Spacer(Modifier.height(8.dp))
 
             AnimatedVisibility(
                 visible = expanded,
@@ -132,60 +127,88 @@ fun CardSinhVien(
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { showDialog = true },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
-                    ) {
-                        Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
-                    }
-                    if (showDialog) {
-                        AlertDialog(
-                            containerColor = Color.White,
-                            onDismissRequest = { showDialog = false },
-                            title = {
-                                Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
+                    if(sinhVien.TrangThai == 1){
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                var sinhviennew = sinhVien.copy(TrangThai = 0)
+                                sinhVienViewModel.updateSinhVien(sinhviennew)
+                                Toast.makeText(context, "Đình chỉ thành công", Toast.LENGTH_SHORT).show()
                             },
-                            text = {
-                                Text("Sinh viên: ${sinhVien.TenSinhVien}", color = Color.Black)
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
+                        ) {
+                            Text("Đình chỉ", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+                    }else{
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                var sinhviennew = sinhVien.copy(TrangThai = 1)
+                                sinhVienViewModel.updateSinhVien(sinhviennew)
+                                Toast.makeText(context, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
                             },
-                            confirmButton = {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    if(sinhVien.TrangThai == 0){
-                                        Button(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            onClick = {
-                                                var sinhviennew = sinhVien.copy(TrangThai = 1)
-                                                sinhVienViewModel.updateSinhVien(sinhviennew)
-                                                showDialog = false
-                                            },
-                                            shape = RoundedCornerShape(12.dp),
-                                            colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                                        ) {
-                                            Text("Đang học", color = Color.White)
-                                        }
-                                    }else{
-                                        Button(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            onClick = {
-                                                var sinhviennew = sinhVien.copy(TrangThai = 0)
-                                                sinhVienViewModel.updateSinhVien(sinhviennew)
-                                                showDialog = false
-                                            },
-                                            shape = RoundedCornerShape(12.dp),
-                                            colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
-                                        ) {
-                                            Text("Đình chỉ", color = Color.White)
-                                        }
-                                    }
-                                }
-                            }
-                        )
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                        ) {
+                            Text("Đang học", color = Color.White)
+                        }
                     }
+
+//                    Button(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        onClick = { showDialog = true },
+//                        shape = RoundedCornerShape(12.dp),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
+//                    ) {
+//                        Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
+//                    }
+//                    if (showDialog) {
+//                        AlertDialog(
+//                            containerColor = Color.White,
+//                            onDismissRequest = { showDialog = false },
+//                            title = {
+//                                Text("Cập nhật trạng thái", color = Color.Black, fontWeight = FontWeight.Bold)
+//                            },
+//                            text = {
+//                                Text("Sinh viên: ${sinhVien.TenSinhVien}", color = Color.Black)
+//                            },
+//                            confirmButton = {
+//                                Row(
+//                                    modifier = Modifier.fillMaxWidth(),
+//                                    horizontalArrangement = Arrangement.SpaceBetween
+//                                ) {
+//                                    if(sinhVien.TrangThai == 0){
+//                                        Button(
+//                                            modifier = Modifier.fillMaxWidth(),
+//                                            onClick = {
+//                                                var sinhviennew = sinhVien.copy(TrangThai = 1)
+//                                                sinhVienViewModel.updateSinhVien(sinhviennew)
+//                                                showDialog = false
+//                                            },
+//                                            shape = RoundedCornerShape(12.dp),
+//                                            colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+//                                        ) {
+//                                            Text("Đang học", color = Color.White)
+//                                        }
+//                                    }else{
+//                                        Button(
+//                                            modifier = Modifier.fillMaxWidth(),
+//                                            onClick = {
+//                                                var sinhviennew = sinhVien.copy(TrangThai = 0)
+//                                                sinhVienViewModel.updateSinhVien(sinhviennew)
+//                                                showDialog = false
+//                                            },
+//                                            shape = RoundedCornerShape(12.dp),
+//                                            colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
+//                                        ) {
+//                                            Text("Đình chỉ", color = Color.White)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        )
+//                    }
 
                     Button(
                         onClick = {

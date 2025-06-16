@@ -16,8 +16,12 @@ import androidx.navigation.NavHostController
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.outlined.ListAlt
+import androidx.compose.material3.HorizontalDivider
+import com.composables.icons.lucide.*
 
 @Composable
 fun QuanLySinhVien(
@@ -26,13 +30,13 @@ fun QuanLySinhVien(
 
     val dsChucNang =
         listOf(
-            ChucNang("Sinh Viên Theo Lớp", Icons.Outlined.ListAlt, Click = {
+            ChucNang("Sinh Viên Theo Lớp", Lucide.Users, Click = {
                 navController.navigate(NavRoute.LISTSINHVIENTHEOLOP.route)
             }),
-            ChucNang("Sinh Viên Đình Chỉ", Icons.Outlined.Article, Click = {
+            ChucNang("Sinh Viên Đình Chỉ", Lucide.UserX, Click = {
                 navController.navigate(NavRoute.LISTSINHVIENDINHCHI.route)
             }),
-            ChucNang("Thêm Sinh Viên", Icons.Outlined.AddCircle, Click = {
+            ChucNang("Thêm Sinh Viên", Lucide.UserPlus, Click = {
                 navController.navigate(NavRoute.ADDSINHVIEN.route)
             }),
         )
@@ -42,11 +46,10 @@ fun QuanLySinhVien(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Quản Lý Sinh Viên",
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
             color = Color(0xFF1B8DDE),
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 20.sp
         )
 
         LazyVerticalGrid(

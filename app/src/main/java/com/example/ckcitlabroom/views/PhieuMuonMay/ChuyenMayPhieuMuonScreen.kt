@@ -97,9 +97,8 @@ fun ChuyenMayPhieuMuonScreen(
                 items(danhSachPhongMay) { phongmay ->
                     CardPhongMayChuyen(
                         phongmay,
-                        navController,
                         mayTinhViewModel,
-                        click = {
+                        onClick = {
                             val route =
                                 if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)) {
                                     NavRoute.PHONGKHOCHUYENMUON.route
