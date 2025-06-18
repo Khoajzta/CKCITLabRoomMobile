@@ -39,7 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.lapstore.viewmodels.MayTinhViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

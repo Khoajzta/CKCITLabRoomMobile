@@ -1,16 +1,8 @@
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -37,20 +28,18 @@ import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.Calendar
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
-import com.composables.icons.lucide.CreditCard
 import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Mail
 import com.composables.icons.lucide.Repeat
-import com.composables.icons.lucide.User
 import com.composables.icons.lucide.Users
-import com.example.ckcitlabroom.models.CaHoc
 
 @Composable
 fun CardGiangVien(
@@ -62,6 +51,7 @@ fun CardGiangVien(
     var showDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
 
+    var context = LocalContext.current
 
     Card(
         modifier = Modifier
@@ -127,7 +117,6 @@ fun CardGiangVien(
                         Text("Cập Nhật Trạng Thái", color = Color.White)
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
                     Button(
                         onClick = {
                             navController.navigate(NavRoute.EDITGIANGVIEN.route + "?magv=${giangVien.MaGV}")
@@ -139,6 +128,19 @@ fun CardGiangVien(
                         Spacer(Modifier.width(8.dp))
                         Text("Chỉnh Sửa", color = Color.White)
                     }
+
+                    Button(
+                        onClick = {
+                            var giangviennew = giangVien.copy(MatKhau = giangVien.MaGV)
+                            giangVienViewModel.updateGiangVien(giangviennew)
+                            Toast.makeText(context, "Reset mật khẩu thành công", Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Reset Mật Khẩu", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
                 }
             }
         }
@@ -147,8 +149,8 @@ fun CardGiangVien(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Cập nhật trạng thái", fontWeight = FontWeight.Bold) },
-            text = { Text("Giảng viên: ${giangVien.TenGiangVien}") },
+            title = { Text("Cập nhật trạng thái", fontWeight = FontWeight.Bold, color = Color.Black) },
+            text = { Text("Giảng viên: ${giangVien.TenGiangVien}",color = Color.Black) },
             confirmButton = {
                 val newTrangThai = if (giangVien.TrangThai == 0) 1 else 0
                 val label = if (newTrangThai == 1) "Công tác lại" else "Ngừng công tác"

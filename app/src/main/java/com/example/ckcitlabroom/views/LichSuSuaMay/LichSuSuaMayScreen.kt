@@ -23,9 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
-import com.example.lapstore.viewmodels.DonNhapViewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
+import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
+import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 
 @Composable
 fun LichSuSuaMayScreen(

@@ -1,10 +1,6 @@
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,11 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -42,12 +34,9 @@ import com.example.ckcitlabroom.models.CaHoc
 import com.example.ckcitlabroom.models.LopHoc
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
-import com.example.lapstore.viewmodels.LichHocViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import kotlin.math.sinh
 
 @Composable
 fun EditLichHocScreen(

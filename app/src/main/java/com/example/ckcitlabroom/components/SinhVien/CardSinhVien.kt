@@ -138,7 +138,7 @@ fun CardSinhVien(
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
                         ) {
-                            Text("Đình chỉ", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text("Đình Chỉ", color = Color.White, fontWeight = FontWeight.Bold)
                         }
                     }else{
                         Button(
@@ -151,7 +151,7 @@ fun CardSinhVien(
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
                         ) {
-                            Text("Đang học", color = Color.White)
+                            Text("Đang Học", color = Color.White)
                         }
                     }
 
@@ -221,6 +221,18 @@ fun CardSinhVien(
                         Text("Chỉnh Sửa", fontWeight = FontWeight.Bold, color = Color.White)
                     }
 
+                    Button(
+                        onClick = {
+                            var sinhviewnew = sinhVien.copy(MatKhau = sinhVien.MaSinhVien)
+                            sinhVienViewModel.updateSinhVien(sinhviewnew)
+                            Toast.makeText(context, "Reset mật khẩu thành công", Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Reset Mật Khẩu", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
                 }
             }
         }

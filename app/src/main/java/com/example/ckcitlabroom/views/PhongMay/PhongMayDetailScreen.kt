@@ -1,4 +1,4 @@
-import android.util.Log
+
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.lapstore.viewmodels.MayTinhViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 
 @Composable
 fun PhongMayDetailScreen(
@@ -47,9 +47,19 @@ fun PhongMayDetailScreen(
     mayTinhViewModel: MayTinhViewModel
 ) {
 
+    val danhSachLoaiPhong = listOf(
+        LoaiPhong(1, "Phòng máy"),
+        LoaiPhong(2, "Phòng kho"),
+        LoaiPhong(3, "Phòng khoa")
+    )
+
+
     val context = LocalContext.current
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinhtheophong
     val phongmay = phongMayViewModel.phongmay
+
+
+
 
     var showDialog by remember { mutableStateOf(false) }
     var showDeleteWarning by remember { mutableStateOf(false) }
@@ -67,10 +77,14 @@ fun PhongMayDetailScreen(
     }
 
     val tenPhongState = remember { mutableStateOf(phongmay.TenPhong) }
+    val selectedLoaiPhong = remember { mutableStateOf<LoaiPhong?>(null) }
 
     LaunchedEffect(phongmay) {
         tenPhongState.value = phongmay.TenPhong
+        selectedLoaiPhong.value = danhSachLoaiPhong.firstOrNull { it.ma == phongmay.LoaiPhong }
     }
+
+
 
     Column(
     ) {
@@ -125,7 +139,7 @@ fun PhongMayDetailScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)){
+            if (phongmay.LoaiPhong == 2){
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { showDialog = true },
@@ -313,6 +327,16 @@ fun PhongMayDetailScreen(
                             placeholder = { Text("Nhập thông tin") },
                             shape = RoundedCornerShape(12.dp),
                         )
+
+                        Text("Loại Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold)
+
+                        CustomDropdownSelector(
+                            label = "Chọn loại phòng",
+                            items = danhSachLoaiPhong,
+                            selectedItem = selectedLoaiPhong.value,
+                            itemLabel = { it.ten },
+                            onItemSelected = { selectedLoaiPhong.value = it }
+                        )
                     }
                 },
 
@@ -323,7 +347,13 @@ fun PhongMayDetailScreen(
                             .height(55.dp)
                             .shadow(4.dp, shape = RoundedCornerShape(12.dp)),
                         onClick = {
-                            val phongmaynew = PhongMay(phongmay.MaPhong, tenPhongState.value, phongmay.TrangThai)
+                            val phongmaynew = PhongMay(
+                                phongmay.MaPhong,
+                                tenPhongState.value,
+                                selectedLoaiPhong.value?.ma ?: phongmay.LoaiPhong,
+                                phongmay.TrangThai
+                            )
+
                             phongMayViewModel.updatePhongMay(phongmaynew)
                             phongMayViewModel.getPhongMayByMaPhong(maphong)
                             showDialog = false

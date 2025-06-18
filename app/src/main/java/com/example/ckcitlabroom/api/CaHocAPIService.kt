@@ -1,6 +1,4 @@
 import com.example.ckcitlabroom.models.CaHoc
-import com.example.ckcitlabroom.models.LopHoc
-import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.HTTP

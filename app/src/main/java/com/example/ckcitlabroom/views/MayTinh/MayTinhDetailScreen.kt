@@ -1,4 +1,3 @@
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,8 +22,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -48,12 +45,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
-import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
-import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
-import com.example.lapstore.viewmodels.DonNhapViewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
-import kotlinx.coroutines.launch
-import okhttp3.internal.format
+import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
+import com.example.ckcitlabroom.viewmodels.ChiTietSuDungMayViewModel
+import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter

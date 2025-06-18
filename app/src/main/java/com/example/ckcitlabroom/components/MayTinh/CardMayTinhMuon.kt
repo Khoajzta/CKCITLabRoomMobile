@@ -27,7 +27,7 @@ import com.composables.icons.lucide.Cpu
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.MapPin
 import com.composables.icons.lucide.Monitor
-import com.example.lapstore.viewmodels.MayTinhViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 
 @Composable
 fun CardMayTinhMuon(

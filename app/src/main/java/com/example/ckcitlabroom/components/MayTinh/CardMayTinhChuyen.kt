@@ -51,8 +51,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.composables.icons.lucide.*
-import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
+import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

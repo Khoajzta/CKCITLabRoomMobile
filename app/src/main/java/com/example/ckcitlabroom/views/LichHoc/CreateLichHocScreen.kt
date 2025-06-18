@@ -1,8 +1,6 @@
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -50,9 +48,7 @@ import com.example.ckcitlabroom.models.CaHoc
 import com.example.ckcitlabroom.models.LopHoc
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
-import com.example.lapstore.viewmodels.LichHocViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

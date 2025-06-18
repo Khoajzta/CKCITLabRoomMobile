@@ -22,6 +22,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,7 +34,6 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MeetingRoom
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.NoteAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Schedule
@@ -66,8 +66,11 @@ fun CardLichHoc(
     Card(
         modifier = Modifier
             .padding(bottom = 8.dp)
-            .width(360.dp),
-        onClick = {expanded = !expanded },
+            .width(360.dp)
+            .heightIn(min = 190.dp, max = 320.dp)
+            .animateContentSize()
+            .clip(RoundedCornerShape(16.dp)),
+        onClick = { expanded = !expanded },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -81,7 +84,7 @@ fun CardLichHoc(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = tieuDe,
+                    text = lichHoc.TenMonHoc,
                     color = Color(0xFF1B8DDE),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
@@ -100,20 +103,19 @@ fun CardLichHoc(
                 color = Color(0xFFDDDDDD),
             )
 
-            InfoRow(icon = Icons.Filled.MenuBook, label = "Môn học", value = lichHoc.TenMonHoc.toString())
-            Spacer(modifier = Modifier.height(8.dp))
-
             InfoRow(icon = Icons.Filled.MeetingRoom, label = "Phòng", value = lichHoc.TenPhong.toString())
             Spacer(modifier = Modifier.height(8.dp))
 
             InfoRow(icon = Icons.Filled.Schedule, label = nhanCa, value = lichHoc.TenCa.toString())
-            Spacer(modifier = Modifier.height(8.dp))
 
-            InfoRow(
-                icon = Icons.Filled.NoteAlt,
-                label = "Thông báo",
-                value = if (!lichHoc.GhiChu.isNullOrBlank()) lichHoc.GhiChu else "Không có thông báo"
-            )
+            if(!lichHoc.GhiChu.isNullOrBlank()){
+                Spacer(modifier = Modifier.height(8.dp))
+                InfoRow(
+                    icon = Icons.Filled.NoteAlt,
+                    label = "Thông báo",
+                    value = if (!lichHoc.GhiChu.isNullOrBlank()) lichHoc.GhiChu else "Không có thông báo"
+                )
+            }
 
             val (color, statusText, statusIcon) = when (lichHoc.TrangThai) {
                 0 -> Triple(Color(0xFF1B8DDE), "Đã Kết Thúc", Lucide.CircleCheck)

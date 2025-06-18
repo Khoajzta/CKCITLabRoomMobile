@@ -1,4 +1,5 @@
 package com.example.ckcitlabroom.viewmodels
+
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ckcitlabroom.models.CaHoc
-import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
+import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

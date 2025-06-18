@@ -26,14 +26,12 @@ fun createPdfWithQRCodeBase64(
     val pageWidth = 595 // A4 ngang (points)
     val pageHeight = 842 // A4 dọc
     val padding = 32
-    val qrSize = 85 // ~3cm
-    val spacing = 24
-    val columns = 5
-    var currentX = padding
-    var currentY = padding
+    val qrSize = 85
+    val columns = 4
+    val spacingY = 60
+    var currentY = padding + 40
     var pageNumber = 1
 
-    // Vẽ tiêu đề
     val titlePaint = Paint().apply {
         textSize = 20f
         isFakeBoldText = true
@@ -41,20 +39,20 @@ fun createPdfWithQRCodeBase64(
         color = Color.BLACK
     }
 
-    // Vẽ tên máy
-    val paintTenMay = Paint().apply {
+    val paintText = Paint().apply {
         textAlign = Paint.Align.CENTER
-        textSize = 16f
+        textSize = 14f
         isFakeBoldText = true
         color = Color.BLACK
     }
 
-    // Viền QR
     val borderPaint = Paint().apply {
         style = Paint.Style.STROKE
         strokeWidth = 4f
         color = Color.BLACK
     }
+
+    val cellWidth = (pageWidth - 2 * padding) / columns
 
     val pdfDocument = PdfDocument()
     var pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
@@ -62,51 +60,60 @@ fun createPdfWithQRCodeBase64(
     var canvas = page.canvas
 
     // Vẽ tiêu đề
-    canvas.drawText("QR máy phòng: $tenphong", (pageWidth / 2).toFloat(), (padding).toFloat(), titlePaint)
-    currentY = padding + 40 // dời sau tiêu đề
+    canvas.drawText("QR máy phòng: $tenphong", (pageWidth / 2).toFloat(), padding.toFloat(), titlePaint)
 
     danhSachMay.forEachIndexed { index, may ->
         try {
             val qrBitmap = base64ToBitmap(may.QRCode)
             val resizedQR = Bitmap.createScaledBitmap(qrBitmap, qrSize, qrSize, false)
 
-            // Vẽ QR
-            canvas.drawBitmap(resizedQR, currentX.toFloat(), currentY.toFloat(), null)
+            val col = index % columns
+            val rowXStart = padding + col * cellWidth
+            val centerX = (rowXStart + cellWidth / 2).toFloat()
+            val qrLeft = centerX - qrSize / 2f
 
-            // Vẽ viền quanh QR
+            // Vẽ mã máy (ở trên QR)
+            canvas.drawText(
+                may.MaMay ?: "",
+                centerX,
+                (currentY - 10).toFloat(),
+                paintText
+            )
+
+            // Vẽ mã QR
+            canvas.drawBitmap(resizedQR, qrLeft, currentY.toFloat(), null)
+
+            // Vẽ viền QR
             canvas.drawRect(
-                currentX.toFloat(),
+                qrLeft,
                 currentY.toFloat(),
-                (currentX + qrSize).toFloat(),
+                (qrLeft + qrSize).toFloat(),
                 (currentY + qrSize).toFloat(),
                 borderPaint
             )
 
-            // Vẽ tên máy dưới QR
+            // Vẽ vị trí máy (dưới QR)
             canvas.drawText(
                 may.ViTri,
-                (currentX + qrSize / 2).toFloat(),
+                centerX,
                 (currentY + qrSize + 20).toFloat(),
-                paintTenMay
+                paintText
             )
 
-            // Cập nhật vị trí
-            currentX += qrSize + spacing
+            // Nếu đã hết hàng, chuyển xuống dòng mới
             if ((index + 1) % columns == 0) {
-                currentX = padding
-                currentY += qrSize + 50
+                currentY += qrSize + spacingY
             }
 
-            // Nếu vượt trang
-            if (currentY + qrSize + 50 > pageHeight - padding) {
+            // Nếu vượt quá chiều cao trang
+            if (currentY + qrSize + spacingY > pageHeight - padding) {
                 pdfDocument.finishPage(page)
                 pageNumber++
                 pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
                 page = pdfDocument.startPage(pageInfo)
                 canvas = page.canvas
-                canvas.drawText("QR máy phòng: $tenphong", (pageWidth / 2).toFloat(), (padding).toFloat(), titlePaint)
+                canvas.drawText("QR máy phòng: $tenphong", (pageWidth / 2).toFloat(), padding.toFloat(), titlePaint)
                 currentY = padding + 40
-                currentX = padding
             }
 
         } catch (e: Exception) {
@@ -123,6 +130,11 @@ fun createPdfWithQRCodeBase64(
 
     Toast.makeText(context, "Đã lưu tại: ${file.absolutePath}", Toast.LENGTH_LONG).show()
 }
+
+
+
+
+
 
 
 

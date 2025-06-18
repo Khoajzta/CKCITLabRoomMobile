@@ -1,5 +1,4 @@
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -13,14 +12,13 @@ import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.ckcitlabroom.views.SinhVien.CreateSinhVienScreen
 import com.example.ckcitlabroom.views.SinhVien.EditSinhVienScreen
-import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
-import com.example.lapstore.viewmodels.ChiTietPhieuMuonViewModel
-import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
-import com.example.lapstore.viewmodels.DonNhapViewModel
-import com.example.lapstore.viewmodels.LichHocViewModel
-import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
-import org.checkerframework.checker.units.qual.g
+import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
+import com.example.ckcitlabroom.viewmodels.ChiTietPhieuMuonViewModel
+import com.example.ckcitlabroom.viewmodels.ChiTietSuDungMayViewModel
+import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
+import com.example.ckcitlabroom.viewmodels.LichHocViewModel
+import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 
 
 sealed class NavRoute(val route: String) {

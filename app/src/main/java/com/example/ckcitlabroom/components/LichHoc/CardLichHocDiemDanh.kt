@@ -12,13 +12,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.MeetingRoom
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.NoteAlt
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Card
@@ -61,7 +56,7 @@ fun CardLichHocDiemDanh(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Thông tin lịch học",
+                    text = lichHoc.TenMonHoc,
                     color = Color(0xFF1B8DDE),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
@@ -76,8 +71,6 @@ fun CardLichHocDiemDanh(
                 color = Color(0xFFDDDDDD),
             )
 
-            InfoRow(icon = Icons.Filled.MenuBook, label = "Môn học", value = lichHoc.TenMonHoc.toString())
-            Spacer(modifier = Modifier.height(8.dp))
 
             InfoRow(icon = Icons.Filled.MeetingRoom, label = "Phòng", value = lichHoc.TenPhong.toString())
             Spacer(modifier = Modifier.height(8.dp))

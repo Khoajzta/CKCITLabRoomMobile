@@ -1,4 +1,4 @@
-package com.example.lapstore.viewmodels
+package com.example.ckcitlabroom.viewmodels
 
 import MayTinh
 import MayTinhTrangThaiUpdateRequest
@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
+import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

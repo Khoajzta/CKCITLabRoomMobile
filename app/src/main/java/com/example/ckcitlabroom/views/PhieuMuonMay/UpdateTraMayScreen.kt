@@ -22,7 +22,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -39,15 +38,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.composables.icons.lucide.ClipboardList
 import com.composables.icons.lucide.Lucide
-import com.example.lapstore.viewmodels.ChiTietPhieuMuonViewModel
-import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
-import kotlinx.coroutines.coroutineScope
+import com.example.ckcitlabroom.viewmodels.ChiTietPhieuMuonViewModel
+import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

@@ -35,8 +35,8 @@ fun CardLichSuChuyenMay(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    var phongMayCu by remember { mutableStateOf(PhongMay("","",1)) }
-    var phongMayMoi by remember { mutableStateOf(PhongMay("","",1)) }
+    var phongMayCu by remember { mutableStateOf(PhongMay("","",1,1)) }
+    var phongMayMoi by remember { mutableStateOf(PhongMay("","",1,1)) }
 
     LaunchedEffect(lichSuChuyenMay) {
         coroutineScope.launch {

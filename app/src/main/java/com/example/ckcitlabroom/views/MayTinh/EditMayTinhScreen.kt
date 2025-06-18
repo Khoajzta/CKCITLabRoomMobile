@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -503,9 +503,17 @@ fun EditMayTinhScreen(
 
             Button(
                 onClick = {
+                    val viTriDaThayDoi = viTriState.value != maytinh.ViTri
+
+                    val tenMayMoi = if (viTriDaThayDoi) {
+                        "${tenMayState.value}.${viTriState.value}"
+                    } else {
+                        tenMayState.value
+                    }
+
                     val mayTinhMoi = MayTinh(
                         MaMay = maMayState.value,
-                        TenMay = tenMayState.value,
+                        TenMay = tenMayMoi,
                         ViTri = viTriState.value,
                         Main = mainState.value,
                         CPU = cpuState.value,
@@ -520,16 +528,18 @@ fun EditMayTinhScreen(
                         QRCode = maytinh.QRCode,
                         TrangThai = trangThaiState.value.toIntOrNull() ?: 0
                     )
+
                     mayTinhViewModel.updateMayTinh(mayTinhMoi)
+
                     coroutineScope.launch {
                         snackbarData.value = CustomSnackbarData(
-                            message = "Cập nhật máy tính thành công!", type = SnackbarType.SUCCESS
+                            message = "Cập nhật máy tính thành công!",
+                            type = SnackbarType.SUCCESS
                         )
                         snackbarHostState.showSnackbar("Thông báo")
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {
@@ -539,6 +549,7 @@ fun EditMayTinhScreen(
                     fontWeight = FontWeight.SemiBold
                 )
             }
+
         }
     }
 }

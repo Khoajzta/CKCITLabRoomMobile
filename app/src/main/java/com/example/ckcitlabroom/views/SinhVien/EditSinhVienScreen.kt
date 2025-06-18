@@ -240,12 +240,13 @@ fun EditSinhVienScreen(
                                 )
                             )
                             ExposedDropdownMenu(
+                                containerColor = Color.White,
                                 expanded = gioiTinhExpanded,
                                 onDismissRequest = { gioiTinhExpanded = false }
                             ) {
                                 gioiTinhOptions.forEach { option ->
                                     DropdownMenuItem(
-                                        text = { Text(option) },
+                                        text = { Text(option, color = Color.Black) },
                                         onClick = {
                                             gioiTinhState.value = option
                                             gioiTinhExpanded = false
@@ -286,12 +287,13 @@ fun EditSinhVienScreen(
                                 )
                             )
                             ExposedDropdownMenu(
+                                containerColor = Color.White,
                                 expanded = lopExpanded,
                                 onDismissRequest = { lopExpanded = false }
                             ) {
                                 lopOptions.forEach { maLop ->
                                     DropdownMenuItem(
-                                        text = { Text(maLop) },
+                                        text = { Text(maLop, color = Color.Black) },
                                         onClick = {
                                             maLopState.value = maLop
                                             lopExpanded = false

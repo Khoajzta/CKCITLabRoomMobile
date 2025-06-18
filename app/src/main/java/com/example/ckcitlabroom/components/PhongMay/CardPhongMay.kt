@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,10 +34,8 @@ import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
 import com.composables.icons.lucide.Cpu
-import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.Warehouse
-import com.example.lapstore.viewmodels.MayTinhViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 
 @Composable
 fun CardPhongMay(
@@ -141,7 +137,7 @@ fun CardPhongMay(
                             Button(
                                 onClick = {
                                     phongMayViewModel.updateTrangThaiPhongMay(
-                                        PhongMay(phongmay.MaPhong, phongmay.TenPhong, 1)
+                                        PhongMay(phongmay.MaPhong, phongmay.TenPhong, phongmay.LoaiPhong,1)
                                     )
                                     showDialog = false
                                 },
@@ -155,7 +151,7 @@ fun CardPhongMay(
                             Button(
                                 onClick = {
                                     phongMayViewModel.updateTrangThaiPhongMay(
-                                        PhongMay(phongmay.MaPhong, phongmay.TenPhong, 0)
+                                        PhongMay(phongmay.MaPhong, phongmay.TenPhong, phongmay.LoaiPhong,0)
                                     )
                                     showDialog = false
                                 },

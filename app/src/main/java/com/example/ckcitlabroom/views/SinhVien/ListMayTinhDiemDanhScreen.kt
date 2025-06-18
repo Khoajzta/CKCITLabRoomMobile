@@ -1,6 +1,4 @@
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,9 +13,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
-import com.example.lapstore.viewmodels.LichHocViewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
+import com.example.ckcitlabroom.viewmodels.ChiTietSuDungMayViewModel
+import com.example.ckcitlabroom.viewmodels.LichHocViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

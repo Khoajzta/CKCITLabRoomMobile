@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
+import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 
 class PhongMayViewModel : ViewModel() {
 
-    var pm = PhongMay(MaPhong = "", TenPhong = "", TrangThai = 0)
+    var pm = PhongMay(MaPhong = "", TenPhong = "",1, TrangThai = 0)
 
     var phongmay: PhongMay by mutableStateOf(pm)
         private set
@@ -131,7 +131,7 @@ class PhongMayViewModel : ViewModel() {
             ITLabRoomRetrofitClient.phongmayAPIService.getPhongMayByMaPhong(maphong)
         } catch (e: Exception) {
             Log.e("PhongMayViewModel", "Lỗi khi lấy thông tin phòng máy (suspend)", e)
-            pm // trả về phòng mặc định hoặc null tùy bạn
+            pm
         }
     }
 

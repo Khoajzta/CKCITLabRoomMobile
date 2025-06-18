@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.MapPin
-import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
+import com.example.ckcitlabroom.viewmodels.ChiTietSuDungMayViewModel
 
 @Composable
 fun ListSinhVienTheoCa(

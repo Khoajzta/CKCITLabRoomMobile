@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,15 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -40,9 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
-import com.example.lapstore.viewmodels.DonNhapViewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
+import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
+import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 
 @Composable
 fun PhongMayDonNhapScreen(
@@ -53,6 +49,12 @@ fun PhongMayDonNhapScreen(
     donNhapyViewModel: DonNhapViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel
 ){
+    val danhSachLoaiPhong = listOf(
+        LoaiPhong(1, "Phòng máy"),
+        LoaiPhong(2, "Phòng kho"),
+        LoaiPhong(3, "Phòng khoa")
+    )
+
     var danhsachdonnhap = donNhapyViewModel.danhSachDonNhap
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinhtheophong
 
@@ -76,9 +78,11 @@ fun PhongMayDonNhapScreen(
     }
 
     val tenPhongState = remember { mutableStateOf(phongmay.TenPhong) }
+    val selectedLoaiPhong = remember { mutableStateOf<LoaiPhong?>(null) }
 
     LaunchedEffect(phongmay) {
         tenPhongState.value = phongmay.TenPhong
+        selectedLoaiPhong.value = danhSachLoaiPhong.firstOrNull { it.ma == phongmay.LoaiPhong }
     }
 
     LaunchedEffect(Unit) {
@@ -150,7 +154,7 @@ fun PhongMayDonNhapScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)){
+            if (phongmay.LoaiPhong == 2){
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { showDialog = true },
@@ -324,6 +328,18 @@ fun PhongMayDonNhapScreen(
                             placeholder = { Text("Nhập thông tin") },
                             shape = RoundedCornerShape(12.dp),
                         )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text("Loại Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold)
+
+                        CustomDropdownSelector(
+                            label = "Chọn loại phòng",
+                            items = danhSachLoaiPhong,
+                            selectedItem = selectedLoaiPhong.value,
+                            itemLabel = { it.ten },
+                            onItemSelected = { selectedLoaiPhong.value = it }
+                        )
                     }
                 },
 
@@ -334,7 +350,13 @@ fun PhongMayDonNhapScreen(
                             .height(55.dp)
                             .shadow(4.dp, shape = RoundedCornerShape(12.dp)),
                         onClick = {
-                            val phongmaynew = PhongMay(phongmay.MaPhong, tenPhongState.value, phongmay.TrangThai)
+                            val phongmaynew = PhongMay(
+                                phongmay.MaPhong,
+                                tenPhongState.value,
+                                selectedLoaiPhong.value?.ma ?: phongmay.LoaiPhong,
+                                phongmay.TrangThai
+                            )
+
                             phongMayViewModel.updatePhongMay(phongmaynew)
                             phongMayViewModel.getPhongMayByMaPhong(maphong)
                             showDialog = false

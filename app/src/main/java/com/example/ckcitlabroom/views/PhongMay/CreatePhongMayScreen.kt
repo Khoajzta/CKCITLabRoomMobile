@@ -43,6 +43,13 @@ fun CreatePhongMayScreen(
     phongMayViewModel: PhongMayViewModel
 ){
 
+    val danhSachLoaiPhong = listOf(
+        LoaiPhong(1, "Phòng máy"),
+        LoaiPhong(2, "Phòng kho"),
+        LoaiPhong(3, "Phòng khoa")
+    )
+
+
     val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
 
     LaunchedEffect(Unit) {
@@ -51,6 +58,9 @@ fun CreatePhongMayScreen(
 
     val maPhongState = remember { mutableStateOf("") }
     val tenPhongState = remember { mutableStateOf("") }
+
+    val selectedLoaiPhong = remember { mutableStateOf<LoaiPhong?>(danhSachLoaiPhong.first()) }
+
 
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
@@ -123,6 +133,18 @@ fun CreatePhongMayScreen(
                 shape = RoundedCornerShape(12.dp),
             )
 
+            Text(
+                text = "Loại Phòng", color = Color.Black, fontWeight = FontWeight.Bold
+            )
+
+            CustomDropdownSelector(
+                label = "Chọn loại phòng",
+                items = danhSachLoaiPhong,
+                selectedItem = selectedLoaiPhong.value,
+                itemLabel = { it.ten },
+                onItemSelected = { selectedLoaiPhong.value = it }
+            )
+
             SnackbarHost(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(16.dp)
@@ -179,7 +201,8 @@ fun CreatePhongMayScreen(
 
                     } else {
 
-                        var phongmaynew = PhongMay(maPhongState.value,tenPhongState.value,1)
+                        val loai = selectedLoaiPhong.value?.ma ?: 1
+                        var phongmaynew = PhongMay(maPhongState.value,tenPhongState.value,loai,1)
 
                         phongMayViewModel.createPhongMay(phongmaynew)
 

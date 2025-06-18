@@ -1,26 +1,19 @@
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccessAlarm
-import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.Build
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.MeetingRoom
-import androidx.compose.material.icons.outlined.MenuBook
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.SupervisorAccount
-import androidx.compose.material.icons.outlined.SwapHoriz
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.*
 
@@ -37,7 +30,6 @@ fun QuanLyScreen(
     val dsChucNang = when {
         giangVien?.MaLoaiTaiKhoan == 1 -> {
             listOf(
-//                ChucNang("Quản Lý Máy Tính", Icons.Outlined.DesktopWindows, Click = { navController.navigate(NavRoute.QUANLYMAYTINH.route) }),
                 ChucNang("Quản Lý Đơn Nhập", Lucide.ClipboardList, Click = { navController.navigate(NavRoute.QUANLYDONNHAP.route) }),
                 ChucNang("Quản Lý Phòng Máy", Lucide.LayoutGrid, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
                 ChucNang("Chuyển Máy", Lucide.MoveRight, Click = { navController.navigate(NavRoute.QUANLYCHUYENMAY.route) }),
@@ -54,8 +46,6 @@ fun QuanLyScreen(
                 ChucNang("Quản Lý Năm Học", Lucide.CalendarCheck, Click = { navController.navigate(NavRoute.QUANLYNAMHOC.route) }),
                 ChucNang("Quản Lý Ca Học", Lucide.Clock, Click = { navController.navigate(NavRoute.QUANLYCAHOC.route) }),
                 ChucNang("Quản Lý Môn Học", Lucide.BookOpenText, Click = { navController.navigate(NavRoute.QUANLYMONHOC.route) }),
-
-
             )
         }
         giangVien?.MaLoaiTaiKhoan == 2 -> {
@@ -101,22 +91,24 @@ fun QuanLyScreen(
 
 
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = "Chức Năng",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1B8DDE),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(dsChucNang) { chucNang ->
-                CardChucNang(chucNang)
+            columns = GridCells.Adaptive(minSize = 150.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            content = {
+                items(dsChucNang) { chucNang ->
+                    CardChucNang(chucNang)
+                }
             }
-        }
+        )
     }
 }

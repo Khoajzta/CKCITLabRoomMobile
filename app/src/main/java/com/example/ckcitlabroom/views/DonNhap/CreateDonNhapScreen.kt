@@ -1,9 +1,6 @@
 import android.app.DatePickerDialog
-import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -51,15 +48,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
-import com.example.lapstore.viewmodels.DonNhapViewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
-import kotlinx.coroutines.delay
+import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
+import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
-import kotlin.random.Random
 import kotlinx.coroutines.*
 import java.util.Calendar
 
@@ -477,42 +471,6 @@ fun CreateDonNhapScreen(
                 }
             }
 
-            HorizontalDivider(
-                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
-                thickness = 2.dp,
-                color = Color.Gray,
-            )
-
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.padding(8.dp)
-            ) { data ->
-                snackbarData.value?.let { customData ->
-                    Snackbar(
-                        containerColor = Color(0xFF1B8DDE),
-                        contentColor = Color.White,
-                        shape = RoundedCornerShape(12.dp),
-                        action = {
-                            TextButton(onClick = {
-                                snackbarData.value = null
-                            }) {
-                                Text("Đóng", color = Color.White)
-                            }
-                        }
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = if (customData.type == SnackbarType.SUCCESS) Color.Cyan else Color.Yellow,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = customData.message)
-                        }
-                    }
-                }
-            }
 
             if (loadingState.value) {
                 DotLoading()
@@ -529,7 +487,6 @@ fun CreateDonNhapScreen(
                     )
                 }
             }
-
 
             Button(
                 onClick = {
@@ -593,7 +550,7 @@ fun CreateDonNhapScreen(
                                     danhSachMay.add(
                                         MayTinh(
                                             MaMay = maMay,
-                                            TenMay = "PC_$stt",
+                                            TenMay = "MAY_$stt",
                                             ViTri = "",
                                             Main = mainState.value,
                                             CPU = cpuState.value,

@@ -3,7 +3,6 @@ package com.example.ckcitlabroom.components
 import InfoRow
 import MonHoc
 import MonHocViewModel
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -54,9 +52,6 @@ import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
 import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.School
-import com.example.ckcitlabroom.models.LopHoc
-import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 
 @Composable
 fun CardMonHoc(

@@ -18,7 +18,6 @@ import TuanViewModel
 import UpdateLichHocWorker
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -50,9 +49,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,26 +68,21 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.composables.icons.lucide.Bell
 import com.composables.icons.lucide.House
 import com.composables.icons.lucide.LayoutGrid
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
-
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
-import com.example.lapstore.viewmodels.ChiTietDonNhapyViewModel
-import com.example.lapstore.viewmodels.ChiTietPhieuMuonViewModel
-
-
-import com.example.lapstore.viewmodels.ChiTietSuDungMayViewModel
-import com.example.lapstore.viewmodels.DonNhapViewModel
-
-import com.example.lapstore.viewmodels.LichHocViewModel
-import com.example.lapstore.viewmodels.LichSuChuyenMayViewModel
-import com.example.lapstore.viewmodels.MayTinhViewModel
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.User
+import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
+import com.example.ckcitlabroom.viewmodels.ChiTietPhieuMuonViewModel
+import com.example.ckcitlabroom.viewmodels.ChiTietSuDungMayViewModel
+import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
+import com.example.ckcitlabroom.viewmodels.LichHocViewModel
+import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import java.util.concurrent.TimeUnit
 
@@ -236,7 +233,19 @@ fun MainScreen() {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                     title = {
-                        Text("Trở lại", fontWeight = FontWeight.Bold, color = Color(0xFF1B8DDE))
+                        Text("Trở lại",
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF1B8DDE),
+                            modifier = Modifier.padding(start = 15.dp),
+                            fontSize = 21.sp,
+                            style = TextStyle(
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.25f),
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 4f
+                                )
+                            )
+                        )
                     },
                     navigationIcon = {
                         IconButton(
@@ -246,6 +255,7 @@ fun MainScreen() {
                             }
                         ) {
                             Icon(
+                                modifier = Modifier.size(30.dp),
                                 imageVector = Icons.Default.ArrowBackIosNew,
                                 contentDescription = "Back",
                                 tint = Color(0xFF1B8DDE)
@@ -265,15 +275,28 @@ fun MainScreen() {
                             Image(
                                 painter = painterResource(id = R.drawable.logo),
                                 contentDescription = "Logo",
-                                modifier = Modifier.size(40.dp).clip(CircleShape)
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .shadow(8.dp, shape = CircleShape)
+                                    .clip(CircleShape)
+                                    .background(Color.White.copy(alpha = 0.6f))
+                                    .border(1.dp, Color.White.copy(alpha = 0.4f), shape = CircleShape)
                             )
                             Spacer(modifier = Modifier.width(7.dp))
                             Text(
                                 text = "IT LabRoom",
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 25.sp,
-                                color = Color(0xFF1B8DDE)
+                                color = Color(0xFF1B8DDE),
+                                style = TextStyle(
+                                    shadow = Shadow(
+                                        color = Color.Black.copy(alpha = 0.25f),
+                                        offset = Offset(2f, 2f),
+                                        blurRadius = 4f
+                                    )
+                                )
                             )
+
                         }
                     }
                 )
@@ -283,7 +306,20 @@ fun MainScreen() {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                     title = {
-                        Text(textTopbar, fontWeight = FontWeight.SemiBold, color = Color(0xFF1B8DDE),modifier = Modifier.padding(start = 15.dp))
+                        Text(
+                            textTopbar,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF1B8DDE),
+                            modifier = Modifier.padding(start = 15.dp),
+                            fontSize = 21.sp,
+                            style = TextStyle(
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.25f),
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 4f
+                                )
+                            )
+                        )
                     },
                     navigationIcon = {
                         IconButton(
@@ -299,7 +335,7 @@ fun MainScreen() {
                                 imageVector = Icons.Default.ArrowBackIosNew,
                                 contentDescription = "Back",
                                 tint = Color(0xFF1B8DDE),
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(30.dp),
                             )
                         }
                     }

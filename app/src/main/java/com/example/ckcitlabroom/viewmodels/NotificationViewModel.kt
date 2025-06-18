@@ -2,7 +2,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import android.util.Log
-import com.example.lapstore.api.Constants.ITLabRoomRetrofitClient
+import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
 
 class NotificationViewModel : ViewModel() {
 
