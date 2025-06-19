@@ -30,13 +30,19 @@ fun ChiTietLichHocScreen(
     navController: NavHostController,
     sinhVienViewModel: SinhVienViewModel,
     giangVienViewModel: GiangVienViewModel,
-    lichHocViewModel: LichHocViewModel
+    lichHocViewModel: LichHocViewModel,
+    tuanViewModel: TuanViewModel
 ) {
+
     val giangVien = giangVienViewModel.giangvienSet
     val sinhvien = sinhVienViewModel.sinhvienSet
+    val danhsachalltuan = tuanViewModel.danhSachAllTuan
+
+
 
     LaunchedEffect(Unit) {
         lichHocViewModel.startPollingAllLichHoc()
+        tuanViewModel.getAllTuan()
     }
 
     DisposableEffect(Unit) {
@@ -64,10 +70,8 @@ fun ChiTietLichHocScreen(
     }
 
     val maTuanInt = matuan.toIntOrNull()
-    if (maTuanInt == null) {
-        Text("Mã tuần không hợp lệ", color = Color.Red)
-        return
-    }
+
+    var tuan = danhsachalltuan.find { it.MaTuan == maTuanInt}
 
     val lichHocTheoTuan = when (role) {
         "gv" -> listLichHocAll.filter { it.MaTuan == maTuanInt && it.MaGV == giangVien?.MaGV }
@@ -85,13 +89,13 @@ fun ChiTietLichHocScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if (role == "gv") "Chi tiết lịch dạy tuần" else "Chi tiết lịch học tuần",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
+                text = if (role == "gv") "Chi tiết lịch dạy tuần ${tuan!!.TenTuan}" else "Chi tiết lịch học tuần ${tuan!!.TenTuan}",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
         }
@@ -106,12 +110,11 @@ fun ChiTietLichHocScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 16.dp)
+            contentPadding = PaddingValues(bottom = 8.dp)
         ) {
             items(thuList) { thu ->
                 val lichTrongThu = lichHocTheoThu[thu].orEmpty()
 
-                Log.d("ChiTietLichHocScreen", "Lịch trong thứ $thu: $listLichHocAll")
                 if (lichTrongThu.isNotEmpty()) {
                     Column(
                         modifier = Modifier
@@ -123,7 +126,7 @@ fun ChiTietLichHocScreen(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 18.sp,
                             color = Color.Black,
-                            modifier = Modifier.padding(horizontal = 12.dp)
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
 
                         LazyRow(
@@ -149,12 +152,19 @@ fun ChiTietLichHocScreen(
             // Nếu không có lịch học nào cả
             if (lichHocTheoTuan.isEmpty()) {
                 item {
-                    Text(
-                        text = "Không có lịch học nào trong tuần này",
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 16.dp, start = 12.dp)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Không có lịch học nào trong tuần này",
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 16.dp, start = 12.dp),
+
+                            )
+                    }
                 }
             }
         }

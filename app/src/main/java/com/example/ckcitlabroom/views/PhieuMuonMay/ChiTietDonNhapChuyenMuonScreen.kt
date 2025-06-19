@@ -80,15 +80,13 @@ fun ChiTietDonNhapChuyenMuonScreen(
 
     val phieuMuon = phieuMuonMayViewModel.phieuMuonMay
 
-    Log.d("phieumuon", phieuMuon.toString())
-
     val danhSachMayTinhTheoDon = remember(danhSachChiTiet, danhSachMayTinh) {
         val maMayTheoDon = danhSachChiTiet.map { it.MaMay }
         danhSachMayTinh.filter { it.MaMay in maMayTheoDon }
     }
 
     val danhSachMayTinhTrongKhoTheoDon = remember(danhSachMayTinhTheoDon) {
-        danhSachMayTinhTheoDon.filter { it.MaPhong.equals(maphong, ignoreCase = true) }
+        danhSachMayTinhTheoDon.filter { it.MaPhong.equals(maphong, ignoreCase = true) && it.TrangThai == 1}
     }
 
 

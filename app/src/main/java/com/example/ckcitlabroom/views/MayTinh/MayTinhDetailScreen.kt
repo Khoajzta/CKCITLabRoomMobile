@@ -1,4 +1,6 @@
+import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +19,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -48,7 +53,9 @@ import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
 import com.example.ckcitlabroom.viewmodels.ChiTietSuDungMayViewModel
 import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
+import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -60,21 +67,13 @@ fun MayTinhDetailScreen(
     giangVienViewModel: GiangVienViewModel,
     sinhVienViewModel: SinhVienViewModel,
     navController: NavHostController,
-    namHocViewModel: NamHocViewModel,
-    tuanViewModel: TuanViewModel,
     cahocViewModel: CaHocViewModel,
-    chitietsudungmayViewModel: ChiTietSuDungMayViewModel
+    chitietsudungmayViewModel: ChiTietSuDungMayViewModel,
+    lichhocViewModel: LichHocViewModel
 ){
 
     val context = LocalContext.current
     val result = chitietsudungmayViewModel.chitietsudungmayCreateResult
-
-    LaunchedEffect(result) {
-        if (result.isNotBlank()) {
-            Toast.makeText(context, "Điểm danh thành công", Toast.LENGTH_SHORT).show()
-            chitietsudungmayViewModel.chitietsudungmayCreateResult = ""
-        }
-    }
 
     var donNhapViewModel: DonNhapViewModel = viewModel()
     var chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel = viewModel()
@@ -149,55 +148,24 @@ fun MayTinhDetailScreen(
     var sinhvien = sinhVienViewModel.sinhvienSet
 
     LaunchedEffect(Unit) {
-        namHocViewModel.getAllNamHoc()
-        tuanViewModel.getAllTuan()
-        cahocViewModel.getAllCaHoc()
-    }
-
-    val danhSachNamHoc = namHocViewModel.danhSachAllNamHoc
-    val danhSachTuan = tuanViewModel.danhSachAllTuan
-    val danhSachCa = cahocViewModel.danhSachAllCaHoc
-
-    val formatterDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    val todayDate = LocalDate.now()
-
-    val formatterTime = DateTimeFormatter.ofPattern("HH:mm:ss")
-    val currentTime = LocalTime.now()
-
-    val selectedNamHoc = remember(danhSachNamHoc) {
-        danhSachNamHoc.firstOrNull { it.TrangThai == 1 }
-    }
-
-    val danhSachTuanTheoNam = remember(selectedNamHoc, danhSachTuan) {
-        danhSachTuan.filter { it.MaNam == selectedNamHoc?.MaNam }
-    }
-
-    var selectedTuan by remember { mutableStateOf<Tuan?>(null) }
-
-    val caHocHienTai = remember(danhSachCa) {
-        danhSachCa.firstOrNull { ca ->
-            try {
-                val gioBatDau = LocalTime.parse(ca.GioBatDau, formatterTime)
-                val gioKetThuc = LocalTime.parse(ca.GioKetThuc, formatterTime)
-                currentTime in gioBatDau..gioKetThuc
-            } catch (e: Exception) {
-                false
-            }
+        sinhvien?.let {
+            lichhocViewModel.getLichHocByMaLopHoc(it.MaLop)
+            cahocViewModel.getAllCaHoc()
         }
+        chitietsudungmayViewModel.getAllChiTietSuDungMay()
     }
 
-    LaunchedEffect(danhSachTuanTheoNam) {
-        if (selectedTuan == null && danhSachTuanTheoNam.isNotEmpty()) {
-            val tuanHienTai = danhSachTuanTheoNam.firstOrNull { tuan ->
-                val ngayBatDau = LocalDate.parse(tuan.NgayBatDau, formatterDate)
-                val ngayKetThuc = LocalDate.parse(tuan.NgayKetThuc, formatterDate)
-                todayDate in ngayBatDau..ngayKetThuc
-            }
-            selectedTuan = tuanHienTai ?: danhSachTuanTheoNam.first()
-        }
+    val danhSachCaHoc = cahocViewModel.danhSachAllCaHoc
+    val danhSachLichHoc = lichhocViewModel.danhSachLichHoctheomalop
+
+    // Lấy giờ hiện tại
+    val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+    val gioHienTai = LocalTime.now().format(formatter)
+
+    // Tìm ca học hiện tại
+    val caHienTai = danhSachCaHoc.firstOrNull {
+        it.GioBatDau <= gioHienTai && it.GioKetThuc >= gioHienTai
     }
-
-
 
 
     Card(
@@ -213,7 +181,9 @@ fun MayTinhDetailScreen(
                 .padding(16.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text("Cấu Hình Máy Tính", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
@@ -224,7 +194,7 @@ fun MayTinhDetailScreen(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                if(maytinh!=null){
+                if (maytinh != null) {
                     item {
                         Text(
                             text = "Mã Máy",
@@ -237,7 +207,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -267,7 +241,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -297,7 +275,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -327,7 +309,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -357,7 +343,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -387,7 +377,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -417,7 +411,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -447,7 +445,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -477,7 +479,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -507,7 +513,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -537,7 +547,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -567,7 +581,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -597,7 +615,11 @@ fun MayTinhDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -614,7 +636,8 @@ fun MayTinhDetailScreen(
                             }
                         }
                     }
-                }else{
+
+                } else {
                     item {
                         Text("Lỗi khi lấy API")
                     }
@@ -624,7 +647,7 @@ fun MayTinhDetailScreen(
 
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             ) { data ->
                 snackbarData.value?.let { customData ->
                     Snackbar(
@@ -653,6 +676,53 @@ fun MayTinhDetailScreen(
                 }
             }
 
+
+            if(giangVien!= null){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            navController.navigate(NavRoute.CHITIETLICHSUCHUYENMAY.route + "?mamay=${maytinh.MaMay}")
+                        },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1B8DDE)),
+                        border = BorderStroke(1.dp, Color(0xFF1B8DDE)),
+                    ) {
+                        Icon(
+                            Icons.Outlined.History,
+                            contentDescription = "Lịch sử chuyển",
+                            tint = Color(0xFF1B8DDE),
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("Lịch sử chuyển", color = Color(0xFF1B8DDE), fontSize = 14.sp)
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            navController.navigate(NavRoute.DETAILLICHSUSUAMAY.route + "?mamay=${maytinh.MaMay}")
+                        },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1B8DDE)),
+                        border = BorderStroke(1.dp, Color(0xFF1B8DDE))
+                    ) {
+                        Icon(
+                            Icons.Outlined.Build,
+                            contentDescription = "Lịch sử sửa",
+                            tint = Color(0xFF1B8DDE),
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("Lịch sử sửa", color = Color(0xFF1B8DDE), fontSize = 14.sp)
+                    }
+                }
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -675,22 +745,66 @@ fun MayTinhDetailScreen(
                     Button(
                         modifier = Modifier.width(170.dp),
                         onClick = {
-                            val formatterDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                            val todayDate = LocalDate.now()
+                            val ngayHomNay = LocalDate.now().toString()
+                            val maPhongMay = maytinh?.MaPhong
 
-                            if(caHocHienTai!=null){
-                                var chitiet = ChiTietSuDungMay(
-                                    MaSV = sinhvien!!.MaSinhVien,
-                                    MaCa = caHocHienTai?.MaCaHoc ?: 0,
-                                    MaTuan = selectedTuan?.MaTuan ?: 0,
-                                    NgaySuDung = todayDate.format(formatterDate),
-                                    MaMay = maytinh.MaMay,
-                                    MaPhong = maytinh.MaPhong
-                                )
-                                chitietsudungmayViewModel.createChiTietSuDungMay(chitiet)
-                            }else{
-                                Toast.makeText(context, "Ngoài giờ học không được điểm danh", Toast.LENGTH_SHORT).show()
+                            // Kiểm tra thông tin cần thiết
+                            if (sinhvien == null) {
+                                Toast.makeText(context, "Không thể điểm danh: Không tìm thấy thông tin sinh viên", Toast.LENGTH_SHORT).show()
+                                return@Button
                             }
+
+                            if (maytinh == null) {
+                                Toast.makeText(context, "Không thể điểm danh: Không tìm thấy thông tin máy tính", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+
+                            if (caHienTai == null) {
+                                Toast.makeText(context, "Không thể điểm danh: Hiện không nằm trong ca học nào", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+
+                            // Lấy lịch học có cùng ca và ngày
+                            val lichCungCaVaNgay = danhSachLichHoc.firstOrNull { lichHoc ->
+                                lichHoc.MaCaHoc == caHienTai.MaCaHoc &&
+                                        lichHoc.NgayDay == ngayHomNay
+                            }
+
+                            if (lichCungCaVaNgay == null) {
+                                Toast.makeText(context, "Không có lịch học trong ${caHienTai.TenCa} ngày hôm nay", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+
+                            if (lichCungCaVaNgay.MaPhong != maPhongMay) {
+                                Toast.makeText(context, "Máy tính không đúng phòng học hiện tại", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+
+                            val daDiemDanh = chitietsudungmayViewModel.danhSachAllChiTiet.any { chiTiet ->
+                                chiTiet.MaSV == sinhvien.MaSinhVien &&
+                                        chiTiet.MaCa == caHienTai.MaCaHoc &&
+                                        chiTiet.NgaySuDung == ngayHomNay
+                            }
+
+                            if (daDiemDanh) {
+                                Toast.makeText(context, "Bạn đã điểm danh trước đó rồi", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+
+                            // ✅ Chưa điểm danh → tiến hành
+                            val chitiet = ChiTietSuDungMay(
+                                MaChiTietSuDung = 0,
+                                MaSV = sinhvien.MaSinhVien,
+                                MaCa = lichCungCaVaNgay.MaCaHoc,
+                                MaTuan = lichCungCaVaNgay.MaTuan,
+                                NgaySuDung = lichCungCaVaNgay.NgayDay,
+                                MaMay = maytinh.MaMay,
+                                MaPhong = lichCungCaVaNgay.MaPhong
+                            )
+
+                            chitietsudungmayViewModel.createChiTietSuDungMay(chitiet)
+
+                            Toast.makeText(context, "Điểm danh thành công", Toast.LENGTH_SHORT).show()
                         },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
@@ -714,3 +828,4 @@ fun MayTinhDetailScreen(
         }
     }
 }
+

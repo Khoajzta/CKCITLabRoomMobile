@@ -25,7 +25,4 @@ interface MonHocAPIService {
     suspend fun updateMonHoc(
         @Body monhoc: MonHoc
     ): UpdateResponse
-
-
-
 }

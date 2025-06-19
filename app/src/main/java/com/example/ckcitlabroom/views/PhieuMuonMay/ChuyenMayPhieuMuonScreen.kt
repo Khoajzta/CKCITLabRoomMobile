@@ -35,7 +35,7 @@ fun ChuyenMayPhieuMuonScreen(
     }
 
 
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
+    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay.filter { it.LoaiPhong == 1 || it.LoaiPhong == 2 }
 
     LaunchedEffect(Unit) {
         phongMayViewModel.getAllPhongMay()

@@ -2,6 +2,7 @@ package com.example.ckcitlabroom.viewmodels
 
 import LichHoc
 import LichHocRP
+import LichHocTheoThuVaPhongItem
 import MaGVRequest
 import MaLopHocRequest
 import android.util.Log
@@ -23,6 +24,10 @@ class LichHocViewModel : ViewModel() {
     var danhSachLichHoctheomagv by mutableStateOf<List<LichHocRP>>(emptyList())
     var danhSachLichHoctheomalop by mutableStateOf<List<LichHocRP>>(emptyList())
 
+    var danhSachLichHocTheoThuVaPhong by mutableStateOf<List<LichHocTheoThuVaPhongItem>>(emptyList())
+        private set
+
+
     var lichhoc by mutableStateOf<LichHoc?>(null)
         private set
 
@@ -39,6 +44,7 @@ class LichHocViewModel : ViewModel() {
     private var pollingJob: Job? = null
     private var pollingAllJob: Job? = null
     private var pollingSVJob: Job? = null
+    private var pollingALLGVJob: Job? = null
 
     fun getAllLichHoc() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -228,6 +234,41 @@ class LichHocViewModel : ViewModel() {
     fun stopPollingSV() {
         pollingSVJob?.cancel()
         pollingSVJob = null
+    }
+
+    fun getLichHocTheoThuVaPhong(maTuan: String) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.lichhocAPIService.getLichHocTheoThuVaPhong(maTuan)
+                }
+                danhSachLichHocTheoThuVaPhong = response
+            } catch (e: Exception) {
+                errorMessage = "Lỗi khi lấy lịch học theo thứ và phòng: ${e.message}"
+                Log.e("LichHocViewModel", "Lỗi API getLichHocTheoThuVaPhong", e)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun startPollingLichHocTheoThuVaPhong(maTuan: String) {
+        // Dừng polling cũ nếu đang chạy
+        pollingALLGVJob?.cancel()
+
+        pollingALLGVJob = viewModelScope.launch {
+            while (isActive) {
+                getLichHocTheoThuVaPhong(maTuan)
+                delay(1000)
+            }
+        }
+    }
+
+
+    fun stopPollingaALLGV() {
+        pollingALLGVJob?.cancel()
+        pollingALLGVJob = null
     }
 }
 

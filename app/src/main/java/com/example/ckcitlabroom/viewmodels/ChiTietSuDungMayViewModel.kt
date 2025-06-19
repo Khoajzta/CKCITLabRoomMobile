@@ -2,6 +2,7 @@ package com.example.ckcitlabroom.viewmodels
 
 import ChiTietSuDungMay
 import ChiTietSuDungMayRP
+import DeleteChiTietSuDungRequest
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,6 +63,26 @@ class ChiTietSuDungMayViewModel : ViewModel() {
             } catch (e: Exception) {
                 chitietsudungmayCreateResult = "Lỗi khi thêm máy tính: ${e.message}"
                 Log.e("ChiTietSuDungMayViewModel", "Lỗi khi thêm máy tính: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun deleteChiTietSuDungMay(maChiTiet: Int, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.chiTietSuDungMayAPIService.deleteChiTietSuDungMay(
+                        DeleteChiTietSuDungRequest(maChiTiet)
+                    )
+                }
+                onResult(true, response.message)
+
+            } catch (e: Exception) {
+                Log.e("ChiTietSuDungMayViewModel", "Lỗi khi xóa", e)
+                onResult(false, "Lỗi khi xóa: ${e.message}")
             } finally {
                 isLoading = false
             }

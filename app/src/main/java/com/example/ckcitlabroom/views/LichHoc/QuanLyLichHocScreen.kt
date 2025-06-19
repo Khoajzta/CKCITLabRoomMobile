@@ -25,9 +25,10 @@ fun QuanLyLichHocScreen(
 
     val dsChucNang = buildList {
         if (giangvien != null) {
-            add(ChucNang("Danh Sách Lịch Dạy Theo Tuần", Lucide.CalendarRange) {
-                navController.navigate(NavRoute.LISTLICHHOC.route)
+            add(ChucNang("Danh Sách Lịch Dạy", Lucide.CalendarRange) {
+                navController.navigate(NavRoute.LICHDAYTEOTUANALLGV.route)
             })
+
             add(ChucNang("Danh Sách Lịch Đã Dạy", Lucide.ClipboardCheck) {
                 navController.navigate(NavRoute.LISTLICHHOCDADAY.route)
             })
@@ -39,7 +40,7 @@ fun QuanLyLichHocScreen(
             }
         } else {
             add(ChucNang("Danh Sách Lịch Học Theo Tuần", Lucide.CalendarRange) {
-                navController.navigate(NavRoute.LISTLICHHOC.route)
+                navController.navigate(NavRoute.LICHDAYTEOTUANALLGV.route)
             })
             add(ChucNang("Danh Sách Lịch Đã Học", Lucide.ClipboardCheck) {
                 navController.navigate(NavRoute.LISTLICHHOCDADAY.route)

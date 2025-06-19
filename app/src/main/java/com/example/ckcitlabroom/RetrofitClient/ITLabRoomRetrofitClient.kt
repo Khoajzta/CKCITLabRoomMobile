@@ -20,6 +20,7 @@ import PhieuMuonMayAPIService
 import PhieuSuaChuaAPIService
 import PhongMayAPIService
 import SinhVienAPIService
+import ThongBaoAPIService
 import TuanAPIService
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
@@ -206,6 +207,14 @@ object Constants {
                 .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
                 .build()
                 .create(NotificationApiService::class.java)
+        }
+
+        val thongbaoAPIService: ThongBaoAPIService by lazy {
+            Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+                .build()
+                .create(ThongBaoAPIService::class.java)
         }
     }
 }

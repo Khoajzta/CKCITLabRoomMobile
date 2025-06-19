@@ -16,6 +16,7 @@ data class LoginSinhVienState(
     val maLop: String? = null,
     val matKhau: String? = null,
     val maLoaiTaiKhoan: Int = 0,
+    val token: String? = null,
     val trangThai: Int = 0
 )
 
@@ -34,6 +35,7 @@ class SinhVienPreferences(private val context: Context) {
         private val MALOP_KEY = stringPreferencesKey("sinhvien_malop")
         private val MATKHAU_KEY = stringPreferencesKey("sinhvien_matkhau")
         private val LOAITK_KEY = intPreferencesKey("sinhvien_loaitk")
+        private val TOKEN_KEY = stringPreferencesKey("sinhvien_token")
         private val TRANGTHAI_KEY = intPreferencesKey("sinhvien_trangthai")
     }
 
@@ -48,6 +50,7 @@ class SinhVienPreferences(private val context: Context) {
             maLop = prefs[MALOP_KEY],
             matKhau = prefs[MATKHAU_KEY],
             maLoaiTaiKhoan = prefs[LOAITK_KEY] ?: 0,
+            token = prefs[TOKEN_KEY],
             trangThai = prefs[TRANGTHAI_KEY] ?: 0
         )
     }
@@ -63,6 +66,7 @@ class SinhVienPreferences(private val context: Context) {
             prefs[MALOP_KEY] = sv.MaLop
             prefs[MATKHAU_KEY] = sv.MatKhau
             prefs[LOAITK_KEY] = sv.MaLoaiTaiKhoan
+            prefs[TOKEN_KEY] = sv.Token ?: ""
             prefs[TRANGTHAI_KEY] = sv.TrangThai
         }
         UserTypePreferences(context).saveUserType("sinhvien")
@@ -79,6 +83,7 @@ class SinhVienPreferences(private val context: Context) {
             prefs.remove(MALOP_KEY)
             prefs.remove(MATKHAU_KEY)
             prefs[LOAITK_KEY] = 0
+            prefs[TOKEN_KEY] = ""
             prefs[TRANGTHAI_KEY] = 0
         }
         UserTypePreferences(context).clearUserType()

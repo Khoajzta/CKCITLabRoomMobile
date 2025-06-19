@@ -16,6 +16,7 @@ data class LoginGiangVienState(
     val email: String? = null,
     val matKhau: String? = null,
     val maLoaiTaiKhoan: Int? = null,
+    val token: String? = null,
     val trangThai: Int? = null
 )
 
@@ -32,6 +33,7 @@ class GiangVienPreferences(private val context: Context) {
         private val EMAIL_KEY = stringPreferencesKey("giangvien_email")
         private val MATKHAU_KEY = stringPreferencesKey("giangvien_matkhau")
         private val MALOAITK_KEY = intPreferencesKey("giangvien_maloaitaikhoan")
+        private val TOKEN_KEY = stringPreferencesKey("giangvien_token")
         private val TRANGTHAI_KEY = intPreferencesKey("giangvien_trangthai")
     }
 
@@ -45,6 +47,7 @@ class GiangVienPreferences(private val context: Context) {
             email = prefs[EMAIL_KEY],
             matKhau = prefs[MATKHAU_KEY],
             maLoaiTaiKhoan = prefs[MALOAITK_KEY],
+            token = prefs[TOKEN_KEY],
             trangThai = prefs[TRANGTHAI_KEY]
         )
     }
@@ -59,6 +62,7 @@ class GiangVienPreferences(private val context: Context) {
             prefs[EMAIL_KEY] = giangVien.Email
             prefs[MATKHAU_KEY] = giangVien.MatKhau
             prefs[MALOAITK_KEY] = giangVien.MaLoaiTaiKhoan
+            prefs[TOKEN_KEY] = giangVien.Token?: ""
             prefs[TRANGTHAI_KEY] = giangVien.TrangThai
         }
         UserTypePreferences(context).saveUserType("giangvien")

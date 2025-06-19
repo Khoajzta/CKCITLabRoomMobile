@@ -57,15 +57,15 @@ fun UpdateTraMayScreen(
     chitetPhieuMuonViewModel: ChiTietPhieuMuonViewModel,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
 ) {
-
+    // Load dữ liệu khi màn hình được tạo
     LaunchedEffect(maphieumuon) {
         chitetPhieuMuonViewModel.getChiTietPhieuMuonTheoMaPhieuOnce(maphieumuon)
         mayTinhViewModel.getAllMayTinh()
         phieuMuonMayViewModel.getPhieuMuonByMaPhieu(maphieumuon)
     }
 
-    var phieumuon = phieuMuonMayViewModel.phieuMuonMay
-    var danhsachallMayTinh = mayTinhViewModel.danhSachAllMayTinh
+    val phieumuon = phieuMuonMayViewModel.phieuMuonMay
+    val danhSachAllMayTinh = mayTinhViewModel.danhSachAllMayTinh
 
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
@@ -75,28 +75,23 @@ fun UpdateTraMayScreen(
     val mayTinhList by remember {
         derivedStateOf {
             chiTietList.mapNotNull { chitiet ->
-                danhsachallMayTinh.find { it.MaMay == chitiet.MaMay }
+                danhSachAllMayTinh.find { it.MaMay == chitiet.MaMay }
             }
         }
     }
 
-
     val tinhTrangMap = remember { mutableStateMapOf<String, String>() }
-
     val coroutineScope = rememberCoroutineScope()
-
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        LazyColumn(
-            modifier = Modifier.height(550.dp)
-        ) {
+        LazyColumn(modifier = Modifier.height(550.dp)) {
             items(chiTietList) { chitiet ->
                 val maMay = chitiet.MaMay
-                val mayTinh = mayTinhViewModel.danhSachAllMayTinh.find { it.MaMay == maMay }
+                val mayTinh = danhSachAllMayTinh.find { it.MaMay == maMay }
 
                 Card(
                     modifier = Modifier
@@ -113,12 +108,13 @@ fun UpdateTraMayScreen(
                             label = "Tên máy",
                             value = mayTinh?.TenMay ?: "Không tìm thấy"
                         )
-
                         Spacer(modifier = Modifier.height(8.dp))
+
                         OutlinedTextField(
                             value = tinhTrangMap[maMay] ?: "",
                             onValueChange = { tinhTrangMap[maMay] = it },
                             label = { Text("Tình trạng sau khi trả") },
+                            placeholder = { Text("Hoạt động bình thường") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -136,7 +132,8 @@ fun UpdateTraMayScreen(
         }
 
         SnackbarHost(
-            hostState = snackbarHostState, modifier = Modifier.padding(16.dp)
+            hostState = snackbarHostState,
+            modifier = Modifier.padding(16.dp)
         ) { data ->
             snackbarData.value?.let { customData ->
                 Snackbar(
@@ -144,12 +141,11 @@ fun UpdateTraMayScreen(
                     contentColor = Color.White,
                     shape = RoundedCornerShape(12.dp),
                     action = {
-                        TextButton(onClick = {
-                            snackbarData.value = null
-                        }) {
+                        TextButton(onClick = { snackbarData.value = null }) {
                             androidx.compose.material3.Text("Đóng", color = Color.White)
                         }
-                    }) {
+                    }
+                ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
@@ -168,44 +164,42 @@ fun UpdateTraMayScreen(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
                 val ngayHienTai = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-                var maphongcu = ""
-                if (phieumuon != null) {
-                    maphongcu = phieumuon.MaPhong!!.toString()
-                }
+                val maPhongCu = phieumuon?.MaPhong ?: ""
 
-
+                // Nếu trống thì gán "Hoạt động bình thường"
                 val listChiTietUpdate = chiTietList.map { chitiet ->
-                    chitiet.copy(TinhTrangTra = tinhTrangMap[chitiet.MaMay] ?: "")
+                    val tinhTrang = tinhTrangMap[chitiet.MaMay]?.takeIf { it.isNotBlank() } ?: "Hoạt động"
+                    chitiet.copy(TinhTrangTra = tinhTrang)
                 }
 
                 coroutineScope.launch {
+                    // Cập nhật chi tiết phiếu mượn
                     chitetPhieuMuonViewModel.updateNhieuChiTietPhieuMuon(listChiTietUpdate)
-                    val message = chitetPhieuMuonViewModel.chiTietPhieuMuonUpdateResult
-                    Log.d("Update", "Kết quả cập nhật: $message")
 
-                    if(phieumuon!= null){
-                        val phieuMuonCapNhat = phieumuon.copy(NgayTra = ngayHienTai, TrangThai = 2)
-
+                    // Cập nhật phiếu mượn
+                    phieumuon?.let {
+                        val phieuMuonCapNhat = it.copy(NgayTra = ngayHienTai, TrangThai = 2)
                         phieuMuonMayViewModel.updatePhieuMuonMay(phieuMuonCapNhat)
                     }
 
+                    // Cập nhật trạng thái máy và ghi lịch sử chuyển
                     mayTinhList.forEach { mayTinh ->
-                        val mayTinhCapNhat =
-                            mayTinh.copy(MaPhong = "KHOLUUTRU", TenMay = "MAYKHOLUUTRU")
+                        val mayTinhCapNhat = mayTinh.copy(
+                            MaPhong = "KHOLUUTRU",
+                            TenMay = "MAYKHOLUUTRU"
+                        )
                         mayTinhViewModel.updateMayTinh(mayTinhCapNhat)
 
                         val lichSu = LichSuChuyenMay(
                             MaLichSu = 0,
                             MaMay = mayTinh.MaMay,
-                            MaPhongCu = maphongcu,
+                            MaPhongCu = maPhongCu,
                             MaPhongMoi = "KHOLUUTRU",
                             NgayChuyen = ngayHienTai
                         )
                         lichSuChuyenMayViewModel.createLichSuChuyenMay(lichSu)
                     }
-                }
 
-                coroutineScope.launch {
                     snackbarData.value = CustomSnackbarData(
                         message = "Cập nhật trả máy thành công!",
                         type = SnackbarType.SUCCESS
@@ -214,13 +208,14 @@ fun UpdateTraMayScreen(
                 }
             },
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xff0b9adc))
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
         ) {
             androidx.compose.material3.Text(
                 "Cập nhật trả máy",
-                color = Color.White,
-                fontWeight = FontWeight.Bold
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
 }
+

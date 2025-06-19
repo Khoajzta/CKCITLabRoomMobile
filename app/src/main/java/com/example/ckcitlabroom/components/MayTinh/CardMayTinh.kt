@@ -1,5 +1,6 @@
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -35,6 +39,8 @@ import androidx.navigation.NavHostController
 import com.composables.icons.lucide.*
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 
 @Composable
 fun CardMayTinh(
@@ -81,6 +87,7 @@ fun CardMayTinh(
                     else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
                 }
 
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(4.dp))
@@ -97,13 +104,61 @@ fun CardMayTinh(
             )
 
             InfoRow(icon = Lucide.QrCode, label = "Tên máy", value = maytinh.TenMay)
+            Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.MapPin, label = "Vị trí", value = maytinh.ViTri)
+            Spacer(Modifier.height(8.dp))
             InfoRow(icon = Lucide.Building2, label = "Phòng", value = phongMayCard?.TenPhong ?: "Đang tải...")
+            Spacer(Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        navController.navigate(NavRoute.CHITIETLICHSUCHUYENMAY.route + "?mamay=${maytinh.MaMay}")
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1B8DDE)),
+                    border = BorderStroke(1.dp, Color(0xFF1B8DDE)),
+                ) {
+                    Icon(
+                        Icons.Outlined.History,
+                        contentDescription = "Lịch sử chuyển",
+                        tint = Color(0xFF1B8DDE),
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text("Lịch sử chuyển", color = Color(0xFF1B8DDE), fontSize = 14.sp)
+                }
+
+                OutlinedButton(
+                    onClick = {
+                        navController.navigate(NavRoute.DETAILLICHSUSUAMAY.route + "?mamay=${maytinh.MaMay}")
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1B8DDE)),
+                    border = BorderStroke(1.dp, Color(0xFF1B8DDE))
+                ) {
+                    Icon(
+                        Icons.Outlined.Build,
+                        contentDescription = "Lịch sử sửa",
+                        tint = Color(0xFF1B8DDE),
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text("Lịch sử sửa", color = Color(0xFF1B8DDE), fontSize = 14.sp)
+                }
+
+            }
 
             if (expanded) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
 
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     InfoRow(icon = Lucide.Cpu, label = "Main", value = maytinh.Main)
                     InfoRow(icon = Lucide.Cpu, label = "CPU", value = maytinh.CPU)
                     InfoRow(icon = Lucide.MemoryStick, label = "RAM", value = maytinh.RAM)
@@ -113,7 +168,7 @@ fun CardMayTinh(
                     InfoRow(icon = Lucide.Keyboard, label = "Bàn phím", value = maytinh.BanPhim)
                     InfoRow(icon = Lucide.Mouse, label = "Chuột", value = maytinh.Chuot)
 
-                    Spacer(modifier = Modifier.height(12.dp))
+
                     Button(
                         onClick = {
                             navController.navigate(NavRoute.EDITMAYTINH.route + "?mamay=${maytinh.MaMay}")

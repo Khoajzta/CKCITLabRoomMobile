@@ -1,3 +1,4 @@
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -80,7 +82,9 @@ fun EditLichHocScreen(
     val danhSachLopHoc = lopHocViewModel.danhSachAllLopHoc.filter { it.TrangThai == 1 }
     val danhSachCaHoc = caHocViewModel.danhSachAllCaHoc.filter { it.TrangThai == 1 }
     val danhSachTokenSinhVienTheoLop by rememberUpdatedState(newValue = sinhVienViewModel.danhSachToken)
+    var danhsachallsinhvien = sinhVienViewModel.danhSachAllSinhVien
 
+    var danhsachsinhvientheolop = danhsachallsinhvien.filter { it.MaLop == lichhoc?.MaLopHoc }
 
     val danhSachThu = listOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật")
     val thuToOffset = mapOf(
@@ -107,6 +111,7 @@ fun EditLichHocScreen(
         lopHocViewModel.getAllLopHoc()
         caHocViewModel.getAllCaHoc()
         lichhocViewModel.getLichHocByMaLich(malichhoc)
+        sinhVienViewModel.getAllSinhVien()
     }
 
     // Gán dữ liệu vào dropdown khi lichhoc được load
@@ -329,18 +334,54 @@ fun EditLichHocScreen(
                             TrangThai = lichhoc?.TrangThai ?: 0
                         )
 
-
                         // Cập nhật lịch học
                         lichhocViewModel.updateLichHoc(newLichHoc)
 
-                        // Gửi thông báo FCM
-                        val uniqueTokens = danhSachTokenSinhVienTheoLop.distinct()
-                        if (uniqueTokens.isNotEmpty()) {
-                            val title = "Thông báo lịch học"
-                            val body = "Lịch học môn ${selectedMonHoc!!.TenMonHoc} của lớp ${selectedLop!!.TenLopHoc}\n Thông báo: ${ghiChu}."
-                            notificationViewModel.sendNotificationToTokens(uniqueTokens, title, body)
+                        // Thời gian hiện tại
+                        val now = LocalDateTime.now()
+                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val currentTime = now.format(formatter)
+
+                        // Gửi thông báo cho sinh viên
+                        val svTokens = danhSachTokenSinhVienTheoLop.distinct()
+                        val title = "Thông báo lịch học"
+                        val body = "Lịch học môn ${selectedMonHoc!!.TenMonHoc} của lớp ${selectedLop!!.TenLopHoc}\nThông báo: $ghiChu."
+
+                        if (svTokens.isNotEmpty()) {
+                            notificationViewModel.sendNotificationToTokens(svTokens, title, body)
                         }
 
+                        danhsachsinhvientheolop.forEach { sv ->
+                            val thongBao = ThongBao(
+                                MaTB = 0,
+                                TieuDe = title,
+                                NoiDung = body,
+                                MaLoaiTaiKhoan = 3,
+                                MaNguoiDung = sv.MaSinhVien,
+                                ThoiGian = currentTime,
+                                DaDoc = false
+                            )
+                            notificationViewModel.createThongBao(thongBao)
+                        }
+
+                        // Nếu người chỉnh sửa KHÔNG phải là giảng viên trong lịch → gửi thêm cho giảng viên
+                        if (giangvien?.MaGV != selectedGiangVien?.MaGV) {
+                            val gvToken = selectedGiangVien?.Token
+                            if (!gvToken.isNullOrBlank()) {
+                                notificationViewModel.sendNotificationToTokens(listOf(gvToken), title, body)
+                            }
+
+                            val thongBaoGV = ThongBao(
+                                MaTB = 0,
+                                TieuDe = title,
+                                NoiDung = "Lịch dạy môn ${selectedMonHoc!!.TenMonHoc} của lớp ${selectedLop!!.TenLopHoc} đã được cập nhật.\nThông báo: $ghiChu.",
+                                MaLoaiTaiKhoan = 2,
+                                MaNguoiDung = selectedGiangVien!!.MaGV,
+                                ThoiGian = currentTime,
+                                DaDoc = false
+                            )
+                            notificationViewModel.createThongBao(thongBaoGV)
+                        }
 
                         Toast.makeText(context, "Cập nhật lịch học thành công", Toast.LENGTH_SHORT).show()
                         navController.popBackStack()
@@ -348,7 +389,6 @@ fun EditLichHocScreen(
                         Toast.makeText(context, "Vui lòng chọn đầy đủ thông tin", Toast.LENGTH_SHORT).show()
                     }
                 }
-
                 ,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),

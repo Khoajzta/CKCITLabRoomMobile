@@ -281,6 +281,14 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
+
+    suspend fun getSinhVienByMaGOrEmailNow(ma: String): SinhVien? {
+        return try {
+            ITLabRoomRetrofitClient.sinhvienAPIService.getSinhVienByEmailOrMaSV(ma)
+        } catch (e: Exception) {
+            null
+        }
+    }
 }
 
 

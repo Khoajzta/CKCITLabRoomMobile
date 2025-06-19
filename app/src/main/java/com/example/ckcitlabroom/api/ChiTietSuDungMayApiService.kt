@@ -8,6 +8,11 @@ data class ChiTietSuDungMayResponse(
 )
 
 
+data class DeleteChiTietSuDungRequest(
+    val MaChiTietSuDung: Int
+)
+
+
 interface ChiTietSuDungMayAPIService {
     @POST("ChiTietSuDungMay/create.php")
     suspend fun createChiTietSuDungMay(
@@ -16,4 +21,10 @@ interface ChiTietSuDungMayAPIService {
 
     @GET("ChiTietSuDungMay/read.php")
     suspend fun getAllChItietSuDungMay(): ChiTietSuDungMayResponse
+
+    @POST("ChiTietSuDungMay/delete.php")
+    suspend fun deleteChiTietSuDungMay(
+        @Body request: DeleteChiTietSuDungRequest
+    ): DeleteResponse
+
 }

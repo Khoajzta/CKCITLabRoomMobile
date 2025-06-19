@@ -47,6 +47,8 @@ fun CardGiangVien(
     navController: NavHostController,
     giangVienViewModel: GiangVienViewModel
 ) {
+    var giangvienhientai = giangVienViewModel.giangvienSet
+
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -106,17 +108,18 @@ fun CardGiangVien(
             AnimatedVisibility(visible = expanded) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
-                    Button(
-                        onClick = { showDialog = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-                    ) {
-                        Icon(Lucide.Repeat, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Cập Nhật Trạng Thái", color = Color.White)
+                    if(giangVien.MaGV != giangvienhientai!!.MaGV){
+                        Button(
+                            onClick = { showDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                        ) {
+                            Icon(Lucide.Repeat, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Cập Nhật Trạng Thái", color = Color.White)
+                        }
                     }
-
                     Button(
                         onClick = {
                             navController.navigate(NavRoute.EDITGIANGVIEN.route + "?magv=${giangVien.MaGV}")

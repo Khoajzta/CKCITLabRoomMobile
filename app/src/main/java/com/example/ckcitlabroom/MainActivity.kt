@@ -18,6 +18,8 @@ import TuanViewModel
 import UpdateLichHocWorker
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -34,8 +36,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +50,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +65,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -68,6 +81,8 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.composables.icons.lucide.Bell
+import com.composables.icons.lucide.BellDot
 import com.composables.icons.lucide.House
 import com.composables.icons.lucide.LayoutGrid
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
@@ -84,6 +99,9 @@ import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
@@ -104,6 +122,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
 
+    val context = LocalContext.current
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true
 
@@ -146,13 +165,22 @@ fun MainScreen() {
     val giangVien = giangVienViewModel.giangvienSet
     val sinhVien = sinhVienViewModel.sinhvienSet
 
+
+    val unreadCount = notificationViewModel.danhSachAllThongBao.count { tb ->
+        !tb.DaDoc && (
+            (sinhVien != null && tb.MaNguoiDung == sinhVien.MaSinhVien) ||
+            (giangVien != null && tb.MaNguoiDung == giangVien.MaGV)
+        )
+    }
+
+
     val buttons = listOf(
         ButtonData("Home", Lucide.House) {
             navController.navigate(NavRoute.HOME.route) {
                 popUpTo(0) { inclusive = true }
             }
         },
-        ButtonData("Quản Lý", Lucide.LayoutGrid) {
+        ButtonData("Chức Năng", Lucide.LayoutGrid) {
             navController.navigate(NavRoute.QUANLY.route) {
                 popUpTo(0) { inclusive = true }
             }
@@ -168,6 +196,10 @@ fun MainScreen() {
             }
         }
     )
+
+    LaunchedEffect(Unit) {
+        notificationViewModel.getAllThongBao()
+    }
 
     // AppBar logic dùng rõ ràng theo route thay vì index
     @Composable
@@ -266,6 +298,7 @@ fun MainScreen() {
             }
 
             NavRoute.HOME.route,
+            NavRoute.QUETQRCODE.route,
             NavRoute.QUANLY.route,
             NavRoute.ACCOUNT.route -> {
                 TopAppBar(
@@ -297,6 +330,27 @@ fun MainScreen() {
                                 )
                             )
 
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                navController.navigate(NavRoute.ListThongBaoSinhVien.route)
+                            },
+                            modifier = Modifier.padding(end = 12.dp).size(40.dp)
+                        ) {
+                            BadgedBox(badge = {
+                                if (unreadCount > 0) {
+                                    Badge { Text(unreadCount.toString()) }
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = Lucide.Bell,
+                                    contentDescription = "Thông báo",
+                                    tint = Color(0xFF1B8DDE),
+                                    modifier = Modifier.size(30.dp)
+                                )
+                            }
                         }
                     }
                 )
@@ -381,7 +435,10 @@ fun MainScreen() {
                 .padding(paddingValues)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(12.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(12.dp)),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

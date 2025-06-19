@@ -1,4 +1,5 @@
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -289,46 +290,43 @@ fun LoginSVScreen(
                 }
             }
 
-            // Xử lý kết quả login và điều hướng giống code cũ
-            LaunchedEffect(loginResult) {
-                loginResult?.let {
-                    if (it.result) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Đăng nhập thành công", type = SnackbarType.SUCCESS
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
-                        sinhVienViewModel.getSinhVienByMaGOrEmail(emailState.value)
-                    } else {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Email hoặc mật khẩu không chính xác", type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
+            val coroutineScope = rememberCoroutineScope()
 
-                        sinhVienViewModel.resetLoginResult()
-                    }
+            LaunchedEffect(loginResult) {
+                if (loginResult?.result == true) {
+                    sinhVienViewModel.getSinhVienByMaGOrEmail(emailState.value)
+                } else if (loginResult != null) {
+                    Toast.makeText(context, "Email hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show()
+                    sinhVienViewModel.resetLoginResult()
                 }
             }
 
             LaunchedEffect(loginResult, sinhvien) {
                 if (loginResult?.result == true && sinhvien != null) {
-                    sinhVienViewModel.setSV(sinhvien)
-                    userPreferences.saveLoginForSinhVien(sinhvien)
+                    if (sinhvien.TrangThai == 0) {
+                        Toast.makeText(context, "Tài khoản bị khóa", Toast.LENGTH_SHORT).show()
+                        sinhVienViewModel.resetLoginResult()
+                    } else {
+                        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                            val sinhvienWithToken = sinhvien.copy(Token = token)
 
-                    FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
-                        Log.d("FirebaseToken", "Token: $token")
+                            // ✅ Cập nhật token lên server
+                            sinhVienViewModel.updateToken(sinhvien.MaSinhVien, token)
 
-                        val maSinhVien = sinhVienViewModel.sinhvien?.MaSinhVien ?: return@addOnSuccessListener
-                        sinhVienViewModel.updateToken(maSinhVien, token)
-                    }
-                    navController.navigate(NavRoute.HOME.route) {
-                        popUpTo(0) { inclusive = true }
+                            // ✅ Cập nhật local ViewModel & DataStore
+                            sinhVienViewModel.setSV(sinhvienWithToken)
+                            coroutineScope.launch {
+                                userPreferences.saveLoginForSinhVien(sinhvienWithToken)
+                                navController.navigate(NavRoute.HOME.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        }
                     }
                 }
             }
+
+
         }
     }
 }

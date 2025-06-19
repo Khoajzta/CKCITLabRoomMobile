@@ -66,8 +66,8 @@ fun CardLichHoc(
     Card(
         modifier = Modifier
             .padding(bottom = 8.dp)
-            .width(360.dp)
-            .heightIn(min = 190.dp, max = 320.dp)
+            .width(390.dp)
+            .heightIn(min = 190.dp, max = 550.dp)
             .animateContentSize()
             .clip(RoundedCornerShape(16.dp)),
         onClick = { expanded = !expanded },
@@ -87,7 +87,7 @@ fun CardLichHoc(
                     text = lichHoc.TenMonHoc,
                     color = Color(0xFF1B8DDE),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
+                    fontSize = 17.sp
                 )
                 Icon(
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,

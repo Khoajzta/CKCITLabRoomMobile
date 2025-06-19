@@ -95,9 +95,9 @@ fun QuanLyScreen(
         Text(
             text = "Chức Năng",
             fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
             color = Color(0xFF1B8DDE),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
 
         LazyVerticalGrid(

@@ -59,7 +59,7 @@ fun PhongMayChuyenMuonScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    val danhSachMayTinhtheophong = mayTinhViewModel.danhSachAllMayTinhtheophong
+    val danhSachMayTinhtheophong = mayTinhViewModel.danhSachAllMayTinhtheophong.filter { it.TrangThai == 1 }
     val phongmaymuon = phongMayViewModel.phongmay
 
 

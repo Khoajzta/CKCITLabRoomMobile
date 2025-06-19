@@ -150,11 +150,10 @@ fun CardPhieuSuaChua(
                     containerColor = Color.White,
                     title = {
                         Text(
-                            "Xác nhận cập nhật trạng thái",
+                            "Cập nhật trạng thái",
                             fontWeight = FontWeight.Bold,
                             color = Color.Black,
                             modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
                         )
                     },
                     text = {

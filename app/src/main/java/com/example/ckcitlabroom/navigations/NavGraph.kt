@@ -130,6 +130,7 @@ sealed class NavRoute(val route: String) {
     object LISTLICHHOC : NavRoute("danhsachlichhoc_screen")
     object LISTLICHHOCDADAY : NavRoute("danhsachlichhocdaday_screen")
     object CHITIETLICHHOCTHEOTUAN : NavRoute("chitietlichhoctheotuuan_screen")
+    object LICHDAYTEOTUANALLGV : NavRoute("lichdaytheotuanallgv_screen")
 
     //Môn Học
     object QUANLYMONHOC : NavRoute("quanlymonhoc_screen")
@@ -141,6 +142,12 @@ sealed class NavRoute(val route: String) {
     //Chi tiết sử dụng máy
     object LISTLICHHOCSUDUNGMAY : NavRoute("listlichhocsudungmay_screen")
     object LISTSVSUDUNGMAYTHEOCA : NavRoute("listSinhViensudungmaytheoca_screen")
+
+    //Thông báo
+    object ListThongBaoSinhVien : NavRoute("listthongbaosinhvien_screen")
+    object ADDTHONGBAO : NavRoute("addthongbao_screen")
+    object EDITTHONGBAO : NavRoute("editthongbao_screen")
+
 
 }
 
@@ -298,7 +305,7 @@ fun NavgationGraph(
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
-            MayTinhDetailScreen(mamay,phongMayViewModel,giangVienViewModel,sinhVienViewModel,navController,namHocViewModel,tuanViewModel,caHocViewModel,chiTietSuDungMayViewModel)
+            MayTinhDetailScreen(mamay,phongMayViewModel,giangVienViewModel,sinhVienViewModel,navController,caHocViewModel,chiTietSuDungMayViewModel,lichHocViewModel)
         }
 
         composable(
@@ -968,12 +975,32 @@ fun NavgationGraph(
         }
 
         composable(
-            route = NavRoute.LISTLICHHOC.route,
+            route = NavRoute.LICHDAYTEOTUANALLGV.route,
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
-            ListLichHocScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel,namHocViewModel,tuanViewModel,navController)
+            LichDayGVAllTuan(lichHocViewModel,giangVienViewModel,sinhVienViewModel,namHocViewModel,tuanViewModel,phongMayViewModel,navController)
         }
+
+        composable(
+            route = "${NavRoute.LISTLICHHOC.route}/{maTuan}",
+            arguments = listOf(navArgument("maTuan") { type = NavType.IntType }),
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) { backStackEntry ->
+            val maTuan = backStackEntry.arguments?.getInt("maTuan") ?: 0
+
+            ListLichHocScreen(
+                maTuan = maTuan,
+                lichHocViewModel = lichHocViewModel,
+                giangVienViewModel = giangVienViewModel,
+                sinhVienViewModel = sinhVienViewModel,
+                namHocViewModel = namHocViewModel,
+                tuanViewModel = tuanViewModel,
+                navController = navController
+            )
+        }
+
 
         composable(
             route = NavRoute.LISTLICHHOCDADAY.route,
@@ -992,7 +1019,7 @@ fun NavgationGraph(
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
             val matuan = navBackStackEntry.arguments?.getString("matuan") ?: ""
-            ChiTietLichHocScreen(matuan,navController,sinhVienViewModel, giangVienViewModel,lichHocViewModel)
+            ChiTietLichHocScreen(matuan,navController,sinhVienViewModel, giangVienViewModel,lichHocViewModel,tuanViewModel)
         }
 
 
@@ -1067,6 +1094,14 @@ fun NavgationGraph(
             val ngaySuDung = navBackStackEntry.arguments?.getString("ngaySuDung") ?: ""
 
             ListSinhVienTheoCa(maCa,maTuan,maphong,ngaySuDung,chiTietSuDungMayViewModel)
+        }
+
+        composable(
+            route = NavRoute.ListThongBaoSinhVien.route,
+            enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
+            exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
+        ) {
+            ListThongBao(notificationViewModel,sinhVienViewModel,giangVienViewModel)
         }
     }
 }

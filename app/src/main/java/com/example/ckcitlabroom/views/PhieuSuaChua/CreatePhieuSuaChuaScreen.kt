@@ -1,4 +1,5 @@
 import android.app.DatePickerDialog
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -53,6 +54,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
@@ -82,6 +84,10 @@ fun CreatePhieuSuaChuaScreen(
 
     var danhsachphieusuachua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChua
     var danhsachTokenAdmin = giangvienViewmodel.danhSachTokenAdmin
+    var danhsacallgiangvien = giangvienViewmodel.danhSachAllGiangVien
+    var danhsachadmin = danhsacallgiangvien.filter { it.MaLoaiTaiKhoan == 1 }
+
+    Log.d("danhsachs admin",danhsachadmin.toString())
 
     var mayTinhViewModel: MayTinhViewModel = viewModel()
     var maytinh = mayTinhViewModel.maytinh
@@ -90,6 +96,7 @@ fun CreatePhieuSuaChuaScreen(
         mayTinhViewModel.getMayTinhByMaMay(mamay)
         phieuSuaChuaViewModel.getAllPhieuSuaChua()
         giangvienViewmodel.getTokenAdmin()
+        giangvienViewmodel.getAllGiangVien()
     }
 
     DisposableEffect(Unit) {
@@ -571,6 +578,23 @@ fun CreatePhieuSuaChuaScreen(
                                 val title = "Thông báo phiếu sửa chữa"
                                 val body = "Máy tính ${maytinh.ViTri} ở phòng ${maytinh.MaPhong} bị ${moTaLoiState.value}"
                                 notificationViewModel.sendNotificationToTokens(uniqueTokens, title, body)
+                            }
+
+                            val now = LocalDateTime.now()
+                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                            val currentTime = now.format(formatter)
+
+                            danhsachadmin.forEach { gv ->
+                                val thongBao = ThongBao(
+                                    MaTB = 0,
+                                    TieuDe = "Thông báo phiếu sửa chữa",
+                                    NoiDung = "Máy tính ${maytinh.ViTri} ở phòng ${maytinh.MaPhong} bị ${moTaLoiState.value}",
+                                    MaLoaiTaiKhoan = 1,
+                                    MaNguoiDung = gv.MaGV,
+                                    ThoiGian = currentTime,
+                                    DaDoc = false
+                                )
+                                notificationViewModel.createThongBao(thongBao)
                             }
 
                             coroutineScope.launch {

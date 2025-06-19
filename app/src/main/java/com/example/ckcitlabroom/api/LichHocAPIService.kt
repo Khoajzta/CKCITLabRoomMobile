@@ -25,6 +25,23 @@ data class UpdateLichHocRequest(
     val MaLichHocList: List<Int>
 )
 
+data class LichHocTheoThuVaPhongItem(
+    val MaPhong: String,
+    val TenPhong: String,
+    val Thu2: List<MonCa>,
+    val Thu3: List<MonCa>,
+    val Thu4: List<MonCa>,
+    val Thu5: List<MonCa>,
+    val Thu6: List<MonCa>,
+    val Thu7: List<MonCa>,
+    val ChuNhat: List<MonCa>
+)
+
+data class MonCa(
+    val MaMonHoc: String,
+    val MaCaHoc: String,
+    val TenGiangVien: String
+)
 
 interface LichHocAPIService {
     @GET("LichHoc/read.php")
@@ -59,5 +76,10 @@ interface LichHocAPIService {
     suspend fun updateTrangThaiLichHoc(
         @Body request: UpdateLichHocRequest
     ): UpdateResponse
+
+    @GET("LichHoc/getAllLichHocTheoTuan.php")
+    suspend fun getLichHocTheoThuVaPhong(
+        @Query("MaTuan") maTuan: String
+    ): List<LichHocTheoThuVaPhongItem>
 
 }

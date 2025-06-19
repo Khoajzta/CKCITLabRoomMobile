@@ -276,4 +276,16 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
             }
         }
     }
+
+    suspend fun getGiangVienByMaGOrEmailNow(ma: String): GiangVien? {
+        return try {
+            withContext(Dispatchers.IO) {
+                ITLabRoomRetrofitClient.giangVienAPIService.getGiangVienByEmailOrMaGV(ma)
+            }
+        } catch (e: Exception) {
+            Log.e("GiangVienViewModel", "Lỗi khi lấy giảng viên mới: ${e.message}")
+            null
+        }
+    }
+
 }

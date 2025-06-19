@@ -1,4 +1,5 @@
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -274,47 +275,52 @@ fun LoginGVScreen(
                 }
             }
 
-            // Xử lý kết quả login và điều hướng giống code cũ
+            val coroutineScope = rememberCoroutineScope()
+
+// 1. Xử lý kết quả đăng nhập giảng viên
             LaunchedEffect(loginResult) {
                 loginResult?.let {
                     if (it.result) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Đăng nhập thành công", type = SnackbarType.SUCCESS
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
                         giangVienViewModel.getGiangVienByMaGOrEmail(emailState.value)
-                        giangVienViewModel.setGV(giangVien)
                     } else {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Email hoặc mật khẩu không chính xác", type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
+                        Toast.makeText(context, "Email hoặc mật khẩu không chính xác", Toast.LENGTH_SHORT).show()
                         giangVienViewModel.resetLoginResult()
                     }
                 }
             }
 
+// 2. Khi đã có loginResult và giảngVien, kiểm tra trạng thái và cập nhật token
             LaunchedEffect(loginResult, giangVien) {
                 if (loginResult?.result == true && giangVien != null) {
-                    giangVienViewModel.setGV(giangVien)
-                    userPreferences.saveLoginForGiangVien(giangVien)
+                    if (giangVien.TrangThai == 0) {
+                        Toast.makeText(context, "Tài khoản của bạn đã bị khóa", Toast.LENGTH_SHORT).show()
+                        giangVienViewModel.resetLoginResult()
+                    } else {
+                        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                            val maGV = giangVien.MaGV
 
-                    FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
-                        Log.d("FirebaseToken", "Token: $token")
+                            // Cập nhật token lên server
+                            giangVienViewModel.updateToken(maGV, token)
 
-                        val maGV = giangVienViewModel.giangvien?.MaGV ?: return@addOnSuccessListener
-                        giangVienViewModel.updateToken(maGV, token)
-                    }
+                            // Tạo đối tượng mới với token để lưu lại
+                            val giangVienWithToken = giangVien.copy(Token = token)
 
-                    navController.navigate(NavRoute.HOME.route) {
-                        popUpTo(NavRoute.LOGINSINHVIEN.route) { inclusive = true }
+                            // Cập nhật trong ViewModel và DataStore
+                            giangVienViewModel.setGV(giangVienWithToken)
+
+                            coroutineScope.launch {
+                                userPreferences.saveLoginForGiangVien(giangVienWithToken)
+
+                                navController.navigate(NavRoute.HOME.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        }
                     }
                 }
             }
+
+
         }
     }
 }

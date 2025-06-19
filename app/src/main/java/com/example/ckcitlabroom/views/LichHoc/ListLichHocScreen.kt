@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -20,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +34,7 @@ import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 
 @Composable
 fun ListLichHocScreen(
+    maTuan: Int,
     lichHocViewModel: LichHocViewModel,
     giangVienViewModel: GiangVienViewModel,
     sinhVienViewModel: SinhVienViewModel,
@@ -48,77 +53,68 @@ fun ListLichHocScreen(
         giangVienViewModel.getAllGiangVien()
     }
 
-// Danh sách
+    // Danh sách từ ViewModel
     val danhsachnamhoc = namHocViewModel.danhSachAllNamHoc.firstOrNull { it.TrangThai == 1 }
     val danhsachtuantheonam = tuanViewModel.danhSachAllTuan.filter { it.MaNam == danhsachnamhoc?.MaNam }
     val danhsachgiangvien = giangVienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }
 
-// Selected states
+    // Selected states
     var selectedTuan by remember { mutableStateOf<Tuan?>(null) }
     var selectedGV by remember { mutableStateOf<GiangVien?>(null) }
 
-// Gán giảng viên mặc định
+    // Gán giảng viên mặc định
     LaunchedEffect(giangVien, danhsachgiangvien) {
         if (selectedGV == null && giangVien != null) {
             selectedGV = danhsachgiangvien.find { it.MaGV == giangVien.MaGV }
         }
     }
 
-// Gán tuần mặc định
-    LaunchedEffect(danhsachtuantheonam) {
-        if (selectedTuan == null && danhsachtuantheonam.isNotEmpty()) {
-            selectedTuan = danhsachtuantheonam.first()
-        }
+    // Gán tuần theo maTuan
+    LaunchedEffect(maTuan, danhsachtuantheonam) {
+        selectedTuan = danhsachtuantheonam.firstOrNull { it.MaTuan == maTuan }
     }
 
-// Gọi polling nếu là sinh viên
+    // Gọi polling nếu là sinh viên
     LaunchedEffect(sinhVien?.MaLop) {
         sinhVien?.let {
             lichHocViewModel.startPollingLichHocByMaLopHoc(it.MaLop)
         }
     }
 
-// 🔥 GỌI API lấy lịch học theo giảng viên mỗi khi chọn giảng viên mới
+    // Gọi API lấy lịch dạy giảng viên
     LaunchedEffect(selectedGV?.MaGV) {
         selectedGV?.let {
             lichHocViewModel.getLichHocByMaGV(it.MaGV)
         }
     }
 
-// Danh sách hiện tại
+    // Danh sách hiện tại
     val danhsachlichhocSV = lichHocViewModel.danhSachLichHoctheomalop
     val danhsachlichdayGV = lichHocViewModel.danhSachLichHoctheomagv
 
-// Danh sách lọc theo tuần
+    // Danh sách lọc theo tuần
     var danhSachLichHocSVTheoTuan by remember { mutableStateOf<List<LichHocRP>>(emptyList()) }
     var danhsachlichdayGVthuongTheoTuan by remember { mutableStateOf<List<LichHocRP>>(emptyList()) }
     var danhsachlichdayAdminTheoTuan by remember { mutableStateOf<List<LichHocRP>>(emptyList()) }
 
-// Lọc theo tuần và giảng viên
-    LaunchedEffect(selectedTuan?.MaTuan, danhsachlichdayGV, danhsachlichhocSV, selectedGV?.MaGV) {
-        selectedTuan?.let { tuan ->
-            val maTuan = tuan.MaTuan
-            val maGV = selectedGV?.MaGV
+    // Lọc lịch theo tuần & giảng viên
+    LaunchedEffect(maTuan, danhsachlichdayGV, danhsachlichhocSV, selectedGV?.MaGV) {
+        val maGV = selectedGV?.MaGV
 
-            // Lịch học sinh viên
-            danhSachLichHocSVTheoTuan = danhsachlichhocSV.filter {
-                it.MaTuan == maTuan && it.TrangThai == 1
-            }
-
-            // Lịch dạy thường (giảng viên tự xem)
-            danhsachlichdayGVthuongTheoTuan = danhsachlichdayGV.filter {
-                it.MaTuan == maTuan && it.TrangThai == 1
-            }
-
-            // Lịch dạy admin chọn theo GV
-            danhsachlichdayAdminTheoTuan = if (maGV != null) {
-                danhsachlichdayGV.filter {
-                    it.MaTuan == maTuan && it.TrangThai == 1 && it.MaGV == maGV
-                }
-            } else emptyList()
+        danhSachLichHocSVTheoTuan = danhsachlichhocSV.filter {
+            it.MaTuan == maTuan
         }
-    }
 
+        danhsachlichdayGVthuongTheoTuan = danhsachlichdayGV.filter {
+            it.MaTuan == maTuan
+        }
+
+        danhsachlichdayAdminTheoTuan = if (maGV != null) {
+            danhsachlichdayGV.filter {
+                it.MaTuan == maTuan  && it.MaGV == maGV
+            }
+        } else emptyList()
+    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -127,24 +123,47 @@ fun ListLichHocScreen(
         }
     }
 
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         // Tiêu đề
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = if (giangVien != null) "Danh Sách Lịch Dạy" else "Danh Sách Lịch Học",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
+        val tuan = selectedTuan
+        selectedTuan?.let { tuan ->
+            val tenTuan = tuan.TenTuan
+            val tieuDe = when {
+                giangVien != null && giangVien.MaLoaiTaiKhoan == 1 -> {
+                    // Admin đang xem lịch của GV được chọn
+                    "Lịch dạy tuần $tenTuan GV ${selectedGV?.TenGiangVien.orEmpty()}"
+                }
+                giangVien != null -> {
+                    // Giảng viên thường
+                    "Lịch dạy tuần $tenTuan GV ${giangVien.TenGiangVien}"
+                }
+                sinhVien != null -> {
+                    // Sinh viên
+                    "Lịch học tuần $tenTuan lớp ${sinhVien.MaLop}"
+                }
+                else -> ""
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = tieuDe,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
+                    color = Color(0xFF1B8DDE)
+                )
+            }
         }
+
+
+
 
         HorizontalDivider(
             modifier = Modifier
@@ -154,45 +173,20 @@ fun ListLichHocScreen(
             color = Color(0xFF1B8DDE),
         )
 
-        // Dropdown chọn tuần (và giảng viên nếu là admin)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (giangVien?.MaLoaiTaiKhoan == 1) {
-                CustomDropdownSelector(
-                    modifier = Modifier.width(180.dp),
-                    label = "Tuần",
-                    items = danhsachtuantheonam,
-                    selectedItem = selectedTuan,
-                    itemLabel = { it.TenTuan },
-                    onItemSelected = { selectedTuan = it }
-                )
-
-                CustomDropdownSelector(
-                    modifier = Modifier.width(190.dp),
-                    label = "Giảng viên",
-                    items = danhsachgiangvien,
-                    selectedItem = selectedGV,
-                    itemLabel = { it.TenGiangVien },
-                    onItemSelected = { selectedGV = it }
-                )
-            } else {
-                CustomDropdownSelector(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = "Tuần",
-                    items = danhsachtuantheonam,
-                    selectedItem = selectedTuan,
-                    itemLabel = { it.TenTuan },
-                    onItemSelected = { selectedTuan = it }
-                )
-            }
+        // Dropdown chọn giảng viên (admin)
+        if (giangVien?.MaLoaiTaiKhoan == 1) {
+            CustomDropdownSelector(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                label = "Giảng viên",
+                items = danhsachgiangvien,
+                selectedItem = selectedGV,
+                itemLabel = { it.TenGiangVien },
+                onItemSelected = { selectedGV = it }
+            )
         }
 
-        // Hàm nhóm lịch học theo thứ
-
+        // Nhóm theo thứ
         fun groupLichHocByThu(danhSach: List<LichHocRP>): Map<String, List<LichHocRP>> {
             return danhSach.groupBy { it.Thu }
         }
@@ -204,17 +198,17 @@ fun ListLichHocScreen(
                     groupLichHocByThu(danhsachlichdayAdminTheoTuan)
                 }
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
+                ) {
                     if (grouped.isEmpty()) {
                         item {
                             Text(
-                                text = "Giảng viên ${selectedGV?.TenGiangVien ?: "?"} không có lịch dạy trong tuần ${selectedTuan?.TenTuan ?: ""}",
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth(),
+                                text = "Giảng viên ${selectedGV?.TenGiangVien ?: "?"} không có lịch dạy trong tuần",
+                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                                 textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.Black
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     } else {
@@ -222,26 +216,16 @@ fun ListLichHocScreen(
                             val lichTrongThu = grouped[thu] ?: emptyList()
                             if (lichTrongThu.isNotEmpty()) {
                                 item {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                    Column {
                                         Text(
                                             text = thu,
                                             modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
                                             fontWeight = FontWeight.SemiBold,
-                                            fontSize = 18.sp,
-                                            color = Color.Black
+                                            fontSize = 18.sp
                                         )
-
-                                        LazyRow(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(end = 12.dp)
-                                        ) {
+                                        LazyRow(modifier = Modifier.fillMaxWidth()) {
                                             items(lichTrongThu) { lichhoc ->
-                                                CardLichHoc(
-                                                    lichhoc,
-                                                    giangVien = giangVien,
-                                                    navController = navController
-                                                )
+                                                CardLichHoc(lichhoc, giangVien = giangVien, navController = navController)
                                                 Spacer(modifier = Modifier.width(12.dp))
                                             }
                                         }
@@ -259,17 +243,17 @@ fun ListLichHocScreen(
                     groupLichHocByThu(danhsachlichdayGVthuongTheoTuan)
                 }
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
+                ) {
                     if (grouped.isEmpty()) {
                         item {
                             Text(
-                                text = "Không có lịch dạy trong tuần ${selectedTuan?.TenTuan ?: ""}",
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth(),
+                                text = "Không có lịch dạy trong tuần",
+                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                                 textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.Black
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     } else {
@@ -277,26 +261,16 @@ fun ListLichHocScreen(
                             val lichTrongThu = grouped[thu] ?: emptyList()
                             if (lichTrongThu.isNotEmpty()) {
                                 item {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                    Column {
                                         Text(
                                             text = thu,
                                             modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
                                             fontWeight = FontWeight.SemiBold,
-                                            fontSize = 18.sp,
-                                            color = Color.Black
+                                            fontSize = 18.sp
                                         )
-
-                                        LazyRow(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(end = 12.dp)
-                                        ) {
+                                        LazyRow(modifier = Modifier.fillMaxWidth()) {
                                             items(lichTrongThu) { lichhoc ->
-                                                CardLichHoc(
-                                                    lichhoc,
-                                                    giangVien = giangVien,
-                                                    navController = navController
-                                                )
+                                                CardLichHoc(lichhoc, giangVien = giangVien, navController = navController)
                                                 Spacer(modifier = Modifier.width(12.dp))
                                             }
                                         }
@@ -314,17 +288,17 @@ fun ListLichHocScreen(
                     groupLichHocByThu(danhSachLichHocSVTheoTuan)
                 }
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
+                ) {
                     if (grouped.isEmpty()) {
                         item {
                             Text(
-                                text = "Không có lịch học trong tuần ${selectedTuan?.TenTuan ?: ""}",
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth(),
+                                text = "Không có lịch học trong tuần",
+                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                                 textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.Black
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     } else {
@@ -332,26 +306,16 @@ fun ListLichHocScreen(
                             val lichTrongThu = grouped[thu] ?: emptyList()
                             if (lichTrongThu.isNotEmpty()) {
                                 item {
-                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                    Column {
                                         Text(
                                             text = thu,
                                             modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
                                             fontWeight = FontWeight.SemiBold,
-                                            fontSize = 18.sp,
-                                            color = Color.Black
+                                            fontSize = 18.sp
                                         )
-
-                                        LazyRow(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(end = 12.dp)
-                                        ) {
+                                        LazyRow(modifier = Modifier.fillMaxWidth()) {
                                             items(lichTrongThu) { lichhoc ->
-                                                CardLichHoc(
-                                                    lichhoc,
-                                                    sinhvien = sinhVien,
-                                                    navController = navController
-                                                )
+                                                CardLichHoc(lichhoc, sinhvien = sinhVien, navController = navController)
                                                 Spacer(modifier = Modifier.width(12.dp))
                                             }
                                         }
@@ -365,6 +329,7 @@ fun ListLichHocScreen(
         }
     }
 }
+
 
 
 
