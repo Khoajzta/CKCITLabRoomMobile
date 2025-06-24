@@ -1,9 +1,11 @@
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ListLichHocDaDayScreen(
@@ -53,7 +57,8 @@ fun ListLichHocDaDayScreen(
 
 // Danh sách
     val danhsachnamhoc = namHocViewModel.danhSachAllNamHoc.firstOrNull { it.TrangThai == 1 }
-    val danhsachtuantheonam = tuanViewModel.danhSachAllTuan.filter { it.MaNam == danhsachnamhoc?.MaNam }
+    val danhsachtuantheonam =
+        tuanViewModel.danhSachAllTuan.filter { it.MaNam == danhsachnamhoc?.MaNam }
     val danhsachgiangvien = giangVienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }
 
 // Selected states
@@ -67,10 +72,24 @@ fun ListLichHocDaDayScreen(
         }
     }
 
-// Gán tuần mặc định
+
+    // Chọn tuần hiện tại nếu chưa chọn
     LaunchedEffect(danhsachtuantheonam) {
         if (selectedTuan == null && danhsachtuantheonam.isNotEmpty()) {
-            selectedTuan = danhsachtuantheonam.first()
+            val today = LocalDate.now()
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+            val tuanHienTai = danhsachtuantheonam.find { tuan ->
+                try {
+                    val ngayBD = LocalDate.parse(tuan.NgayBatDau, formatter)
+                    val ngayKT = LocalDate.parse(tuan.NgayKetThuc, formatter)
+                    !today.isBefore(ngayBD) && !today.isAfter(ngayKT)
+                } catch (_: Exception) {
+                    false
+                }
+            }
+
+            selectedTuan = tuanHienTai ?: danhsachtuantheonam.first()
         }
     }
 
@@ -132,7 +151,35 @@ fun ListLichHocDaDayScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Tiêu đề
+        val isMissingData =
+            danhsachnamhoc == null || danhsachtuantheonam.isEmpty() || selectedTuan == null
+
+        if (isMissingData) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+
+                var text = if (giangVien != null) {
+                    "Chưa có lịch dạy"
+                } else {
+                    "Chưa có lịch học"
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = text,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            return
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -165,7 +212,7 @@ fun ListLichHocDaDayScreen(
         ) {
             if (giangVien?.MaLoaiTaiKhoan == 1) {
                 CustomDropdownSelector(
-                    modifier = Modifier.width(180.dp),
+                    modifier = Modifier.width(140.dp),
                     label = "Tuần",
                     items = danhsachtuantheonam,
                     selectedItem = selectedTuan,
@@ -174,7 +221,7 @@ fun ListLichHocDaDayScreen(
                 )
 
                 CustomDropdownSelector(
-                    modifier = Modifier.width(190.dp),
+                    modifier = Modifier.width(240.dp),
                     label = "Giảng viên",
                     items = danhsachgiangvien,
                     selectedItem = selectedGV,
@@ -208,7 +255,8 @@ fun ListLichHocDaDayScreen(
 
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
+                        .fillMaxSize()
+                        .clip(shape = RoundedCornerShape(12.dp))
                 ) {
                     if (grouped.isEmpty()) {
                         item {
@@ -230,7 +278,11 @@ fun ListLichHocDaDayScreen(
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         Text(
                                             text = thu,
-                                            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
+                                            modifier = Modifier.padding(
+                                                start = 16.dp,
+                                                top = 12.dp,
+                                                bottom = 4.dp
+                                            ),
                                             fontWeight = FontWeight.SemiBold,
                                             fontSize = 18.sp,
                                             color = Color.Black
@@ -266,7 +318,8 @@ fun ListLichHocDaDayScreen(
 
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
+                        .fillMaxSize()
+                        .clip(shape = RoundedCornerShape(12.dp))
                 ) {
                     if (grouped.isEmpty()) {
                         item {
@@ -288,7 +341,11 @@ fun ListLichHocDaDayScreen(
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         Text(
                                             text = thu,
-                                            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
+                                            modifier = Modifier.padding(
+                                                start = 16.dp,
+                                                top = 12.dp,
+                                                bottom = 4.dp
+                                            ),
                                             fontWeight = FontWeight.SemiBold,
                                             fontSize = 18.sp,
                                             color = Color.Black
@@ -324,7 +381,8 @@ fun ListLichHocDaDayScreen(
 
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
+                        .fillMaxSize()
+                        .clip(shape = RoundedCornerShape(12.dp))
                 ) {
                     if (grouped.isEmpty()) {
                         item {
@@ -346,7 +404,11 @@ fun ListLichHocDaDayScreen(
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         Text(
                                             text = thu,
-                                            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
+                                            modifier = Modifier.padding(
+                                                start = 16.dp,
+                                                top = 12.dp,
+                                                bottom = 4.dp
+                                            ),
                                             fontWeight = FontWeight.SemiBold,
                                             fontSize = 18.sp,
                                             color = Color.Black

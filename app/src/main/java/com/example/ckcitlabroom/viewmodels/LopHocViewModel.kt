@@ -10,6 +10,8 @@ import com.example.ckcitlabroom.models.LopHoc
 import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -35,18 +37,25 @@ class LopHocViewModel: ViewModel() {
         pollingJob = null
     }
 
+
+
     fun getAllLopHoc() {
-        viewModelScope.launch {
-            isLoading = true
-            try {
-                val response = ITLabRoomRetrofitClient.lophocAPIService.getAllLopHoc()
-                danhSachAllLopHoc = response.lophoc ?: emptyList()
-                Log.d("LopHocViewModel", "Lấy danh sách lớp: ${danhSachAllLopHoc.size} lớp")
-            } catch (e: Exception) {
-                errorMessage = "Lỗi: ${e.localizedMessage ?: e.message}"
-                Log.e("LopHocViewModel", "Lỗi khi lấy danh sách lớp", e)
-            } finally {
-                isLoading = false
+        if (pollingJob != null) return
+
+        pollingJob = viewModelScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                try {
+                    val response = ITLabRoomRetrofitClient.lophocAPIService.getAllLopHoc()
+                    if (response.lophoc != null) {
+                        danhSachAllLopHoc = response.lophoc!!
+                    } else {
+                        danhSachAllLopHoc = emptyList()
+                    }
+                } catch (e: Exception) {
+                    Log.e("LopHocViewModel", "Polling lỗi", e)
+                }
+
+                delay(200) // Có thể chỉnh lên 1000-3000 nếu không cần cập nhật liên tục
             }
         }
     }
@@ -143,5 +152,4 @@ class LopHocViewModel: ViewModel() {
             }
         }
     }
-
 }

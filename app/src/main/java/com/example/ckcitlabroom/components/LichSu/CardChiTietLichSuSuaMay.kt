@@ -74,7 +74,7 @@ fun CardChiTietLichSuSuaMay(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Thông tin lịch sử",
+                text = "Thông tin lịch sử sửa máy",
                 color = Color(0xFF1B8DDE),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp

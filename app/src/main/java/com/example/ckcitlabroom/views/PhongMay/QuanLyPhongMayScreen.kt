@@ -93,7 +93,8 @@ fun QuanLyPhongMay(
                     ) {
                         Text(
                             "Chưa có phòng nào",
-                            color = Color.White,
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(16.dp)
                         )
                     }

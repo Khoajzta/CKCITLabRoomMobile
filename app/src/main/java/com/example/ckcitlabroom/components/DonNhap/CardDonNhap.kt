@@ -48,7 +48,8 @@ fun InfoRow(icon: ImageVector, label: String, value: String) {
         Text(
             text = "$label: ",
             fontWeight = FontWeight.ExtraBold,
-            fontSize = 16.sp
+            fontSize = 16.sp,
+            color = Color.Black
         )
         Text(
             text = value,

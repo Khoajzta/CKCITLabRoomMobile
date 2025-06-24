@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -77,6 +78,12 @@ fun DiemDanhScreen(
             fontWeight = FontWeight.SemiBold,
             color = Color(0xFF1B8DDE),
             modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
         )
 
         if (caHienTai == null) {

@@ -108,8 +108,8 @@ fun LichSuSuaMayScreen(
                     ) {
                         Text(
                             text = "Chưa có đơn nhập nào",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold,
                             fontSize = 17.sp
                         )
                     }

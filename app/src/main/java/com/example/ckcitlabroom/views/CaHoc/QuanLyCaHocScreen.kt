@@ -91,8 +91,9 @@ fun QuanLyCaHoc(
                     ) {
                         Text(
                             "Chưa có ca học nào",
-                            color = Color.White,
-                            modifier = Modifier.padding(16.dp)
+                            color = Color.Black,
+                            modifier = Modifier.padding(16.dp),
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }

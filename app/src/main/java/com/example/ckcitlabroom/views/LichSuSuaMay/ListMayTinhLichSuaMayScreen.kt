@@ -29,7 +29,7 @@ fun ListMayTinhLichSuSuaMayScreen(
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel,
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
-    lichSuSuaMayViewModel: LichSuSuaMayViewModel
+    lichSuSuaMayViewModel: LichSuSuaMayViewModel,
 ){
     val danhsachchitietdonnhap = chiTietDonNhapyViewModel.danhSachChiTietDonNhaptheoMaDonNhap
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
@@ -87,8 +87,9 @@ fun ListMayTinhLichSuSuaMayScreen(
                     ) {
                         Text(
                             "Chưa có máy tính nào",
-                            color = Color.White,
-                            modifier = Modifier.padding(16.dp)
+                            color = Color.Black,
+                            modifier = Modifier.padding(16.dp),
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }

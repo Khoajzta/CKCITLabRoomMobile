@@ -71,7 +71,7 @@ fun ListThongBao(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Thông báo của bạn",
+                text = "Thông báo",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1B8DDE),
@@ -158,10 +158,12 @@ fun SwipeableThongBaoCard(
     ) {
         // Nền đỏ phía sau
         Card(
-            modifier = Modifier.matchParentSize(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFFD32F2F)),
-            elevation = CardDefaults.cardElevation(0.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),

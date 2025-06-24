@@ -25,6 +25,8 @@ fun ChiTietLichSuSuaMayScreen(
 ){
     var danhsachphieusuachua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChuaTheoMa
 
+    var solan = danhsachphieusuachua.count()
+
     LaunchedEffect(mamay) {
         phieuSuaChuaViewModel.getPhieuSuaChuaTheoMaMay(mamay)
         lichSuSuaMayViewModel.getLichSuTheoMaMay(mamay)
@@ -39,11 +41,18 @@ fun ChiTietLichSuSuaMayScreen(
             modifier = Modifier
                 .padding(bottom = 12.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 "Lịch sử sửa máy",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+                color = Color(0xFF1B8DDE)
+            )
+
+            Text(
+                "Số lần: $solan",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)

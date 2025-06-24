@@ -5,6 +5,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.models.LopHoc
@@ -55,7 +56,8 @@ fun ListSinhVienDangHoc(
                         Text(
                             "Không có sinh viên nào đang học.",
                             color = Color.Black,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(16.dp),
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }

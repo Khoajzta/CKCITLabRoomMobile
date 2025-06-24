@@ -29,6 +29,9 @@ class PhongMayViewModel : ViewModel() {
         private set
 
 
+
+
+
     private var pollingJob: Job? = null
 
     var phongmayCreateResult by mutableStateOf("")
@@ -190,29 +193,22 @@ class PhongMayViewModel : ViewModel() {
 
     //
 //    // Hàm xóa máy tính
-    fun deletePhongMay(maphong: String) {
+    fun deletePhongMay(maPhong: String) {
         viewModelScope.launch {
             isLoading = true
             try {
-                val body = mapOf("MaPhong" to maphong)
+                val request = DeletePhongMayRequest(maPhong)
                 val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.phongmayAPIService.deletePhongMay(body)
+                    ITLabRoomRetrofitClient.phongmayAPIService.deletePhongMay(request)
                 }
                 phongmayDeleteResult = response.message
-
-                if (response.message == "phongmay deleted") {
-                    // Cập nhật lại danh sách máy tính sau khi xóa thành công
-                    val allResponse = withContext(Dispatchers.IO) {
-                        ITLabRoomRetrofitClient.phongmayAPIService.getAllPhongMay()
-                    }
-                    danhSachAllPhongMay = allResponse.phongmay ?: emptyList()
-                }
             } catch (e: Exception) {
-                phongmayDeleteResult = "Lỗi khi xóa máy tính: ${e.localizedMessage ?: e.message}"
-                Log.e("MayTinhViewModel", "Lỗi khi xóa máy tính", e)
+                phongmayDeleteResult = "Lỗi khi xóa phòng máy: ${e.message}"
+                Log.e("PhongMayViewModel", "Lỗi khi xóa phòng máy: ${e.message}")
             } finally {
                 isLoading = false
             }
         }
     }
+
 }

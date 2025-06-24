@@ -309,24 +309,24 @@ fun CreateSinhVienScreen(
                         )
                     )
 
-                    Text("Mật Khẩu", fontWeight = FontWeight.Bold, color = Color.Black)
-                    OutlinedTextField(
-                        value = matKhauState.value,
-                        onValueChange = { matKhauState.value = it },
-                        placeholder = { Text("Nhập mật khẩu") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White,
-                            focusedBorderColor = Color.Black,
-                            unfocusedBorderColor = Color.Black,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
-                        )
-                    )
+//                    Text("Mật Khẩu", fontWeight = FontWeight.Bold, color = Color.Black)
+//                    OutlinedTextField(
+//                        value = matKhauState.value,
+//                        onValueChange = { matKhauState.value = it },
+//                        placeholder = { Text("Nhập mật khẩu") },
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(bottom = 12.dp),
+//                        shape = RoundedCornerShape(12.dp),
+//                        colors = OutlinedTextFieldDefaults.colors(
+//                            unfocusedContainerColor = Color.White,
+//                            focusedContainerColor = Color.White,
+//                            focusedBorderColor = Color.Black,
+//                            unfocusedBorderColor = Color.Black,
+//                            focusedTextColor = Color.Black,
+//                            unfocusedTextColor = Color.Black
+//                        )
+//                    )
                 }
             }
 
@@ -383,7 +383,7 @@ fun CreateSinhVienScreen(
 
                     if (maSVState.value.isBlank() || tenSVState.value.isBlank() ||
                         ngaySinhDb.value.isBlank() || gioiTinhState.value.isBlank() ||
-                        emailState.value.isBlank() || matKhauState.value.isBlank()
+                        emailState.value.isBlank()
                     ) {
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(
@@ -416,15 +416,7 @@ fun CreateSinhVienScreen(
                             )
                             snackbarHostState.showSnackbar("Thông báo")
                         }
-                    } else if (!passwordRegex.matches(matKhauState.value)) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Mật khẩu phải từ 8 ký tự, có chữ hoa, chữ thường và ký tự đặc biệt",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
-                    } else {
+                    }  else {
                         val daTonTai = danhSachSinhVien.any { it.MaSinhVien == maSVState.value }
                         if (daTonTai) {
                             coroutineScope.launch {
@@ -441,7 +433,7 @@ fun CreateSinhVienScreen(
                                 NgaySinh = ngaySinhDb.value,
                                 GioiTinh = gioiTinhState.value,
                                 Email = emailState.value,
-                                MatKhau = matKhauState.value,
+                                MatKhau = maSVState.value,
                                 MaLop = maLopState.value,
                                 MaLoaiTaiKhoan = 3,
                                 TrangThai = 1

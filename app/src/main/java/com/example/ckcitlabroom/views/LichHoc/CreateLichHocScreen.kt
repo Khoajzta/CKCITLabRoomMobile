@@ -293,7 +293,7 @@ fun CreateLichHocScreen(
                                     // 🔹 So sánh với giờ hiện tại
                                     if (ngayDayGioKetThuc != null && ngayDayGioKetThuc.isBefore(LocalDateTime.now())) {
                                         conflictMessage =
-                                            "Không thể thêm lịch:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, ca ${selectedCaHoc?.TenCa} đã kết thúc."
+                                            "Không thể thêm lịch:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, ${selectedCaHoc?.TenCa} đã kết thúc."
                                         showDialog = true
                                         return@Button
                                     }
@@ -307,7 +307,7 @@ fun CreateLichHocScreen(
 
                                     if (isTrungCaTrongPhong) {
                                         conflictMessage =
-                                            "Trùng lịch phòng:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, phòng ${selectedPhong?.TenPhong}, ca ${selectedCaHoc?.TenCa} đã có lịch dạy!"
+                                            "Trùng lịch phòng:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, phòng ${selectedPhong?.TenPhong}, ${selectedCaHoc?.TenCa} đã có lịch dạy!"
                                         showDialog = true
                                         return@Button
                                     }
@@ -321,12 +321,12 @@ fun CreateLichHocScreen(
 
                                     if (isTrungCaCuaGV) {
                                         conflictMessage =
-                                            "Trùng lịch giảng viên:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, giảng viên ${selectedGiangVien?.TenGiangVien} đã có lịch dạy ca ${selectedCaHoc?.TenCa}!"
+                                            "Trùng lịch giảng viên:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, giảng viên ${selectedGiangVien?.TenGiangVien} đã có lịch dạy ${selectedCaHoc?.TenCa}!"
                                         showDialog = true
                                         return@Button
                                     }
 
-                                    // ✅ Nếu không trùng thì thêm lịch
+
                                     val lichHoc = LichHoc(
                                         MaLichHoc = 0,
                                         MaGV = selectedGiangVien!!.MaGV,
@@ -374,7 +374,7 @@ fun CreateLichHocScreen(
                             Icon(
                                 imageVector = Icons.Default.Warning,
                                 contentDescription = null,
-                                tint = Color(0xFFD32F2F), // Red color
+                                tint = Color(0xFFD32F2F),
                                 modifier = Modifier.size(28.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -426,13 +426,13 @@ fun <T> CustomDropdownSelector(
     itemLabel: (T) -> String,
     onItemSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true // ✅ thêm tham số enabled
+    enabled: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { if (enabled) expanded = !expanded }, // ✅ chỉ cho mở khi enabled
+        onExpandedChange = { if (enabled) expanded = !expanded },
         modifier = modifier
     ) {
         OutlinedTextField(

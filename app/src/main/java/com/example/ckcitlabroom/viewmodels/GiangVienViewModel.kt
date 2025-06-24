@@ -26,6 +26,9 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
     var giangvienSet: GiangVien? by mutableStateOf(null)
         private set
 
+    var giangvienToken: String? by mutableStateOf(null)
+        private set
+
     var danhSachAllGiangVien by mutableStateOf<List<GiangVien>>(emptyList())
         private set
 
@@ -51,6 +54,10 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun setGV(gv: GiangVien?) {
         giangvienSet = gv
+    }
+
+    fun setToken(token: String?) {
+        giangvienToken = token
     }
 
     private val _loginResult = MutableStateFlow<LoginResponse?>(null)

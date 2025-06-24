@@ -9,6 +9,10 @@ data class PhongMayResponse(
     val phongmay: List<PhongMay>
 )
 
+data class DeletePhongMayRequest(
+    val MaPhong: String
+)
+
 interface PhongMayAPIService {
     @GET("PhongMay/read.php")
     suspend fun getAllPhongMay(): PhongMayResponse
@@ -33,8 +37,9 @@ interface PhongMayAPIService {
         @Body phongmay: PhongMay
     ): UpdateResponse
 
-    @HTTP(method = "DELETE", path = "PhongMay/delete.php", hasBody = true)
+    @PUT("PhongMay/delete.php")
     suspend fun deletePhongMay(
-        @Body body: Map<String, String>
+        @Body request: DeletePhongMayRequest
     ): DeleteResponse
+
 }

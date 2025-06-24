@@ -15,14 +15,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -104,33 +108,35 @@ fun LichDayGVAllTuan(
         }
     }
 
-
-
     var danhSachPhongMayCoTKB = lichHocViewModel.danhSachLichHocTheoThuVaPhong
 
 
     val danhSachPhongDayDu by remember(danhSachPhongMayCoTKB, danhSachPhongMay) {
         derivedStateOf {
             danhSachPhongMay.map { phong ->
-                danhSachPhongMayCoTKB.find { it.MaPhong == phong.MaPhong } ?: LichHocTheoThuVaPhongItem(
-                    MaPhong = phong.MaPhong,
-                    TenPhong = phong.TenPhong,
-                    Thu2 = emptyList(),
-                    Thu3 = emptyList(),
-                    Thu4 = emptyList(),
-                    Thu5 = emptyList(),
-                    Thu6 = emptyList(),
-                    Thu7 = emptyList(),
-                    ChuNhat = emptyList()
-                )
+                danhSachPhongMayCoTKB.find { it.MaPhong == phong.MaPhong }
+                    ?: LichHocTheoThuVaPhongItem(
+                        MaPhong = phong.MaPhong,
+                        TenPhong = phong.TenPhong,
+                        Thu2 = emptyList(),
+                        Thu3 = emptyList(),
+                        Thu4 = emptyList(),
+                        Thu5 = emptyList(),
+                        Thu6 = emptyList(),
+                        Thu7 = emptyList(),
+                        ChuNhat = emptyList()
+                    )
             }
         }
     }
 
 
     LaunchedEffect(selectedTuan) {
-        lichHocViewModel.startPollingLichHocTheoThuVaPhong(selectedTuan!!.MaTuan.toString())
+        selectedTuan?.let {
+            lichHocViewModel.startPollingLichHocTheoThuVaPhong(it.MaTuan.toString())
+        }
     }
+
 
     DisposableEffect(Unit) {
         onDispose {
@@ -141,16 +147,68 @@ fun LichDayGVAllTuan(
 
     // Giao diện
     Column(modifier = Modifier.fillMaxSize()) {
+        val isMissingData =
+            danhSachNamHoc == null || danhSachTuanTheoNam.isEmpty() || selectedTuan == null || danhSachPhongMay.isEmpty()
+
+        if(giangVienViewModel.giangvienSet?.MaLoaiTaiKhoan == 1){
+            if (isMissingData) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "Chưa có lịch phòng máy",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Tạo năm học mới để có thể tạo lịch dạy",
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center,
+                            color = Color.Black
+                        )
+                    }
+                }
+                return
+            }
+        }else{
+            if (isMissingData) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "Chưa có lịch phòng máy",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+                return
+            }
+        }
+
+
         CustomDropdownSelector(
             modifier = Modifier.fillMaxWidth(),
             label = "Tuần",
             items = danhSachTuanTheoNam,
             selectedItem = selectedTuan,
             itemLabel = { it.TenTuan },
-            onItemSelected = { selectedTuan = it }
-        )
+            onItemSelected = { selectedTuan = it })
 
-        if(selectedTuan!=null){
+        if (selectedTuan != null) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -165,7 +223,7 @@ fun LichDayGVAllTuan(
                     color = Color(0xFF1B8DDE)
                 )
             }
-        }else{
+        } else {
             DotLoading()
         }
 
@@ -174,18 +232,18 @@ fun LichDayGVAllTuan(
         } else {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
-                    .shadow(elevation = 4.dp, shape = RoundedCornerShape(12.dp))
+                    .fillMaxSize()
+                    .clip(shape = RoundedCornerShape(12.dp))
             ) {
                 item {
                     CardThoiKhoaBieuTheoTuan(
-                        danhSachPhongDayDu,
-                        click = {
-                        navController.navigate("${NavRoute.LISTLICHHOC.route}/${selectedTuan!!.MaTuan}")
-                    })
+                        danhSachPhongDayDu, click = {
+                            navController.navigate("${NavRoute.LISTLICHHOC.route}/${selectedTuan!!.MaTuan}")
+                        })
                 }
             }
         }
+
     }
 }
 

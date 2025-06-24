@@ -34,6 +34,7 @@ import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.CircleX
 import com.composables.icons.lucide.Cpu
 import com.composables.icons.lucide.Lucide
+import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +48,8 @@ fun CardMayTinhLichSu(
     var selectdMaPhong by remember { mutableStateOf("") }
     var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
     val maPhongState = remember { mutableStateOf("") }
+
+
 
     LaunchedEffect(Unit) {
         phongMayViewModel.getAllPhongMay()

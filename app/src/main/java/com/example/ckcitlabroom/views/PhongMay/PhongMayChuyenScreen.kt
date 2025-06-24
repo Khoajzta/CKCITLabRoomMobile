@@ -52,7 +52,7 @@ fun PhongMayChuyenScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val danhSachMayTinhtheophong = mayTinhViewModel.danhSachAllMayTinhtheophong
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
+    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay.filter { it.LoaiPhong == 1 || it.LoaiPhong == 2 }
     val selectedMayTinhs = mayTinhViewModel.danhSachMayTinhDuocChon
 
     var selectedMaPhongMoi by remember { mutableStateOf<String?>(null) }

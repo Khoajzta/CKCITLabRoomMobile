@@ -39,7 +39,6 @@ fun ChiTietLichHocScreen(
     val danhsachalltuan = tuanViewModel.danhSachAllTuan
 
 
-
     LaunchedEffect(Unit) {
         lichHocViewModel.startPollingAllLichHoc()
         tuanViewModel.getAllTuan()
@@ -47,7 +46,7 @@ fun ChiTietLichHocScreen(
 
     DisposableEffect(Unit) {
         onDispose {
-           lichHocViewModel.stopPollingAllLichHoc()
+            lichHocViewModel.stopPollingAllLichHoc()
         }
     }
 
@@ -71,7 +70,7 @@ fun ChiTietLichHocScreen(
 
     val maTuanInt = matuan.toIntOrNull()
 
-    var tuan = danhsachalltuan.find { it.MaTuan == maTuanInt}
+    var tuan = danhsachalltuan.find { it.MaTuan == maTuanInt }
 
     val lichHocTheoTuan = when (role) {
         "gv" -> listLichHocAll.filter { it.MaTuan == maTuanInt && it.MaGV == giangVien?.MaGV }
@@ -84,86 +83,101 @@ fun ChiTietLichHocScreen(
         lichHocTheoTuan.filter { it.Thu == thu }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
+    if (danhsachalltuan.isNullOrEmpty() || listLichHocAll.isNullOrEmpty()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
             Text(
-                text = if (role == "gv") "Chi tiết lịch dạy tuần ${tuan!!.TenTuan}" else "Chi tiết lịch học tuần ${tuan!!.TenTuan}",
+                text = "Chưa có lịch",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
         }
+    } else {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (role == "gv") "Chi tiết lịch dạy tuần ${tuan!!.TenTuan}" else "Chi tiết lịch học tuần ${tuan!!.TenTuan}",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
+                    color = Color(0xFF1B8DDE)
+                )
+            }
 
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE)
-        )
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                thickness = 2.dp,
+                color = Color(0xFF1B8DDE)
+            )
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 8.dp)
-        ) {
-            items(thuList) { thu ->
-                val lichTrongThu = lichHocTheoThu[thu].orEmpty()
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 8.dp)
+            ) {
+                items(thuList) { thu ->
+                    val lichTrongThu = lichHocTheoThu[thu].orEmpty()
 
-                if (lichTrongThu.isNotEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = thu,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 18.sp,
-                            color = Color.Black,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-
-                        LazyRow(
+                    if (lichTrongThu.isNotEmpty()) {
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                .padding(vertical = 8.dp)
                         ) {
-                            items(lichTrongThu) { lichHoc ->
-                                CardLichHoc(
-                                    lichHoc = lichHoc,
-                                    giangVien = if (role == "gv") giangVien else null,
-                                    sinhvien = if (role == "sv") sinhvien else null,
-                                    navController = navController
-                                )
+                            Text(
+                                text = thu,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 18.sp,
+                                color = Color.Black,
+                                modifier = Modifier.padding(horizontal = 8.dp)
+                            )
+
+                            LazyRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(lichTrongThu) { lichHoc ->
+                                    CardLichHoc(
+                                        lichHoc = lichHoc,
+                                        giangVien = if (role == "gv") giangVien else null,
+                                        sinhvien = if (role == "sv") sinhvien else null,
+                                        navController = navController
+                                    )
+                                }
                             }
                         }
                     }
                 }
-            }
 
 
-            // Nếu không có lịch học nào cả
-            if (lichHocTheoTuan.isEmpty()) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Không có lịch học nào trong tuần này",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(top = 16.dp, start = 12.dp),
+                // Nếu không có lịch học nào cả
+                if (lichHocTheoTuan.isEmpty()) {
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Không có lịch học nào trong tuần này",
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(top = 16.dp, start = 12.dp),
 
-                            )
+                                )
+                        }
                     }
                 }
             }

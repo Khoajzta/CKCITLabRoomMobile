@@ -70,7 +70,8 @@ fun ListPhongMayChuyenScreen(
                     ) {
                         Text(
                             "Chưa có phòng máy",
-                            color = Color.White,
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(16.dp)
                         )
                     }

@@ -290,12 +290,6 @@ fun CreateGiangVienScreen(
                         shape = RoundedCornerShape(12.dp),
                         action = {
                             TextButton(onClick = {
-                                maGVState.value = ""
-                                tenGVState.value = ""
-                                ngaySinhHienThi.value = ""
-                                gioiTinhState.value = ""
-                                emailState.value = ""
-                                matKhauState.value = ""
                                 snackbarData.value = null
                             }) {
                                 Text("Đóng", color = Color.White)

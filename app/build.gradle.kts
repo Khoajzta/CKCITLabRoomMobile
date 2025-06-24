@@ -1,3 +1,12 @@
+import org.gradle.kotlin.dsl.release
+import org.gradle.internal.impldep.com.amazonaws.util.IOUtils
+import org.gradle.internal.impldep.org.eclipse.jgit.lib.InflaterCache
+import org.apache.commons.logging.LogFactory
+import io.grpc.internal.SharedResourceHolder
+import io.netty.util.ReferenceCountUtil
+import io.netty.util.ReferenceCountUtil.release
+
+
 plugins {
     id("com.android.application")
     alias(libs.plugins.kotlin.android)
@@ -18,6 +27,8 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
+
 
     buildTypes {
         release {
@@ -41,6 +52,7 @@ android {
     buildFeatures {
         compose = true
     }
+
 }
 
 dependencies {
@@ -116,7 +128,8 @@ dependencies {
 
     implementation ("com.google.accompanist:accompanist-navigation-animation:0.34.0")
 
-    implementation ("com.google.accompanist:accompanist-systemuicontroller:<version>")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
+
 
 
     // Google Maps & Other Libs

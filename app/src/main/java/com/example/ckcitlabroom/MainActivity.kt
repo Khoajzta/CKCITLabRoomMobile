@@ -2,6 +2,8 @@ package com.example.ckcitlabroom
 
 import AnimatedNavigationBar
 import ButtonData
+import GiangVien
+import GiangVienPreferences
 import GiangVienViewModel
 import LichSuSuaMayViewModel
 import MonHocViewModel
@@ -13,6 +15,8 @@ import PhieuMuonMayViewModel
 import PhieuSuaChuaViewModel
 import PhongMayViewModel
 import RequestPermissionsOnFirstLaunch
+import SinhVien
+import SinhVienPreferences
 import SinhVienViewModel
 import TuanViewModel
 import UpdateLichHocWorker
@@ -122,7 +126,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
 
-    val context = LocalContext.current
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true
 
@@ -162,14 +165,63 @@ fun MainScreen() {
     val notificationViewModel: NotificationViewModel = viewModel()
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-    val giangVien = giangVienViewModel.giangvienSet
-    val sinhVien = sinhVienViewModel.sinhvienSet
+    val context = LocalContext.current
+
+    var gv = giangVienViewModel.giangvienSet
+    var sv = sinhVienViewModel.sinhvienSet
+
+    var SinhVienPreferences = remember { SinhVienPreferences(context) }
+    var GiangVienPreferences = remember { GiangVienPreferences(context) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(15_000)
+
+            try {
+                val localSV = SinhVienPreferences.getSinhVienFromDataStore()
+                val localGV = GiangVienPreferences.getGiangVienFromDataStore()
+
+                val currentToken = FirebaseMessaging.getInstance().token.await()
+
+                if (localSV != null) {
+                    // Gọi từ API, không dùng state cũ trong ViewModel
+                    val svServer = sinhVienViewModel.getSinhVienByMaGOrEmailNow(localSV.MaSinhVien)
+
+                    if (svServer != null && svServer.Token != currentToken) {
+                        Toast.makeText(context, "Tài khoản đã đăng nhập trên thiết bị khác", Toast.LENGTH_SHORT).show()
+                        sinhVienViewModel.logout()
+                        SinhVienPreferences.logout()
+                        navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                }
+
+                if (localGV != null) {
+                    val gvServer = giangVienViewModel.getGiangVienByMaGOrEmailNow(localGV.MaGV)
+
+                    if (gvServer != null && gvServer.Token != currentToken) {
+                        Toast.makeText(context, "Tài khoản đã đăng nhập trên thiết bị khác", Toast.LENGTH_SHORT).show()
+                        giangVienViewModel.logout()
+                        GiangVienPreferences.logout()
+                        navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                }
+
+            } catch (e: Exception) {
+                Log.e("AutoLogout", "Lỗi kiểm tra thiết bị khác: ${e.message}")
+            }
+        }
+    }
+
 
 
     val unreadCount = notificationViewModel.danhSachAllThongBao.count { tb ->
         !tb.DaDoc && (
-            (sinhVien != null && tb.MaNguoiDung == sinhVien.MaSinhVien) ||
-            (giangVien != null && tb.MaNguoiDung == giangVien.MaGV)
+            (sv != null && tb.MaNguoiDung == sv.MaSinhVien) ||
+            (gv != null && tb.MaNguoiDung == gv.MaGV)
         )
     }
 
@@ -236,7 +288,7 @@ fun MainScreen() {
                 textTopbar = "Quản Lý Điểm Danh"
             }
             NavRoute.QUANLYLICHHOC.route -> {
-                if(giangVien!=null){
+                if(gv!=null){
                     textTopbar = "Quản Lý Lịch Dạy"
                 }else{
                     textTopbar = "Quản Lý Lịch Học"

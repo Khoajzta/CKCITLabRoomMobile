@@ -1,10 +1,13 @@
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -34,12 +37,25 @@ fun ChiTietPhieuMuonMay(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            "Danh Sách Máy Cho Mượn",
-            modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp),
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
-            color = Color(0xFF1B8DDE)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Danh Sách Máy Cho Mượn",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+                color = Color(0xFF1B8DDE)
+            )
+        }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
         )
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {

@@ -66,8 +66,7 @@ fun CardLichHoc(
     Card(
         modifier = Modifier
             .padding(bottom = 8.dp)
-            .width(390.dp)
-            .heightIn(min = 190.dp, max = 550.dp)
+            .width(380.dp)
             .animateContentSize()
             .clip(RoundedCornerShape(16.dp)),
         onClick = { expanded = !expanded },
@@ -108,14 +107,12 @@ fun CardLichHoc(
 
             InfoRow(icon = Icons.Filled.Schedule, label = nhanCa, value = lichHoc.TenCa.toString())
 
-            if(!lichHoc.GhiChu.isNullOrBlank()){
-                Spacer(modifier = Modifier.height(8.dp))
-                InfoRow(
-                    icon = Icons.Filled.NoteAlt,
-                    label = "Thông báo",
-                    value = if (!lichHoc.GhiChu.isNullOrBlank()) lichHoc.GhiChu else "Không có thông báo"
-                )
-            }
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(
+                icon = Icons.Filled.NoteAlt,
+                label = "Thông báo",
+                value = if (!lichHoc.GhiChu.isNullOrBlank()) lichHoc.GhiChu else "Không có thông báo"
+            )
 
             val (color, statusText, statusIcon) = when (lichHoc.TrangThai) {
                 0 -> Triple(Color(0xFF1B8DDE), "Đã Kết Thúc", Lucide.CircleCheck)

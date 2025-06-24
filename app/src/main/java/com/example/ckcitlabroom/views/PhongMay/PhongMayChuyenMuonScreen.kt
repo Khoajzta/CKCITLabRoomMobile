@@ -178,6 +178,11 @@ fun PhongMayChuyenMuonScreen(
                     )
                 }
 
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                    thickness = 2.dp,
+                    color = Color(0xFFDDDDDD),
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 

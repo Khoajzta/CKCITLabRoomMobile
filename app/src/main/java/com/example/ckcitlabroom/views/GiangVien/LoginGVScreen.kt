@@ -96,6 +96,12 @@ fun LoginGVScreen(
 
     val isAutoLoginChecked = remember { mutableStateOf(false) }
 
+    val tokenLocal = remember { mutableStateOf("") }
+
+    if (!loginState.isLoggedIn) {
+        giangVienViewModel.setGV(null)
+    }
+
     LaunchedEffect(loginState) {
         if (loginState.isLoggedIn && loginState.maGiangVien != null && !isAutoLoginChecked.value) {
             isAutoLoginChecked.value = true
@@ -190,7 +196,7 @@ fun LoginGVScreen(
                                 Icon(imageVector = icon, contentDescription = "Toggle Password")
                             }
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier
                             .fillMaxWidth()
                             .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
@@ -299,6 +305,8 @@ fun LoginGVScreen(
                         FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
                             val maGV = giangVien.MaGV
 
+                            giangVienViewModel.setToken(token)
+
                             // Cập nhật token lên server
                             giangVienViewModel.updateToken(maGV, token)
 
@@ -319,8 +327,6 @@ fun LoginGVScreen(
                     }
                 }
             }
-
-
         }
     }
 }

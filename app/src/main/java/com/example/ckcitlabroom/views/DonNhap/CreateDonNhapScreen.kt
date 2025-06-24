@@ -478,7 +478,9 @@ fun CreateDonNhapScreen(
                     AlertDialog(
                         onDismissRequest = { openDialog.value = false },
                         confirmButton = {
-                            TextButton(onClick = { openDialog.value = false }) {
+                            TextButton(onClick = {
+                                openDialog.value = false
+                            }) {
                                 Text("OK")
                             }
                         },

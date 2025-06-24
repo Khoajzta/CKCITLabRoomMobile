@@ -63,7 +63,7 @@ fun ChiTietDonNhapChuyenScreen(
         danhSachMayTinh.filter { it.MaMay in maMayTheoDon && it.MaPhong == "KHOLUUTRU"}
     }
 
-    var danhSachPhong = phongMayViewModel.danhSachAllPhongMay
+    var danhSachPhong = phongMayViewModel.danhSachAllPhongMay.filter { it.LoaiPhong == 1 || it.LoaiPhong == 2 }
 
     LaunchedEffect(Unit) {
         mayTinhViewModel.getAllMayTinh()

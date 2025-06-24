@@ -160,6 +160,7 @@ fun CardGiangVien(
                 val buttonColor = if (newTrangThai == 1) Color(0xFF4CAF50) else Color(0xFFE53935)
 
                 Button(
+                    modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         giangVienViewModel.updateTrangThaiGiangVien(giangVien.copy(TrangThai = newTrangThai))
                         showDialog = false

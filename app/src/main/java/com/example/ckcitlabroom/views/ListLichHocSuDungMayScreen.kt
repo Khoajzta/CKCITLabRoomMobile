@@ -1,4 +1,5 @@
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,9 +18,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -97,6 +100,36 @@ fun ListLichHocSuDungMay(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+
+        val isMissingData =
+            danhSachNamHoc == null || danhSachTuanTheoNam.isEmpty() || selectedTuan == null
+
+        if (isMissingData) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+
+                var text = if (giangVien != null) {
+                    "Chưa có lịch dạy"
+                } else {
+                    "Chưa có lịch học"
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = text,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            return
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()

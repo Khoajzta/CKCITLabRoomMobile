@@ -91,7 +91,8 @@ fun ListPhieuSuaBySinhVienScreen(
                         Text(
                             "Không có phiếu nào",
                             color = Color.Black,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(16.dp),
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
 

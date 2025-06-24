@@ -2,6 +2,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 val Context.sinhVienDataStore by preferencesDataStore(name = "sinhvien_prefs")
@@ -72,6 +73,35 @@ class SinhVienPreferences(private val context: Context) {
         UserTypePreferences(context).saveUserType("sinhvien")
     }
 
+    suspend fun getSinhVienFromDataStore(): SinhVien? {
+        val prefs = dataStore.data.firstOrNull() ?: return null
+
+        val maSV = prefs[MASV_KEY] ?: return null
+        val tenSV = prefs[TENSV_KEY] ?: ""
+        val ngaySinh = prefs[NGAYSINH_KEY] ?: ""
+        val gioiTinh = prefs[GIOITINH_KEY] ?: ""
+        val email = prefs[EMAIL_KEY] ?: ""
+        val maLop = prefs[MALOP_KEY] ?: ""
+        val matKhau = prefs[MATKHAU_KEY] ?: ""
+        val maLoaiTK = prefs[LOAITK_KEY] ?: 0
+        val token = prefs[TOKEN_KEY] ?: ""
+        val trangThai = prefs[TRANGTHAI_KEY] ?: 0
+
+        return SinhVien(
+            MaSinhVien = maSV,
+            TenSinhVien = tenSV,
+            NgaySinh = ngaySinh,
+            GioiTinh = gioiTinh,
+            Email = email,
+            MaLop = maLop,
+            MatKhau = matKhau,
+            MaLoaiTaiKhoan = maLoaiTK,
+            Token = token,
+            TrangThai = trangThai
+        )
+    }
+
+
     suspend fun logout() {
         dataStore.edit { prefs ->
             prefs[LOGIN_KEY] = false
@@ -85,6 +115,13 @@ class SinhVienPreferences(private val context: Context) {
             prefs[LOAITK_KEY] = 0
             prefs[TOKEN_KEY] = ""
             prefs[TRANGTHAI_KEY] = 0
+        }
+        UserTypePreferences(context).clearUserType()
+    }
+
+    suspend fun clearLogin() {
+        dataStore.edit { prefs ->
+            prefs.clear() // Xoá tất cả key liên quan
         }
         UserTypePreferences(context).clearUserType()
     }

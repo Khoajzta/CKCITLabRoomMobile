@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,9 +47,8 @@ fun StartupCheckScreen(
     val context = LocalContext.current
     var isConnected by remember { mutableStateOf(isInternetAvailable(context)) }
     var isNavigated by remember { mutableStateOf(false) }
-    var hasTriedLogin by remember { mutableStateOf(false) }
 
-    // Theo dõi trạng thái mạng
+    // Theo dõi mạng
     NetworkStatusHandler(
         onAvailable = {
             isConnected = true
@@ -63,28 +65,21 @@ fun StartupCheckScreen(
     val loginSinhVienState by sinhVienPreferences.loginStateFlow.collectAsState(initial = LoginSinhVienState())
     val loginGiangVienState by giangVienPreferences.loginStateFlow.collectAsState(initial = LoginGiangVienState())
 
-    // Hiệu ứng scale và alpha cho logo
+    // Hiệu ứng splash
     val infiniteTransition = rememberInfiniteTransition(label = "startup_transition")
     val scale by infiniteTransition.animateFloat(
         initialValue = 0.8f,
         targetValue = 1.05f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
+        animationSpec = infiniteRepeatable(tween(1000, easing = FastOutSlowInEasing), RepeatMode.Reverse),
         label = "scale"
     )
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.4f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200),
-            repeatMode = RepeatMode.Reverse
-        ),
+        animationSpec = infiniteRepeatable(tween(1200), RepeatMode.Reverse),
         label = "alpha"
     )
 
-    // Giao diện splash
     if (!isNavigated) {
         Column(
             modifier = Modifier
@@ -96,7 +91,6 @@ fun StartupCheckScreen(
             if (!isConnected) NoInternetBanner()
 
             Spacer(modifier = Modifier.height(100.dp))
-
             Image(
                 painter = painterResource(R.drawable.logo),
                 contentDescription = "Logo",
@@ -110,93 +104,55 @@ fun StartupCheckScreen(
                     .clip(CircleShape)
                     .shadow(8.dp, shape = CircleShape)
             )
-
             Spacer(modifier = Modifier.height(32.dp))
             DotLoading()
         }
     }
 
-    // Xử lý điều hướng khởi động
-    LaunchedEffect(loginGiangVienState, loginSinhVienState) {
-        if (isNavigated || !isConnected) return@LaunchedEffect
-        delay(800)
-        hasTriedLogin = true
 
-        if (loginGiangVienState.maGiangVien != null) {
-            giangVienViewModel.getGiangVienByMaGOrEmail(loginGiangVienState.maGiangVien!!)
-            delay(300)
-            giangVienViewModel.giangvien?.let {
-                giangVienViewModel.setGV(it)
-                isNavigated = true
-                navController.navigate(NavRoute.HOME.route) {
-                    popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
-                }
-            } ?: run {
-                isNavigated = true
-                navController.navigate(NavRoute.LOGINGIANGVIEN.route) {
-                    popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
-                }
-            }
-        } else if (loginSinhVienState.maSinhVien != null) {
-            sinhVienViewModel.getSinhVienByMaGOrEmail(loginSinhVienState.maSinhVien!!)
-            delay(300)
-            sinhVienViewModel.sinhvien?.let {
-                sinhVienViewModel.setSV(it)
-                isNavigated = true
-                navController.navigate(NavRoute.HOME.route) {
-                    popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
-                }
-            } ?: run {
-                isNavigated = true
-                navController.navigate(NavRoute.LOGINSINHVIEN.route) {
-                    popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
-                }
-            }
-        } else {
-            isNavigated = true
-            navController.navigate(NavRoute.LOGINSINHVIEN.route) {
-                popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
-            }
-        }
-    }
+    LaunchedEffect(isConnected, loginGiangVienState, loginSinhVienState) {
+        if (!isConnected || isNavigated) return@LaunchedEffect
+        delay(500)
 
-    // Tự động thử lại khi kết nối mạng trở lại
-    LaunchedEffect(isConnected) {
-        if (isConnected && !isNavigated && !hasTriedLogin) {
-            delay(300)
-            hasTriedLogin = true
-
-            if (loginGiangVienState.maGiangVien != null) {
-                giangVienViewModel.getGiangVienByMaGOrEmail(loginGiangVienState.maGiangVien!!)
-                delay(300)
-                giangVienViewModel.giangvien?.let {
-                    giangVienViewModel.setGV(it)
+        when {
+            loginGiangVienState.maGiangVien != null -> {
+                val gv = giangVienViewModel.getGiangVienByMaGOrEmailNow(loginGiangVienState.maGiangVien!!)
+                if (gv != null && gv.Token == loginGiangVienState.token) {
+                    giangVienViewModel.setGV(gv)
                     isNavigated = true
                     navController.navigate(NavRoute.HOME.route) {
                         popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
                     }
-                } ?: run {
+                } else {
+                    Toast.makeText(context, "Tài khoản đã đăng nhập trên thiết bị khác", Toast.LENGTH_SHORT).show()
+                    giangVienPreferences.logout()
                     isNavigated = true
-                    navController.navigate(NavRoute.LOGINGIANGVIEN.route) {
+                    navController.navigate(NavRoute.LOGINSINHVIEN.route) {
                         popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
                     }
+
                 }
-            } else if (loginSinhVienState.maSinhVien != null) {
-                sinhVienViewModel.getSinhVienByMaGOrEmail(loginSinhVienState.maSinhVien!!)
-                delay(300)
-                sinhVienViewModel.sinhvien?.let {
-                    sinhVienViewModel.setSV(it)
+            }
+
+            loginSinhVienState.maSinhVien != null -> {
+                val sv = sinhVienViewModel.getSinhVienByMaGOrEmailNow(loginSinhVienState.maSinhVien!!)
+                if (sv != null && sv.Token == loginSinhVienState.token) {
+                    sinhVienViewModel.setSV(sv)
                     isNavigated = true
                     navController.navigate(NavRoute.HOME.route) {
                         popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
                     }
-                } ?: run {
+                } else {
+                    Toast.makeText(context, "Tài khoản đã đăng nhập trên thiết bị khác", Toast.LENGTH_SHORT).show()
+                    sinhVienPreferences.logout()
                     isNavigated = true
                     navController.navigate(NavRoute.LOGINSINHVIEN.route) {
                         popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
                     }
                 }
-            } else {
+            }
+
+            else -> {
                 isNavigated = true
                 navController.navigate(NavRoute.LOGINSINHVIEN.route) {
                     popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
@@ -205,6 +161,7 @@ fun StartupCheckScreen(
         }
     }
 }
+
 
 
 

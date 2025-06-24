@@ -364,8 +364,12 @@ fun EditLichHocScreen(
                             notificationViewModel.createThongBao(thongBao)
                         }
 
-                        // Nếu người chỉnh sửa KHÔNG phải là giảng viên trong lịch → gửi thêm cho giảng viên
-                        if (giangvien?.MaGV != selectedGiangVien?.MaGV) {
+                        // Xác định người sửa và người trong lịch
+                        val isAdmin = giangvien?.MaLoaiTaiKhoan == 1
+                        val isChinhMinh = giangvien?.MaGV == selectedGiangVien?.MaGV
+
+                        // Gửi thông báo cho giảng viên nếu là admin và sửa lịch của người khác
+                        if (isAdmin && !isChinhMinh) {
                             val gvToken = selectedGiangVien?.Token
                             if (!gvToken.isNullOrBlank()) {
                                 notificationViewModel.sendNotificationToTokens(listOf(gvToken), title, body)
@@ -388,14 +392,14 @@ fun EditLichHocScreen(
                     } else {
                         Toast.makeText(context, "Vui lòng chọn đầy đủ thông tin", Toast.LENGTH_SHORT).show()
                     }
-                }
-                ,
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {
                 Text("Cập nhật Lịch Dạy", color = Color.White, fontWeight = FontWeight.Bold)
             }
+
         }
     }
 }

@@ -145,16 +145,16 @@ fun CardLopHoc(
                         Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
                     }
 
-                    Button(
-                        onClick = { showConfirmDialog = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935))
-                    ) {
-                        Icon(Lucide.Trash2, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Xoá Lớp", color = Color.White, fontWeight = FontWeight.Bold)
-                    }
+//                    Button(
+//                        onClick = { showConfirmDialog = true },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        shape = RoundedCornerShape(12.dp),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935))
+//                    ) {
+//                        Icon(Lucide.Trash2, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+//                        Spacer(Modifier.width(8.dp))
+//                        Text("Xoá Lớp", color = Color.White, fontWeight = FontWeight.Bold)
+//                    }
                 }
             }
 
@@ -197,12 +197,16 @@ fun CardLopHoc(
                 AlertDialog(
                     onDismissRequest = { showConfirmDialog = false },
                     containerColor = Color.White,
-                    title = { Text("Xác nhận", fontWeight = FontWeight.Bold) },
+                    title = { Text("Xác nhận", fontWeight = FontWeight.Bold,color = Color.Red) },
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Lucide.ShieldQuestion, contentDescription = null)
+                            Icon(
+                                Lucide.ShieldQuestion,
+                                contentDescription = null,
+                                tint = Color.Red,
+                            )
                             Spacer(Modifier.width(8.dp))
-                            Text("Bạn có chắc chắn muốn xoá lớp này không?", fontSize = 16.sp)
+                            Text("Bạn có chắc chắn muốn xoá lớp này không?", fontSize = 16.sp, color = Color.Black)
                         }
                     },
                     confirmButton = {

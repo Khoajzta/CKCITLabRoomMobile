@@ -1,3 +1,4 @@
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -51,6 +52,9 @@ fun HomeScreen(
     tuanViewModel: TuanViewModel
 ) {
     BackHandler {}
+
+
+    Log.d("Home","HOME")
 
     LaunchedEffect(Unit) {
         namHocViewModel.getAllNamHoc()
@@ -222,13 +226,3 @@ fun HomeScreen(
         }
     }
 }
-
-
-
-
-
-
-
-
-
-

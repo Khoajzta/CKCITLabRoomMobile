@@ -28,6 +28,9 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
     var sinhvienSet: SinhVien? by mutableStateOf(null)
         private set
 
+    var sinhvienToken: String? by mutableStateOf(null)
+        private set
+
     var danhSachToken by mutableStateOf<List<String>>(emptyList())
         private set
 
@@ -61,6 +64,10 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
 
     fun setSV(sv: SinhVien?) {
         sinhvienSet = sv
+    }
+
+    fun setToken(token: String?) {
+        sinhvienToken = token
     }
 
     fun checkLogin(email: String, matKhau: String) {

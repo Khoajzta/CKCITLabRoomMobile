@@ -25,9 +25,9 @@ fun QuanLyPhieuMuonMayScreen(
 
     val dsChucNang =
         listOf(
-            ChucNang("Phiếu Mươn Đã Trả", Icons.Outlined.Article, Click = {navController.navigate(NavRoute.LISTPHIEUMUONMAYDATRA.route)}),
-            ChucNang("Phiếu Mươn Chưa Trả", Icons.Outlined.Article, Click = {navController.navigate(NavRoute.LISTPHIEUMUONMAYCHUATRA.route)}),
-            ChucNang("Phiếu Mươn Chưa Chuyển Máy", Icons.Outlined.Article, Click = {navController.navigate(NavRoute.LISTPHIEUMUONMAYCHUACHUYEN.route)}),
+            ChucNang("Phiếu Đã Trả", Icons.Outlined.Article, Click = {navController.navigate(NavRoute.LISTPHIEUMUONMAYDATRA.route)}),
+            ChucNang("Phiếu Chưa Trả", Icons.Outlined.Article, Click = {navController.navigate(NavRoute.LISTPHIEUMUONMAYCHUATRA.route)}),
+            ChucNang("Phiếu Chưa Chuyển Máy", Icons.Outlined.Article, Click = {navController.navigate(NavRoute.LISTPHIEUMUONMAYCHUACHUYEN.route)}),
             ChucNang("Tạo Phiếu Mượn May", Icons.Outlined.AddCircle, Click = {navController.navigate(NavRoute.ADDPHIEUMUONMAY.route)}),
         )
 

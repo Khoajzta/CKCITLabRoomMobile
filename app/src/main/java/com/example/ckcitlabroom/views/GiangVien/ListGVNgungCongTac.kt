@@ -76,7 +76,8 @@ fun ListGiangVienNgungCongTac(
                         Text(
                             "Chưa có giảng viên nào Ngưng công tác",
                             color = Color.Black,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(16.dp),
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }

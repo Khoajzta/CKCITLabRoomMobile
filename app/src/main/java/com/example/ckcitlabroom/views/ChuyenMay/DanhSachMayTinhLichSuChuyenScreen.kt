@@ -86,7 +86,8 @@ fun ListMayTinhTrongDonNhapScreen(
                     ) {
                         Text(
                             "Chưa có máy tính nào",
-                            color = Color.White,
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(16.dp)
                         )
                     }

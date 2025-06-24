@@ -38,7 +38,7 @@ fun CardChucNang(chucnang: ChucNang) {
         onClick = chucnang.Click,
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
+            .height(110.dp)
             .shadow(
                 elevation = 6.dp,
                 shape = RoundedCornerShape(20.dp),
@@ -47,19 +47,20 @@ fun CardChucNang(chucnang: ChucNang) {
             ),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp), // ↓ Giảm khoảng cách giữa các phần tử
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Icon với hiệu ứng nổi và gradient nền
             Box(
                 modifier = Modifier
-                    .size(60.dp)
+                    .padding(top = 6.dp)
+                    .size(50.dp)
                     .background(
                         brush = Brush.linearGradient(
                             colors = listOf(Color(0xFF1B8DDE), Color(0xFF6DC8F3))
@@ -79,13 +80,15 @@ fun CardChucNang(chucnang: ChucNang) {
             // Text gần hơn
             Text(
                 text = chucnang.name,
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
                 color = Color(0xFF1B1B1B),
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
             )
+
         }
     }
 }

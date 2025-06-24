@@ -1,5 +1,6 @@
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -69,6 +70,9 @@ fun LoginSVScreen(
     navController: NavHostController,
     sinhVienViewModel: SinhVienViewModel
 ) {
+
+    BackHandler {}
+
     val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
     val cardOffset by animateDpAsState(
         targetValue = if (imeBottom > 0) 20.dp else 120.dp,
@@ -95,6 +99,10 @@ fun LoginSVScreen(
     val loginState by userPreferences.loginStateFlow.collectAsState(initial = LoginSinhVienState())
 
     val isAutoLoginChecked = remember { mutableStateOf(false) }
+
+    if (!loginState.isLoggedIn) {
+        sinhVienViewModel.setSV(null)
+    }
 
 
     LaunchedEffect(loginState) {
@@ -191,7 +199,7 @@ fun LoginSVScreen(
                                 Icon(imageVector = icon, contentDescription = "Toggle Password")
                             }
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier
                             .fillMaxWidth()
                             .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
@@ -309,7 +317,7 @@ fun LoginSVScreen(
                     } else {
                         FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
                             val sinhvienWithToken = sinhvien.copy(Token = token)
-
+                            sinhVienViewModel.setToken(token)
                             // ✅ Cập nhật token lên server
                             sinhVienViewModel.updateToken(sinhvien.MaSinhVien, token)
 
@@ -325,8 +333,6 @@ fun LoginSVScreen(
                     }
                 }
             }
-
-
         }
     }
 }

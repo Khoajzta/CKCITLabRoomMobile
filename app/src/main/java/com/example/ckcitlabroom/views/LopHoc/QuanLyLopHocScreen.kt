@@ -92,7 +92,8 @@ fun QuanLyLopHoc(
                         Text(
                             "Chưa có lớp học nào",
                             color = Color.Black,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(16.dp),
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }
