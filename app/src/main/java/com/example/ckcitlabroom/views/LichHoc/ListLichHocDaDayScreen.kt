@@ -1,40 +1,66 @@
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListLichHocDaDayScreen(
     lichHocViewModel: LichHocViewModel,
@@ -180,6 +206,8 @@ fun ListLichHocDaDayScreen(
             return
         }
 
+        var expanded by remember { mutableStateOf(false) }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -188,11 +216,84 @@ fun ListLichHocDaDayScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if (giangVien != null) "Lịch Đã Dạy Tuần ${selectedTuan?.TenTuan ?: ""}" else "Lịch Đã Học Tuần ${selectedTuan?.TenTuan ?: ""}",
+                text = if (giangVien != null) "Lịch Đã Dạy " else "Lịch Đã Học ",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
+
+            val primary = Color(0xFF1B8DDE)
+
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier.width(100.dp)          // khung ngoài 200 dp
+            ) {
+                // ── Anchor ───────────────────────────────────────────────
+                Row(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .width(100.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .padding(vertical = 6.dp)          // KHÔNG padding start
+                        .clickable { expanded = !expanded },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 1️⃣  Text dính trái, chiếm hết khoảng còn lại
+                    BasicTextField(
+                        value = selectedTuan?.TenTuan ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        singleLine = true,
+                        textStyle = TextStyle(
+                            fontSize = 20.sp,
+                            color = primary,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        modifier = Modifier
+                            .weight(1f)                    // đẩy icon về phải
+                            .padding(start = 0.dp)
+                    )
+
+                    // 2️⃣  IconButton sát chữ
+                    IconButton(
+                        onClick = { expanded = !expanded },
+                        modifier = Modifier
+                            .size(24.dp)                   // ripple / hit-box tiêu chuẩn
+                    ) {
+                        Icon(
+                            imageVector = if (expanded)
+                                Icons.Default.KeyboardArrowUp
+                            else
+                                Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = primary
+                        )
+                    }
+                }
+
+                // ── Menu ────────────────────────────────────────────────
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    containerColor = Color.White
+                ) {
+                    danhsachtuantheonam.forEach { tuan ->
+                        DropdownMenuItem(
+                            text = {
+                                androidx.compose.material3.Text(
+                                    tuan.TenTuan,
+                                    color = Color.Black
+                                )
+                            },
+                            onClick = {
+                                selectedTuan = tuan
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
         }
 
         HorizontalDivider(
@@ -212,30 +313,12 @@ fun ListLichHocDaDayScreen(
         ) {
             if (giangVien?.MaLoaiTaiKhoan == 1) {
                 CustomDropdownSelector(
-                    modifier = Modifier.width(140.dp),
-                    label = "Tuần",
-                    items = danhsachtuantheonam,
-                    selectedItem = selectedTuan,
-                    itemLabel = { it.TenTuan },
-                    onItemSelected = { selectedTuan = it }
-                )
-
-                CustomDropdownSelector(
-                    modifier = Modifier.width(240.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     label = "Giảng viên",
                     items = danhsachgiangvien,
                     selectedItem = selectedGV,
                     itemLabel = { it.TenGiangVien },
                     onItemSelected = { selectedGV = it }
-                )
-            } else {
-                CustomDropdownSelector(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = "Tuần",
-                    items = danhsachtuantheonam,
-                    selectedItem = selectedTuan,
-                    itemLabel = { it.TenTuan },
-                    onItemSelected = { selectedTuan = it }
                 )
             }
         }
@@ -288,18 +371,65 @@ fun ListLichHocDaDayScreen(
                                             color = Color.Black
                                         )
 
+                                        val listState = rememberLazyListState()
+
                                         LazyRow(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(end = 12.dp)
+                                            modifier = Modifier.fillMaxWidth(),
+                                            state = listState,
+                                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                            contentPadding = PaddingValues(end = 3.dp),
+                                            flingBehavior = rememberSnapFlingBehavior(listState)
                                         ) {
                                             items(lichTrongThu) { lichhoc ->
-                                                CardLichHoc(
-                                                    lichhoc,
-                                                    giangVien = giangVien,
-                                                    navController = navController
-                                                )
+                                                CardLichHoc(lichhoc, giangVien = giangVien, navController = navController)
                                                 Spacer(modifier = Modifier.width(12.dp))
+                                            }
+                                        }
+
+                                        val currentPage by remember {
+                                            derivedStateOf {
+                                                listState.layoutInfo.visibleItemsInfo
+                                                    .firstOrNull()?.index ?: 0
+                                            }
+                                        }
+
+
+                                        val scope = rememberCoroutineScope()
+
+                                        if (lichTrongThu.size > 1) {
+                                            Row(
+                                                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                repeat(lichTrongThu.size) { index ->
+                                                    val selected = index == currentPage
+
+                                                    // 👇 Size & color có animation
+                                                    val dotSize by animateDpAsState(
+                                                        targetValue = if (selected) 13.dp else 8.dp,
+                                                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+                                                    )
+
+                                                    val dotColor by animateColorAsState(
+                                                        targetValue = if (selected) Color.White
+                                                        else Color.White.copy(alpha = 0.3f),
+                                                        animationSpec = tween(200)
+                                                    )
+
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(dotSize)
+                                                            .clip(CircleShape)
+                                                            .background(dotColor)
+                                                            .clickable(
+                                                                interactionSource = remember { MutableInteractionSource() },
+                                                                indication = null
+                                                            ) {
+                                                                scope.launch { listState.animateScrollToItem(index) }
+                                                            }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -341,28 +471,70 @@ fun ListLichHocDaDayScreen(
                                     Column(modifier = Modifier.fillMaxWidth()) {
                                         Text(
                                             text = thu,
-                                            modifier = Modifier.padding(
-                                                start = 16.dp,
-                                                top = 12.dp,
-                                                bottom = 4.dp
-                                            ),
+                                            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
                                             fontWeight = FontWeight.SemiBold,
-                                            fontSize = 18.sp,
-                                            color = Color.Black
+                                            fontSize = 18.sp
                                         )
 
+                                        val listState = rememberLazyListState()
+
                                         LazyRow(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(end = 12.dp)
+                                            modifier = Modifier.fillMaxWidth(),
+                                            state = listState,
+                                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                            contentPadding = PaddingValues(end = 3.dp),
+                                            flingBehavior = rememberSnapFlingBehavior(listState)
                                         ) {
                                             items(lichTrongThu) { lichhoc ->
-                                                CardLichHoc(
-                                                    lichhoc,
-                                                    giangVien = giangVien,
-                                                    navController = navController
-                                                )
+                                                CardLichHoc(lichhoc, giangVien = giangVien, navController = navController)
                                                 Spacer(modifier = Modifier.width(12.dp))
+                                            }
+                                        }
+
+                                        val currentPage by remember {
+                                            derivedStateOf {
+                                                listState.layoutInfo.visibleItemsInfo
+                                                    .firstOrNull()?.index ?: 0
+                                            }
+                                        }
+
+
+                                        val scope = rememberCoroutineScope()
+
+                                        if (lichTrongThu.size > 1) {
+                                            Row(
+                                                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                repeat(lichTrongThu.size) { index ->
+                                                    val selected = index == currentPage
+
+                                                    // 👇 Size & color có animation
+                                                    val dotSize by animateDpAsState(
+                                                        targetValue = if (selected) 13.dp else 8.dp,
+                                                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+                                                    )
+
+                                                    val dotColor by animateColorAsState(
+                                                        targetValue = if (selected) Color.White
+                                                        else Color.White.copy(alpha = 0.3f),
+                                                        animationSpec = tween(200)
+                                                    )
+
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(dotSize)
+                                                            .clip(CircleShape)
+                                                            .background(dotColor)
+                                                            .clickable(
+                                                                interactionSource = remember { MutableInteractionSource() },
+                                                                indication = null
+                                                            ) {
+                                                                scope.launch { listState.animateScrollToItem(index) }
+                                                            }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -414,10 +586,20 @@ fun ListLichHocDaDayScreen(
                                             color = Color.Black
                                         )
 
+                                        val listState = rememberLazyListState()
+                                        val currentPage by remember {
+                                            derivedStateOf {
+                                                listState.layoutInfo.visibleItemsInfo
+                                                    .firstOrNull()?.index ?: 0
+                                            }
+                                        }
+
                                         LazyRow(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(end = 12.dp)
+                                            modifier = Modifier.fillMaxWidth(),
+                                            state = listState,
+                                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                            contentPadding = PaddingValues(end = 3.dp),
+                                            flingBehavior = rememberSnapFlingBehavior(listState)
                                         ) {
                                             items(lichTrongThu) { lichhoc ->
                                                 CardLichHoc(
@@ -426,6 +608,45 @@ fun ListLichHocDaDayScreen(
                                                     navController = navController
                                                 )
                                                 Spacer(modifier = Modifier.width(12.dp))
+                                            }
+                                        }
+
+                                        val scope = rememberCoroutineScope()
+
+                                        if (lichTrongThu.size > 1) {
+                                            Row(
+                                                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                repeat(lichTrongThu.size) { index ->
+                                                    val selected = index == currentPage
+
+                                                    // 👇 Size & color có animation
+                                                    val dotSize by animateDpAsState(
+                                                        targetValue = if (selected) 13.dp else 8.dp,
+                                                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+                                                    )
+
+                                                    val dotColor by animateColorAsState(
+                                                        targetValue = if (selected) Color.White
+                                                        else Color.White.copy(alpha = 0.3f),
+                                                        animationSpec = tween(200)
+                                                    )
+
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(dotSize)
+                                                            .clip(CircleShape)
+                                                            .background(dotColor)
+                                                            .clickable(
+                                                                interactionSource = remember { MutableInteractionSource() },
+                                                                indication = null
+                                                            ) {
+                                                                scope.launch { listState.animateScrollToItem(index) }
+                                                            }
+                                                    )
+                                                }
                                             }
                                         }
                                     }

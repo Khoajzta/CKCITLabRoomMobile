@@ -14,6 +14,8 @@ import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,6 +25,10 @@ class MayTinhViewModel : ViewModel() {
     var mt = MayTinh("","",""",""","","","","","","","","","","","",1)
 
     var danhSachAllMayTinh by mutableStateOf(listOf<MayTinh>())
+
+    private val _danhSachAllMayTinh2 = MutableStateFlow<List<MayTinh>>(emptyList())
+    val danhSachAllMayTinh2: StateFlow<List<MayTinh>> = _danhSachAllMayTinh2
+
 
     var danhSachAllMayTinhtheophong by mutableStateOf<List<MayTinh>>(emptyList())
         private set
@@ -80,6 +86,23 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
+
+    fun getAllMayTinh2() {
+        if (pollingAllMayTinhJob != null) return
+
+        pollingAllMayTinhJob = viewModelScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                try {
+                    val response = ITLabRoomRetrofitClient.maytinhAPIService.getAllMayTinh()
+                    _danhSachAllMayTinh2.value = response.maytinh ?: emptyList()
+                } catch (e: Exception) {
+                    Log.e("PhongMayViewModel", "Polling all máy lỗi", e)
+                }
+                delay(500)
+            }
+        }
+    }
+
 
     fun stopPollingAllMayTinh() {
         pollingAllMayTinhJob?.cancel()

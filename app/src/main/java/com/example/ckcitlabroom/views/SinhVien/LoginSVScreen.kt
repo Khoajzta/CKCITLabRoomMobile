@@ -70,7 +70,6 @@ fun LoginSVScreen(
     navController: NavHostController,
     sinhVienViewModel: SinhVienViewModel
 ) {
-
     BackHandler {}
 
     val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
@@ -83,12 +82,9 @@ fun LoginSVScreen(
         label = "CardElevation"
     )
 
-    val sinhvien = sinhVienViewModel.sinhvien
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
 
-    val loginResult by sinhVienViewModel.loginResult.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -97,14 +93,17 @@ fun LoginSVScreen(
     val userPreferences = remember { SinhVienPreferences(context) }
 
     val loginState by userPreferences.loginStateFlow.collectAsState(initial = LoginSinhVienState())
+    val loginResult by sinhVienViewModel.loginResult.collectAsState()
+    val sinhvien = sinhVienViewModel.sinhvien
 
     val isAutoLoginChecked = remember { mutableStateOf(false) }
+    val isNavigated = remember { mutableStateOf(false) }
 
     if (!loginState.isLoggedIn) {
         sinhVienViewModel.setSV(null)
     }
 
-
+    // Tự động load SV khi đã lưu loginState
     LaunchedEffect(loginState) {
         if (loginState.isLoggedIn && loginState.maSinhVien != null && !isAutoLoginChecked.value) {
             isAutoLoginChecked.value = true
@@ -112,19 +111,7 @@ fun LoginSVScreen(
         }
     }
 
-    // Khi sinhvien được load -> điều hướng
-    LaunchedEffect(sinhvien) {
-        if (loginState.isLoggedIn && sinhvien != null) {
-            sinhVienViewModel.setSV(sinhvien)
-            navController.navigate(NavRoute.HOME.route) {
-                popUpTo(NavRoute.LOGINSINHVIEN.route) { inclusive = true }
-            }
-        }
-    }
-
-
-
-
+    // Hiển thị màn hình loading nếu đang tự động đăng nhập
     if (loginState.isLoggedIn && !isAutoLoginChecked.value) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -133,7 +120,6 @@ fun LoginSVScreen(
             DotLoading()
         }
     } else {
-        // Hiển thị form đăng nhập
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -151,155 +137,43 @@ fun LoginSVScreen(
                 elevation = CardDefaults.cardElevation(animatedElevation),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.logo),
-                        contentDescription = "Logo",
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                    )
+                LoginForm(
+                    email = emailState.value,
+                    onEmailChange = { emailState.value = it },
+                    password = passwordState.value,
+                    onPasswordChange = { passwordState.value = it },
+                    onLoginClick = {
+                        val email = emailState.value.trim()
+                        val password = passwordState.value.trim()
 
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    OutlinedTextField(
-                        value = emailState.value,
-                        onValueChange = { emailState.value = it },
-                        placeholder = { Text("Email hoặc Mã số sinh viên") },
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            unfocusedBorderColor = Color.White,
-                            focusedBorderColor = Color.White,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedTextField(
-                        value = passwordState.value,
-                        onValueChange = { passwordState.value = it },
-                        placeholder = { Text("Mật khẩu") },
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            val icon = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(imageVector = icon, contentDescription = "Toggle Password")
+                        if (email.isEmpty() || password.isEmpty()) {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Vui lòng nhập đầy đủ Email và Mật khẩu",
+                                    type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
                             }
-                        },
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            unfocusedBorderColor = Color.White,
-                            focusedBorderColor = Color.White,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
-                        )
-                    )
-
-                    // Các phần snackbar, button đăng nhập, nút chuyển sang Giảng Viên,...
-                    SnackbarHost(
-                        hostState = snackbarHostState,
-                        modifier = Modifier.padding(16.dp)
-                    ) { data ->
-                        snackbarData.value?.let { customData ->
-                            Snackbar(
-                                containerColor = Color(0xFF1B8DDE),
-                                contentColor = Color.White,
-                                shape = RoundedCornerShape(12.dp),
-                                action = {
-                                    TextButton(onClick = {
-                                        snackbarData.value = null
-                                    }) {
-                                        Text("Đóng", color = Color.White)
-                                    }
-                                }
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
-                                        contentDescription = null,
-                                        tint = if (customData.type == SnackbarType.SUCCESS) Color.Cyan else Color.Yellow,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = customData.message)
-                                }
+                        } else if (email.contains("@") && !email.endsWith("@caothang.edu.vn")) {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Vui lòng sử dụng mail Cao Thắng để đăng nhập",
+                                    type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
                             }
+                        } else {
+                            sinhVienViewModel.checkLogin(email, password)
                         }
+                    },
+                    showSwitchAccount = true,
+                    onSwitchAccountClick = {
+                        navController.navigate(NavRoute.LOGINGIANGVIEN.route)
                     }
-
-                    Button(
-                        onClick = {
-                            val email = emailState.value.trim()
-                            val password = passwordState.value.trim()
-
-                            if (email.isEmpty() || password.isEmpty()) {
-                                coroutineScope.launch {
-                                    snackbarData.value = CustomSnackbarData(
-                                        message = "Vui lòng nhập đầy đủ Email và Mật khẩu",
-                                        type = SnackbarType.ERROR
-                                    )
-                                    snackbarHostState.showSnackbar("Thông báo")
-                                }
-                            } else if (email.contains("@") && !email.endsWith("@caothang.edu.vn")) {
-                                coroutineScope.launch {
-                                    snackbarData.value = CustomSnackbarData(
-                                        message = "Vui lòng sử dụng mail Cao Thắng để đăng nhập",
-                                        type = SnackbarType.ERROR
-                                    )
-                                    snackbarHostState.showSnackbar("Thông báo")
-                                }
-                            } else {
-                                sinhVienViewModel.checkLogin(email, password)
-                            }
-                        },
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF1B8DDE),
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Đăng nhập", fontWeight = FontWeight.Bold)
-                    }
-
-                    TextButton(
-                        modifier = Modifier.padding(8.dp),
-                        onClick = {
-                            navController.navigate(NavRoute.LOGINGIANGVIEN.route)
-                        },
-                        colors = ButtonDefaults.textButtonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = Color(0xFF1B8DDE)
-                        ),
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Text("Giảng Viên Đăng nhập")
-                    }
-                }
+                )
             }
 
-            val coroutineScope = rememberCoroutineScope()
-
+            // Xử lý kết quả đăng nhập
             LaunchedEffect(loginResult) {
                 if (loginResult?.result == true) {
                     sinhVienViewModel.getSinhVienByMaGOrEmail(emailState.value)
@@ -309,8 +183,9 @@ fun LoginSVScreen(
                 }
             }
 
+            // Xử lý thành công login và điều hướng
             LaunchedEffect(loginResult, sinhvien) {
-                if (loginResult?.result == true && sinhvien != null) {
+                if (!isNavigated.value && loginResult?.result == true && sinhvien != null) {
                     if (sinhvien.TrangThai == 0) {
                         Toast.makeText(context, "Tài khoản bị khóa", Toast.LENGTH_SHORT).show()
                         sinhVienViewModel.resetLoginResult()
@@ -318,15 +193,18 @@ fun LoginSVScreen(
                         FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
                             val sinhvienWithToken = sinhvien.copy(Token = token)
                             sinhVienViewModel.setToken(token)
-                            // ✅ Cập nhật token lên server
                             sinhVienViewModel.updateToken(sinhvien.MaSinhVien, token)
 
-                            // ✅ Cập nhật local ViewModel & DataStore
-                            sinhVienViewModel.setSV(sinhvienWithToken)
                             coroutineScope.launch {
                                 userPreferences.saveLoginForSinhVien(sinhvienWithToken)
-                                navController.navigate(NavRoute.HOME.route) {
-                                    popUpTo(0) { inclusive = true }
+
+                                // ✅ Chỉ điều hướng 1 lần
+                                if (!isNavigated.value) {
+                                    isNavigated.value = true
+                                    sinhVienViewModel.setSV(sinhvienWithToken)
+                                    navController.navigate(NavRoute.HOME.route) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
                                 }
                             }
                         }
@@ -336,6 +214,114 @@ fun LoginSVScreen(
         }
     }
 }
+
+
+@Composable
+fun LoginForm(
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    showSwitchAccount: Boolean = false,
+    onSwitchAccountClick: (() -> Unit)? = null
+) {
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier.padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(R.drawable.logo),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = onEmailChange,
+            placeholder = { Text("Email hoặc Mã số") },
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                focusedBorderColor = Color.White,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            )
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = onPasswordChange,
+            placeholder = { Text("Mật khẩu") },
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val icon = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = icon, contentDescription = "Toggle Password")
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(7.dp, shape = RoundedCornerShape(12.dp)),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                focusedBorderColor = Color.White,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            )
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = onLoginClick,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF1B8DDE),
+                contentColor = Color.White
+            )
+        ) {
+            Text("Đăng nhập", fontWeight = FontWeight.Bold)
+        }
+
+        if (showSwitchAccount && onSwitchAccountClick != null) {
+            TextButton(
+                modifier = Modifier.padding(8.dp),
+                onClick = onSwitchAccountClick,
+                colors = ButtonDefaults.textButtonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color(0xFF1B8DDE)
+                ),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text("Giảng viên đăng nhập")
+            }
+        }
+    }
+}
+
 
 
 

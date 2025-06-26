@@ -60,8 +60,15 @@ fun ChiTietDonNhapChuyenScreen(
 
     val danhSachMayTheoDon = remember(danhsachchitietdonnhap, danhSachMayTinh) {
         val maMayTheoDon = danhsachchitietdonnhap.map { it.MaMay }
-        danhSachMayTinh.filter { it.MaMay in maMayTheoDon && it.MaPhong == "KHOLUUTRU"}
+        danhSachMayTinh
+            .filter { it.MaMay in maMayTheoDon && it.MaPhong == "KHOLUUTRU"}
+            .sortedBy { may ->
+            // Trích số từ tên máy, mặc định 0 nếu không trích được
+            Regex("""\d+""").find(may.TenMay)?.value?.toIntOrNull() ?: 0
+        }
     }
+
+
 
     var danhSachPhong = phongMayViewModel.danhSachAllPhongMay.filter { it.LoaiPhong == 1 || it.LoaiPhong == 2 }
 
@@ -241,11 +248,15 @@ fun ChiTietDonNhapChuyenScreen(
     if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
-            title = { Text("Thông báo", fontWeight = FontWeight.Bold) },
-            text = { Text(errorMessage) },
+            title = { Text("Thông báo", fontWeight = FontWeight.Bold,color = Color.Black) },
+            text = { Text(errorMessage,color = Color.Black) },
             containerColor = Color.White,
             confirmButton = {
-                Button(onClick = { showErrorDialog = false }) {
+                Button(
+                    onClick = { showErrorDialog = false },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE)))
+                {
                     Text("OK", color = Color.White)
                 }
             }

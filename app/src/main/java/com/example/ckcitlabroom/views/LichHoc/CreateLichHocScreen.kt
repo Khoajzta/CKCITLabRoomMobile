@@ -97,7 +97,7 @@ fun CreateLichHocScreen(
 
     // Dữ liệu nguồn
     val danhSachGiangVien = giangvienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }
-    val danhSachPhong = phongMayViewModel.danhSachAllPhongMay.filter { it.TrangThai == 1 }
+    val danhSachPhong = phongMayViewModel.danhSachAllPhongMay.filter { it.TrangThai == 1 && it.LoaiPhong == 1 }
     val danhSachNamHoc = namHocViewModel.danhSachAllNamHoc.filter { it.TrangThai == 1 }
     val danhSachTuan = tuanViewModel.danhSachAllTuan
     val danhSachMonHoc = monHocViewModel.danhSachAllMonHoc.filter { it.TrangThai == 1 }

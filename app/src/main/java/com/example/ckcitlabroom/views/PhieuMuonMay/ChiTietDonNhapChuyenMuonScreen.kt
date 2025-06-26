@@ -82,7 +82,10 @@ fun ChiTietDonNhapChuyenMuonScreen(
 
     val danhSachMayTinhTheoDon = remember(danhSachChiTiet, danhSachMayTinh) {
         val maMayTheoDon = danhSachChiTiet.map { it.MaMay }
-        danhSachMayTinh.filter { it.MaMay in maMayTheoDon }
+        danhSachMayTinh.filter { it.MaMay in maMayTheoDon }.sortedBy { may ->
+            // Trích số từ tên máy, mặc định 0 nếu không trích được
+            Regex("""\d+""").find(may.TenMay)?.value?.toIntOrNull() ?: 0
+        }
     }
 
     val danhSachMayTinhTrongKhoTheoDon = remember(danhSachMayTinhTheoDon) {
@@ -121,12 +124,18 @@ fun ChiTietDonNhapChuyenMuonScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Máy Tính Phòng",
-                fontWeight = FontWeight.ExtraBold,
+                "Danh Sách Máy Tính",
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
+        )
 
         LazyColumn(
             modifier = Modifier.weight(1f)

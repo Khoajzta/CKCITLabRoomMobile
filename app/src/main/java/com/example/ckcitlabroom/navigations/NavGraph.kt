@@ -1,12 +1,14 @@
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
@@ -19,7 +21,10 @@ import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
-
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 
 sealed class NavRoute(val route: String) {
     object HOME : NavRoute("home_screen")
@@ -60,7 +65,6 @@ sealed class NavRoute(val route: String) {
     object PHANQUYENADMIN : NavRoute("phanquyenadmin_screen")
     object PHANQUYENGIANGVIEN : NavRoute("phanquyengiangvien_screen")
     object DOIMATKHAUGV : NavRoute("doimatkhaugv_screen")
-
 
     //Chuyển Máy
     object QUANLYCHUYENMAY : NavRoute("quanlychuyenmay_screen")
@@ -106,7 +110,6 @@ sealed class NavRoute(val route: String) {
     //Năm học
     object QUANLYNAMHOC : NavRoute("quanlynamhoc_screen")
     object ADDNAMHOC : NavRoute("addnamhoc_screen")
-    object EDITNAMHOC : NavRoute("editnamhoc_screen")
     object NAMHOCDETAIL : NavRoute("namhocdetail_screen")
 
     //DiemDanh
@@ -145,10 +148,6 @@ sealed class NavRoute(val route: String) {
 
     //Thông báo
     object ListThongBaoSinhVien : NavRoute("listthongbaosinhvien_screen")
-    object ADDTHONGBAO : NavRoute("addthongbao_screen")
-    object EDITTHONGBAO : NavRoute("editthongbao_screen")
-
-
 }
 
 @Composable
@@ -175,14 +174,9 @@ fun NavgationGraph(
     monhocViewModel: MonHocViewModel,
     notificationViewModel: NotificationViewModel
 ) {
-
-    val context = LocalContext.current.applicationContext
-    val userPreferences = remember { SinhVienPreferences(context) }
-
-
-    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-    NavHost(navController = navController, startDestination = NavRoute.STARTSCREEN.route,
-
+    NavHost(
+        navController = navController,
+        startDestination = NavRoute.STARTSCREEN.route,
     ) {
 
         composable(
@@ -200,8 +194,6 @@ fun NavgationGraph(
         ) { navBackStackEntry ->
             HomeScreen(lichHocViewModel,giangVienViewModel,sinhVienViewModel,navController,namHocViewModel,tuanViewModel)
         }
-
-
 
         composable(
             route = NavRoute.QUANLY.route,
@@ -470,8 +462,6 @@ fun NavgationGraph(
             CreateLopHocScreen(navController,lopHocViewModel)
         }
 
-
-
         composable(
             NavRoute.EDITLOPHOC.route + "?malop={malop}",
             arguments = listOf(
@@ -511,8 +501,6 @@ fun NavgationGraph(
             val maca = navBackStackEntry.arguments?.getString("maca") ?: ""
             EditCaHocScreen(caHocViewModel, maca)
         }
-
-
 
         composable(
             route = NavRoute.QUANLYPHONGMAY.route,
@@ -662,7 +650,6 @@ fun NavgationGraph(
             )
         }
 
-
         composable(
             route = NavRoute.ADDPHONGMAY.route,
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
@@ -672,7 +659,6 @@ fun NavgationGraph(
         }
 
         ///Chuyển máy
-
         composable(
             route = NavRoute.QUANLYCHUYENMAY.route,
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
@@ -701,22 +687,48 @@ fun NavgationGraph(
             ChiTietLichSuChuyenMay(mamay,lichSuChuyenMayViewModel,phongMayViewModel)
         }
 
-
-
         composable(
             route = NavRoute.QUETQRCODE.route,
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
-            QRCodeScannerScreen(
-                onResult = { qrCodeValue ->
-                    navController.navigate(NavRoute.MAYTINHDETAIL.route + "?mamay=${qrCodeValue}")
+            val context = LocalContext.current
+
+            /* 1. Thu thập Flow thành State */
+            val danhSachMay by mayTinhViewModel
+                .danhSachAllMayTinh2           // Flow<List<MayTinh>>
+                .collectAsState(initial = emptyList())
+
+            /* 2. Gọi API một lần duy nhất khi composable được đưa vào composition */
+            LaunchedEffect(Unit) {
+                mayTinhViewModel.getAllMayTinh2()
+            }
+
+            /* 3. Chờ dữ liệu xong rồi mới hiển thị QR scanner */
+            if (danhSachMay.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    DotLoading()
                 }
-            )
+            } else {
+                QRCodeScannerScreen { qrCodeValue ->
+                    val tonTai = danhSachMay.any { it.MaMay == qrCodeValue }
+                    if (tonTai) {
+                        navController.navigate(
+                            NavRoute.MAYTINHDETAIL.route + "?mamay=$qrCodeValue"
+                        )
+                    } else {
+                        Toast.makeText(context, "Mã QR không hợp lệ", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
 
-        //Sửa chữa
 
+
+        //Sửa chữa
         composable(
             NavRoute.ADDPHIEUSUACHUA.route + "?mamay={mamay}",
             arguments = listOf(
@@ -920,7 +932,7 @@ fun NavgationGraph(
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
             val maphieumuon = navBackStackEntry.arguments?.getString("maphieumuon") ?: ""
-            UpdateTraMayScreen(maphieumuon,mayTinhViewModel,phieuMuonMayViewModel,chitetPhieuMuonViewModel,lichSuChuyenMayViewModel)
+            UpdateTraMayScreen(navController,maphieumuon,mayTinhViewModel,phieuMuonMayViewModel,chitetPhieuMuonViewModel,lichSuChuyenMayViewModel)
         }
 
         composable(

@@ -117,47 +117,72 @@ fun CreateCaHocScreen(
 
             Button(
                 onClick = {
-                    val maCaMoi = tenCaHocState.value
-                    val daTonTai = danhSachCaHoc.any { it.MaCaHoc.toString() == maCaMoi }
+                    val tenCa = tenCaHocState.value.trim()
+                    val batDau = thoiGianBatDauState.value.trim()
+                    val ketThuc = thoiGianKetThucState.value.trim()
+                    val daTonTai = danhSachCaHoc.any { it.TenCa.equals(tenCa, ignoreCase = true) }
 
-                    if (tenCaHocState.value == "") {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Tên ca học không được để trống!",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
+                    when {
+                        tenCa.isEmpty() -> {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Tên ca học không được để trống!",
+                                    type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
                         }
-                    } else if (daTonTai) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Tên ca học đã tồn tại!",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
+                        batDau.isEmpty() -> {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Thời gian bắt đầu không được để trống!",
+                                    type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
                         }
-                    } else {
-                        val caHocMoi = CaHoc(
-                            0,
-                            tenCaHocState.value,
-                            thoiGianBatDauState.value,
-                            thoiGianKetThucState.value,
-                            1
-                        )
-
-                        caHocViewModel.createCaHoc(caHocMoi)
-
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Thêm ca học thành công",
-                                type = SnackbarType.SUCCESS
+                        ketThuc.isEmpty() -> {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Thời gian kết thúc không được để trống!",
+                                    type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
+                        }
+                        daTonTai -> {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Tên ca học đã tồn tại!",
+                                    type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
+                        }
+                        else -> {
+                            val caHocMoi = CaHoc(
+                                MaCaHoc = 0,
+                                TenCa = tenCa,
+                                GioBatDau = batDau,
+                                GioKetThuc = ketThuc,
+                                TrangThai = 1
                             )
-                            snackbarHostState.showSnackbar("Thông báo")
-                            delay(1000)
-                            navController.popBackStack()
+
+                            caHocViewModel.createCaHoc(caHocMoi)
+
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Thêm ca học thành công",
+                                    type = SnackbarType.SUCCESS
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                                delay(1000)
+                                navController.popBackStack()
+                            }
                         }
                     }
-                },
+                }
+                ,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))

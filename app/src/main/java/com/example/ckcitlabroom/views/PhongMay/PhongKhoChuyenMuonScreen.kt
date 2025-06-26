@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -68,12 +69,18 @@ fun PhongKhoChuyenMuonScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Đơn Nhập",
-                fontWeight = FontWeight.ExtraBold,
+                "Danh Sách Máy Tính Theo Đơn Nhập",
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
             )
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
+            color = Color(0xFF1B8DDE),
+        )
 
         // Danh sách đơn nhập
         LazyColumn(

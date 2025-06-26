@@ -57,7 +57,7 @@ fun CardGiangVien(
 
     Card(
         modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 4.dp) // padding BÊN NGOÀI card
+            .padding(vertical = 4.dp) // padding BÊN NGOÀI card
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp)) // quan trọng để áp dụng bo góc cho phần nền trắng
             .clickable { expanded = !expanded }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -54,13 +55,27 @@ fun ChuyenMayPhieuMuonScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Text(
-            modifier = Modifier.padding(bottom = 16.dp),
-            text = "Danh Sách Phòng Máy",
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                modifier = Modifier.padding(bottom = 8.dp),
+                text = "Danh Sách Phòng Máy",
+                color = Color(0xFF1B8DDE),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp
+            )
+        }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            thickness = 2.dp,
             color = Color(0xFF1B8DDE),
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 20.sp
         )
+
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()

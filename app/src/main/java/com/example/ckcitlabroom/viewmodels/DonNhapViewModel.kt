@@ -1,6 +1,7 @@
 package com.example.ckcitlabroom.viewmodels
 
 import DonNhap
+import DonNhapRequest
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,7 +18,6 @@ import kotlinx.coroutines.withContext
 
 class DonNhapViewModel : ViewModel() {
 
-
     var danhSachDonNhap by mutableStateOf<List<DonNhap>>(emptyList())
         private set
 
@@ -29,7 +29,6 @@ class DonNhapViewModel : ViewModel() {
 
     var isLoading by mutableStateOf(false)
         private set
-
 
     fun getAllDonNhap() {
         if (pollingAllDonNhapJob != null) return
@@ -52,31 +51,30 @@ class DonNhapViewModel : ViewModel() {
         pollingAllDonNhapJob = null
     }
 
-    // 1. Hàm suspend thực hiện tạo đơn nhập và trả về kết quả
-    suspend fun createDonNhapAsync(donNhap: DonNhap): Boolean {
+    // Suspend function gửi DonNhapRequest thay vì DonNhap
+    suspend fun createDonNhapAsync(donNhapRequest: DonNhapRequest): Boolean {
         return try {
             val response = withContext(Dispatchers.IO) {
-                ITLabRoomRetrofitClient.donnhapAPIService.createDonNhap(donNhap)
+                ITLabRoomRetrofitClient.donnhapAPIService.createDonNhap(donNhapRequest)
             }
-            // Giả sử response có trường 'success' hoặc kiểm tra message
-            response.message.contains("thành công", ignoreCase = true)
+            response.message?.contains("thành công", ignoreCase = true) == true
         } catch (e: Exception) {
-            Log.e("DonNhapViewModel", "Lỗi khi thêm don nhap: ${e.message}")
+            Log.e("DonNhapViewModel", "Lỗi khi thêm đơn nhập: ${e.message}")
             false
         }
     }
 
-    // 2. Hàm gọi launch để cập nhật UI
-    fun createDonNhap(donNhap: DonNhap) {
+    // Hàm gọi từ UI, nhận DonNhapRequest
+    fun createDonNhap(donNhapRequest: DonNhapRequest) {
         viewModelScope.launch {
             isLoading = true
-            val success = createDonNhapAsync(donNhap)
-            donnhapCreateResult = if(success) "Thêm đơn nhập thành công" else "Thêm đơn nhập thất bại"
+            val success = createDonNhapAsync(donNhapRequest)
+            donnhapCreateResult = if (success) "Thêm đơn nhập thành công" else "Thêm đơn nhập thất bại"
             isLoading = false
         }
     }
-
 }
+
 
 
 

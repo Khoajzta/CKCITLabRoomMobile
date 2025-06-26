@@ -83,11 +83,10 @@ fun CreatePhieuSuaChuaScreen(
     }
 
     var danhsachphieusuachua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChua
-    var danhsachTokenAdmin = giangvienViewmodel.danhSachTokenAdmin
+    var danhsachTokenAdmin = giangvienViewmodel.danhSachTokenAdmin.filter { it != giangvien?.Token }
     var danhsacallgiangvien = giangvienViewmodel.danhSachAllGiangVien
-    var danhsachadmin = danhsacallgiangvien.filter { it.MaLoaiTaiKhoan == 1 }
+    val danhsachadmin = danhsacallgiangvien.filter { it.MaLoaiTaiKhoan == 1 && it.MaGV != giangvien?.MaGV }
 
-    Log.d("danhsachs admin",danhsachadmin.toString())
 
     var mayTinhViewModel: MayTinhViewModel = viewModel()
     var maytinh = mayTinhViewModel.maytinh
@@ -565,6 +564,7 @@ fun CreatePhieuSuaChuaScreen(
                                 MoTaLoi = moTaLoiState.value,
                                 MaPhong = maytinh.MaPhong,
                                 MaNguoiBaoHong = maNguoiBaoHong.value,
+                                MaGV= null,
                                 TrangThai = 0
                             )
 

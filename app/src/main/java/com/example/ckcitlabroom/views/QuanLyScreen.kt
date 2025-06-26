@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -27,8 +28,23 @@ fun QuanLyScreen(
     val giangVien = giangVienViewModel.giangvienSet
     val sinhvien = sinhVienViewModel.sinhvienSet
 
+    var sinhviennew = sinhVienViewModel.sinhvien
+    var giangviennew = giangVienViewModel.giangvien
+
+    if(sinhvien!=null){
+        LaunchedEffect(sinhvien) {
+            sinhVienViewModel.getSinhVienByMaGOrEmail(sinhvien.MaSinhVien)
+        }
+    }
+
+    if(giangVien!=null){
+        LaunchedEffect(giangVien) {
+            giangVienViewModel.getGiangVienByMaGOrEmail(giangVien.MaGV)
+        }
+    }
+
     val dsChucNang = when {
-        giangVien?.MaLoaiTaiKhoan == 1 -> {
+        giangviennew?.MaLoaiTaiKhoan == 1 -> {
             listOf(
                 ChucNang("Quản Lý Đơn Nhập", Lucide.ClipboardList, Click = { navController.navigate(NavRoute.QUANLYDONNHAP.route) }),
                 ChucNang("Quản Lý Phòng Máy", Lucide.LayoutGrid, Click = { navController.navigate(NavRoute.QUANLYPHONGMAY.route) }),
@@ -48,7 +64,7 @@ fun QuanLyScreen(
                 ChucNang("Quản Lý Môn Học", Lucide.BookOpenText, Click = { navController.navigate(NavRoute.QUANLYMONHOC.route) }),
             )
         }
-        giangVien?.MaLoaiTaiKhoan == 2 -> {
+        giangviennew?.MaLoaiTaiKhoan == 2 -> {
             listOf(
                 ChucNang(
                     "Quản Lý Lịch Dạy",
@@ -67,7 +83,7 @@ fun QuanLyScreen(
                 )
             )
         }
-        sinhvien != null -> {
+        sinhviennew != null -> {
             listOf(
                 ChucNang(
                     "Danh Sách Lịch Học",

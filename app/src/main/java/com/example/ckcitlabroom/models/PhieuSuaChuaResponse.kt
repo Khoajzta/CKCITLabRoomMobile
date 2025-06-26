@@ -10,5 +10,6 @@ data class PhieuSuaChuaRp(
     val MaNguoiBaoHong: String,
     val TenNguoiBaoHong: String,
     val MaLoaiTaiKhoan: Int,
+    val TenNguoiSua: String,
     val TrangThai: Int
 )

@@ -53,7 +53,7 @@ fun LichSuChuyenMayScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Đơn Nhập",
+                "Lịch Sử Chuyển Máy Theo Đơn Nhập",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)

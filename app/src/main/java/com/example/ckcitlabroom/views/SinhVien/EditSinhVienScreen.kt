@@ -45,6 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import formatNgay
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,7 +88,7 @@ fun EditSinhVienScreen(
             tenSVState.value = it.TenSinhVien
             val parts = it.NgaySinh.split("-")
             if (parts.size == 3) {
-                ngaySinhState.value = "${parts[2]}-${parts[1]}-${parts[0]}"
+                ngaySinhState.value = "${parts[2]}/${parts[1]}/${parts[0]}"
             }
             gioiTinhState.value = it.GioiTinh
             emailState.value = it.Email
@@ -106,17 +108,26 @@ fun EditSinhVienScreen(
         val month = parts.getOrNull(1)?.toIntOrNull()?.minus(1) ?: calendar.get(Calendar.MONTH)
         val year = parts.getOrNull(2)?.toIntOrNull() ?: calendar.get(Calendar.YEAR)
 
+        // Tạo dialog
         DatePickerDialog(
             context,
             { _, selectedYear, selectedMonth, selectedDay ->
-                ngaySinhState.value = "${selectedDay.toString().padStart(2, '0')}-${(selectedMonth + 1).toString().padStart(2, '0')}-$selectedYear"
-                showDatePicker = false
+                ngaySinhState.value =
+                    "${selectedDay.toString().padStart(2, '0')}-${
+                        (selectedMonth + 1).toString().padStart(2, '0')
+                    }-$selectedYear"
+                showDatePicker = false         // đóng khi chọn ngày
             },
             year,
             month,
             day
-        ).show()
+        ).apply {
+            setOnDismissListener {            // đóng khi chạm ngoài / BACK
+                showDatePicker = false
+            }
+        }.show()
     }
+
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -131,10 +142,16 @@ fun EditSinhVienScreen(
                 .padding(16.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text("Chỉnh Sửa Thông Tin Sinh Viên", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                Text(
+                    "Chỉnh Sửa Thông Tin Sinh Viên",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 20.sp
+                )
             }
 
             LazyColumn(
@@ -158,7 +175,11 @@ fun EditSinhVienScreen(
                                     .padding(start = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(maSVState.value, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                                Text(
+                                    maSVState.value,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 17.sp
+                                )
                             }
                         }
                     }
@@ -187,7 +208,7 @@ fun EditSinhVienScreen(
                     item {
                         Text("Ngày Sinh", color = Color.Black, fontWeight = FontWeight.Bold)
                         OutlinedTextField(
-                            value = formatNgay(ngaySinhState.value),
+                            value = ngaySinhState.value,
                             onValueChange = {},
                             readOnly = true,
                             modifier = Modifier
@@ -362,6 +383,7 @@ fun EditSinhVienScreen(
 
             Button(
                 onClick = {
+                    /* 1) Kiểm tra bỏ trống */
                     if (tenSVState.value.isBlank() || ngaySinhState.value.isBlank() ||
                         gioiTinhState.value.isBlank() || emailState.value.isBlank() || maLopState.value.isBlank()
                     ) {
@@ -372,29 +394,72 @@ fun EditSinhVienScreen(
                             )
                             snackbarHostState.showSnackbar("Thông báo")
                         }
-                    } else {
-                        val parts = ngaySinhState.value.split("-")
-                        val ngaySinhDB = if (parts.size == 3) "${parts[2]}-${parts[1]}-${parts[0]}" else ""
+                        return@Button          // ⬅️ dừng sớm
+                    }
 
-                        val svUpdate = SinhVien(
-                            MaSinhVien = maSVState.value,
-                            TenSinhVien = tenSVState.value,
-                            NgaySinh = ngaySinhDB,
-                            GioiTinh = gioiTinhState.value,
-                            Email = emailState.value,
-                            MaLop = maLopState.value, // Cập nhật mã lớp
-                            MatKhau = sinhVien?.MatKhau ?: "",
-                            MaLoaiTaiKhoan = sinhVien?.MaLoaiTaiKhoan ?: 3,
-                            TrangThai = sinhVien?.TrangThai ?: 1
-                        )
-
-                        sinhVienViewModel.updateSinhVien(svUpdate)
+                    /* 2) Kiểm tra email đúng tên miền @caothang.edu.vn */
+                    val emailRegex =
+                        Regex("^[\\w.+-]+@caothang\\.edu\\.vn$", RegexOption.IGNORE_CASE)
+                    if (!emailRegex.matches(emailState.value.trim())) {
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(
-                                message = "Cập nhật sinh viên thành công!",
-                                type = SnackbarType.SUCCESS
+                                message = "Email phải có đuôi *@caothang.edu.vn!",
+                                type = SnackbarType.ERROR
                             )
                             snackbarHostState.showSnackbar("Thông báo")
+                        }
+                        return@Button
+                    }
+
+                    /* 3) Kiểm tra ngày sinh & độ tuổi (như cũ) */
+                    val parts = ngaySinhState.value.split("/")            // dd/MM/yyyy
+                    val ngaySinhDB = if (parts.size == 3)
+                        "${parts[2]}-${parts[1]}-${parts[0]}" else ""
+
+                    val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val today = LocalDate.now()
+                    val birthDate =
+                        ngaySinhDB.runCatching { LocalDate.parse(this, dateFormat) }.getOrNull()
+
+                    when {
+                        birthDate == null -> coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Ngày sinh không hợp lệ! (dd/MM/yyyy)",
+                                type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+
+                        today.year - birthDate.year < 18 -> coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Sinh viên phải đủ 18 tuổi trở lên!",
+                                type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
+                        }
+
+                        else -> {
+                            /* 4) Tạo đối tượng & gọi update */
+                            val svUpdate = SinhVien(
+                                MaSinhVien = maSVState.value,
+                                TenSinhVien = tenSVState.value,
+                                NgaySinh = ngaySinhDB,
+                                GioiTinh = gioiTinhState.value,
+                                Email = emailState.value.trim(),
+                                MaLop = maLopState.value,
+                                MatKhau = sinhVien?.MatKhau ?: "",
+                                MaLoaiTaiKhoan = sinhVien?.MaLoaiTaiKhoan ?: 3,
+                                TrangThai = sinhVien?.TrangThai ?: 1
+                            )
+
+                            sinhVienViewModel.updateSinhVien(svUpdate)
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Cập nhật sinh viên thành công!",
+                                    type = SnackbarType.SUCCESS
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
                         }
                     }
                 },

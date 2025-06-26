@@ -1,3 +1,4 @@
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,8 +44,10 @@ import kotlinx.coroutines.launch
 fun CreateMonHocScreen(
     navController: NavHostController,
     monHocViewModel: MonHocViewModel
-){
-    var danhsachMonHoc = monHocViewModel.danhSachAllMonHoc
+) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var danhSachMonHoc = monHocViewModel.danhSachAllMonHoc
 
     LaunchedEffect(Unit) {
         monHocViewModel.getAllMonHoc()
@@ -52,43 +56,21 @@ fun CreateMonHocScreen(
     val maMonHocState = remember { mutableStateOf("") }
     val tenMonHocState = remember { mutableStateOf("") }
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
-    val coroutineScope = rememberCoroutineScope()
-
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Thêm Môn Học",
                 fontSize = 20.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Mã Môn Học", color = Color.Black, fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
+            Text("Mã Môn Học", color = Color.Black, fontWeight = FontWeight.Bold)
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -107,10 +89,7 @@ fun CreateMonHocScreen(
                 shape = RoundedCornerShape(12.dp),
             )
 
-            Text(
-                text = "Tên Môn Học", color = Color.Black, fontWeight = FontWeight.Bold
-            )
-
+            Text("Tên Môn Học", color = Color.Black, fontWeight = FontWeight.Bold)
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -129,78 +108,34 @@ fun CreateMonHocScreen(
                 shape = RoundedCornerShape(12.dp),
             )
 
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) { data ->
-                snackbarData.value?.let { customData ->
-                    Snackbar(
-                        containerColor = Color(0xFF1B8DDE),
-                        contentColor = Color.White,
-                        shape = RoundedCornerShape(12.dp),
-                        action = {
-                            TextButton(onClick = {
-                                snackbarData.value = null
-                            }) {
-                                Text("Đóng", color = Color.White)
-                            }
-                        }
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = if (customData.type == SnackbarType.SUCCESS) Color.Cyan else Color.Yellow,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = customData.message)
-                        }
-                    }
-                }
-            }
-
-
             Button(
                 onClick = {
-                    val maMonMoi = maMonHocState.value
-                    val daTonTai = danhsachMonHoc.any { it.MaMonHoc == maMonMoi }
+                    val maMon = maMonHocState.value.trim()
+                    val tenMon = tenMonHocState.value.trim()
+                    val daTonTai = danhSachMonHoc.any { it.MaMonHoc == maMon }
 
-                    if (maMonHocState.value == "") {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Mã môn học không được để trống!", type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
+                    when {
+                        maMon.isEmpty() -> {
+                            Toast.makeText(context, "Mã môn học không được để trống!", Toast.LENGTH_SHORT).show()
                         }
-                    } else if (daTonTai) {
-                        // Hiện snackbar lỗi
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Mã môn học đã tồn tại!", type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
+                        tenMon.isEmpty() -> {
+                            Toast.makeText(context, "Tên môn học không được để trống!", Toast.LENGTH_SHORT).show()
                         }
-
-                    } else {
-
-                        var monhocnew = MonHoc(maMonHocState.value, tenMonHocState.value, 1)
-
-                        monHocViewModel.createMonHoc(monhocnew)
-
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Thêm môn học thành công",
-                                type = SnackbarType.SUCCESS
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                            delay(1000)
-                            navController.popBackStack()
+                        daTonTai -> {
+                            Toast.makeText(context, "Mã môn học đã tồn tại!", Toast.LENGTH_SHORT).show()
                         }
+                        else -> {
+                            val monHocMoi = MonHoc(maMon, tenMon, 1)
+                            monHocViewModel.createMonHoc(monHocMoi)
+                            Toast.makeText(context, "Thêm môn học thành công", Toast.LENGTH_SHORT).show()
 
+                            coroutineScope.launch {
+                                delay(1000)
+                                navController.popBackStack()
+                            }
+                        }
                     }
                 },
-
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
@@ -208,6 +143,5 @@ fun CreateMonHocScreen(
                 Text("Thêm Môn Học", color = Color.White)
             }
         }
-
     }
 }

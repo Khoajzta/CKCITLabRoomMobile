@@ -30,15 +30,25 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -73,8 +83,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -107,6 +120,8 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
+import androidx.compose.ui.unit.LayoutDirection
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -216,8 +231,6 @@ fun MainScreen() {
         }
     }
 
-
-
     val unreadCount = notificationViewModel.danhSachAllThongBao.count { tb ->
         !tb.DaDoc && (
             (sv != null && tb.MaNguoiDung == sv.MaSinhVien) ||
@@ -253,7 +266,6 @@ fun MainScreen() {
         notificationViewModel.getAllThongBao()
     }
 
-    // AppBar logic dùng rõ ràng theo route thay vì index
     @Composable
     fun TopBar(
         navController: NavController,
@@ -306,6 +318,9 @@ fun MainScreen() {
             NavRoute.QUANLYMONHOC.route -> {
                 textTopbar = "Quản Lý Môn Học"
             }
+            NavRoute.ListThongBaoSinhVien.route -> {
+                textTopbar = "Thông Báo"
+            }
         }
 
         when (currentRoute) {
@@ -320,7 +335,7 @@ fun MainScreen() {
                         Text("Trở lại",
                             fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF1B8DDE),
-                            modifier = Modifier.padding(start = 15.dp),
+                            modifier = Modifier.padding(start = 10.dp),
                             fontSize = 21.sp,
                             style = TextStyle(
                                 shadow = Shadow(
@@ -332,17 +347,24 @@ fun MainScreen() {
                         )
                     },
                     navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                mayTinhViewModel.clearDanhSachMayTinhDuocChon()
-                                navController.popBackStack()
-                            }
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .size(40.dp)
+                                .shadow(4.dp, CircleShape, clip = false)
+                                .background(Color.White, CircleShape)
+                                .border(1.dp, Color.White, CircleShape)
+                                .clickable {
+                                    mayTinhViewModel.clearDanhSachMayTinhDuocChon()
+                                    navController.popBackStack()
+                                 },
+                            contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                modifier = Modifier.size(30.dp),
                                 imageVector = Icons.Default.ArrowBackIosNew,
                                 contentDescription = "Back",
-                                tint = Color(0xFF1B8DDE)
+                                tint = Color(0xFF1B8DDE),
+                                modifier = Modifier.size(25.dp)
                             )
                         }
                     }
@@ -386,22 +408,43 @@ fun MainScreen() {
                     },
                     actions = {
                         IconButton(
-                            onClick = {
-                                navController.navigate(NavRoute.ListThongBaoSinhVien.route)
-                            },
-                            modifier = Modifier.padding(end = 12.dp).size(40.dp)
+                            onClick = { navController.navigate(NavRoute.ListThongBaoSinhVien.route) },
+                            modifier = Modifier
+                                .padding(end = 12.dp)
+                                .size(48.dp)
                         ) {
-                            BadgedBox(badge = {
-                                if (unreadCount > 0) {
-                                    Badge { Text(unreadCount.toString()) }
-                                }
-                            }) {
+                            Box(modifier = Modifier.size(40.dp)) {
                                 Icon(
                                     imageVector = Lucide.Bell,
                                     contentDescription = "Thông báo",
                                     tint = Color(0xFF1B8DDE),
-                                    modifier = Modifier.size(30.dp)
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .offset(x = (-8).dp)
+                                        .size(30.dp)
                                 )
+
+                                if (unreadCount > 0) {
+                                    Box(
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .offset(x = 0.dp, y = (-3).dp)
+                                            .background(Color(0xFF1B8DDE), shape = RoundedCornerShape(50.dp))
+                                            .border(1.dp, Color.White, RoundedCornerShape(50.dp))
+                                            .padding(horizontal = 5.dp, vertical = 1.dp)
+                                            .defaultMinSize(minWidth = 16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = if (unreadCount > 99) "99+" else unreadCount.toString(),
+                                            color = Color.White,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            textAlign = TextAlign.Center,
+                                            maxLines = 1
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -416,7 +459,7 @@ fun MainScreen() {
                             textTopbar,
                             fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF1B8DDE),
-                            modifier = Modifier.padding(start = 15.dp),
+                            modifier = Modifier.padding(start = 10.dp),
                             fontSize = 21.sp,
                             style = TextStyle(
                                 shadow = Shadow(
@@ -428,30 +471,28 @@ fun MainScreen() {
                         )
                     },
                     navigationIcon = {
-                        IconButton(
-                            onClick = { navController.popBackStack() },
+                        Box(
                             modifier = Modifier
-                                .padding(start = 12.dp)
+                                .padding(start = 10.dp)
                                 .size(40.dp)
-                                .shadow(4.dp, shape = CircleShape)
-                                .background(Color.White, shape = CircleShape)
-                                .border(2.dp, Color.White, shape = CircleShape)
+                                .shadow(4.dp, CircleShape, clip = false)
+                                .background(Color.White, CircleShape)
+                                .border(1.dp, Color.White, CircleShape)
+                                .clickable { navController.popBackStack() },
+                            contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBackIosNew,
                                 contentDescription = "Back",
                                 tint = Color(0xFF1B8DDE),
-                                modifier = Modifier.size(30.dp),
+                                modifier = Modifier.size(25.dp)
                             )
                         }
                     }
                 )
-
             }
         }
     }
-
-
 
     Scaffold(
         topBar = { TopBar(navController,mayTinhViewModel,currentRoute) },
@@ -484,13 +525,17 @@ fun MainScreen() {
                         endY = Float.POSITIVE_INFINITY
                     )
                 )
-                .padding(paddingValues)
+                .padding(
+                    top = 90.dp,
+                    bottom = 110.dp,
+                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                    end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+                )
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(8.dp)
-                    .clip(RoundedCornerShape(12.dp)),
+                    .padding(12.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

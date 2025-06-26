@@ -725,13 +725,13 @@ fun MayTinhDetailScreen(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
                 if(giangVien!=null){
                     Button(
-                        modifier = Modifier.width(170.dp),
+                        modifier = Modifier.weight(1f),
                         onClick = {
                             navController.navigate(NavRoute.EDITMAYTINH.route + "?mamay=${maytinh.MaMay}")
                         },
@@ -743,7 +743,7 @@ fun MayTinhDetailScreen(
                 }
                 else{
                     Button(
-                        modifier = Modifier.width(170.dp),
+                        modifier = Modifier.weight(1f),
                         onClick = {
                             val ngayHomNay = LocalDate.now().toString()
                             val maPhongMay = maytinh?.MaPhong
@@ -815,7 +815,7 @@ fun MayTinhDetailScreen(
 
 
                 Button(
-                    modifier = Modifier.width(170.dp),
+                    modifier = Modifier.weight(1f),
                     onClick = {
                         navController.navigate(NavRoute.ADDPHIEUSUACHUA.route + "?mamay=${maytinh.MaMay}")
                     },

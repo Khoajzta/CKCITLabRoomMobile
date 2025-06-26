@@ -41,8 +41,15 @@ fun ChiTietDonNhapScreen(
 
     val danhSachMayTheoDon = remember(danhsachchitietdonnhap, danhSachMayTinh) {
         val maMayTheoDon = danhsachchitietdonnhap.map { it.MaMay }
-        danhSachMayTinh.filter { it.MaMay in maMayTheoDon }
+
+        danhSachMayTinh
+            .filter { it.MaMay in maMayTheoDon }
+            .sortedBy { may ->
+                // Trích số từ tên máy, mặc định 0 nếu không trích được
+                Regex("""\d+""").find(may.TenMay)?.value?.toIntOrNull() ?: 0
+            }
     }
+
 
     LaunchedEffect(Unit) {
         mayTinhViewModel.getAllMayTinh()

@@ -17,16 +17,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,17 +48,52 @@ fun CardGiangVienInfo(
     navController: NavHostController,
     giangVienViewModel: GiangVienViewModel
 ) {
+    var showLogoutConfirmDialog by remember { mutableStateOf(false) }
+
+    if (showLogoutConfirmDialog) {
+        AlertDialog(
+            containerColor = Color.White,
+            onDismissRequest = { showLogoutConfirmDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showLogoutConfirmDialog = false
+
+                    // Đăng xuất
+                    val giangVienNew = giangVien.copy(Token = "")
+                    giangVienViewModel.updateGiangVien(giangVienNew)
+
+                    giangVienViewModel.setGV(null)
+                    giangVienViewModel.resetLoginResult()
+                    giangVienViewModel.logout()
+
+                    navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                        popUpTo(NavRoute.HOME.route) { inclusive = true }
+                    }
+                }) {
+                    Text("Đăng xuất", fontWeight = FontWeight.Bold, color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutConfirmDialog = false }) {
+                    Text("Hủy",color = Color.Black)
+                }
+            },
+            title = { Text("Xác nhận đăng xuất", color = Color.Red) },
+            text = { Text("Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?",color = Color.Black) },
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+
     Card(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().shadow(4.dp, RoundedCornerShape(20.dp)),
+        elevation = CardDefaults.cardElevation(4.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(7.dp)
+
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
 
             Image(
@@ -69,22 +111,17 @@ fun CardGiangVienInfo(
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
             )
-            Spacer(modifier = Modifier.height(10.dp))
-            if(giangVien.MaLoaiTaiKhoan!=1){
-                Text(
-                    text = "Giảng Viên",
-                    fontSize = 20.sp,
-                    color = Color.Gray
-                )
-            }else{
-                Text(
-                    text = "Admin",
-                    fontSize = 20.sp,
-                    color = Color.Gray
-                )
-            }
 
             Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = if (giangVien.MaLoaiTaiKhoan != 1) "Giảng Viên" else "Admin",
+                fontSize = 20.sp,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
             Text(
                 text = giangVien.MaGV,
                 fontSize = 20.sp,
@@ -93,26 +130,26 @@ fun CardGiangVienInfo(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            // Ngày sinh
             Text(
                 text = "Ngày Sinh:",
                 modifier = Modifier.align(Alignment.Start),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.ExtraBold
             )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
                     .background(Color.White)
-                    .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                    .border(1.dp, Color.Black, RoundedCornerShape(12.dp)),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(start = 10.dp),
-                    horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -121,58 +158,51 @@ fun CardGiangVienInfo(
                         fontSize = 17.sp
                     )
                 }
-
             }
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            // Trạng thái
             Text(
                 text = "Trạng Thái",
                 modifier = Modifier.align(Alignment.Start),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.ExtraBold
             )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
                     .background(Color.White)
-                    .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                    .border(1.dp, Color.Black, RoundedCornerShape(12.dp)),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(start = 10.dp),
-                    horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text =
-                        if (giangVien.TrangThai == 1) {
-                            "Đang Giảng Dạy"
-                        } else {
-                            "Ngừng Dạy"
-                        },
-
+                        text = if (giangVien.TrangThai == 1) "Đang Giảng Dạy" else "Ngừng Dạy",
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp
                     )
                 }
-
             }
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            // Nút hành động
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
                     modifier = Modifier.width(170.dp),
-                    onClick = { navController.navigate(NavRoute.DOIMATKHAUGV.route + "?magv=${giangVien.MaGV}")},
+                    onClick = {
+                        navController.navigate(NavRoute.DOIMATKHAUGV.route + "?magv=${giangVien.MaGV}")
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -184,23 +214,14 @@ fun CardGiangVienInfo(
                 Button(
                     modifier = Modifier.width(170.dp),
                     onClick = {
-                        var giangViennew = giangVien.copy(Token = "")
-                        giangVienViewModel.updateGiangVien(giangViennew)
-
-                        giangVienViewModel.setGV(null)
-                        giangVienViewModel.resetLoginResult()
-                        giangVienViewModel.logout()
-                        navController.navigate(NavRoute.LOGINSINHVIEN.route) {
-                            popUpTo(NavRoute.HOME.route) { inclusive = true }
-                        }
-
+                        showLogoutConfirmDialog = true
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(Icons.Default.Logout, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Đăng xuất", color = Color.White,fontSize = 15.sp)
+                    Text("Đăng xuất", color = Color.White, fontSize = 15.sp)
                 }
             }
         }

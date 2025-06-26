@@ -157,6 +157,3 @@ fun QRCodeScannerScreen(
         }
     }
 }
-
-
-

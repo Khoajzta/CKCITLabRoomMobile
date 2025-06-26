@@ -45,10 +45,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.composables.icons.lucide.CalendarClock
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.Clock
 import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Play
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 @Composable
 fun CardLichHoc(
@@ -57,6 +63,17 @@ fun CardLichHoc(
     sinhvien: SinhVien? = null,
     navController: NavHostController
 ) {
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")      // đổi nếu cần
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")        // "09:00:00"
+
+    val lessonDate = try { LocalDate.parse(lichHoc.NgayDay, dateFormatter) }
+    catch (e: DateTimeParseException) { null }        // chống crash
+
+    val timeStart  = LocalTime.parse(lichHoc.GioBatDau, timeFormatter)
+    val timeEnd    = LocalTime.parse(lichHoc.GioKetThuc, timeFormatter)
+    val today      = LocalDate.now()
+    val now        = LocalTime.now()
+
     val isGiangVien = giangVien != null
     val tieuDe = if (isGiangVien) "Thông tin lịch dạy" else "Thông tin lịch học"
     val nhanCa = if (isGiangVien) "Ca dạy" else "Ca học"
@@ -114,10 +131,40 @@ fun CardLichHoc(
                 value = if (!lichHoc.GhiChu.isNullOrBlank()) lichHoc.GhiChu else "Không có thông báo"
             )
 
-            val (color, statusText, statusIcon) = when (lichHoc.TrangThai) {
-                0 -> Triple(Color(0xFF1B8DDE), "Đã Kết Thúc", Lucide.CircleCheck)
-                1 -> Triple(Color(0xFF4CAF50), "Đang Diễn Ra", Lucide.Clock)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
+            val (color, statusText, statusIcon) = if (lessonDate == null) {
+                // Ngày sai định dạng
+                Triple(Color.Gray, "Ngày không hợp lệ", Lucide.CircleAlert)
+            } else when {
+                lessonDate.isAfter(today) -> Triple(
+                    Color(0xFFFFA000),            // cam nhạt
+                    "Sắp diễn ra",
+                    Lucide.CalendarClock          // biểu tượng lịch-đồng hồ
+                )
+
+                lessonDate.isBefore(today) -> Triple(
+                    Color(0xFF9E9E9E),            // xám
+                    "Đã kết thúc",
+                    Lucide.CircleCheck
+                )
+
+                /* ----- Cùng ngày -> so sánh giờ ----- */
+                now.isBefore(timeStart) -> Triple(
+                    Color(0xFFFFA000),            // cam nhạt
+                    "Sắp diễn ra",
+                    Lucide.Clock
+                )
+
+                now.isAfter(timeEnd) -> Triple(
+                    Color(0xFF9E9E9E),            // xám
+                    "Đã kết thúc",
+                    Lucide.CircleCheck
+                )
+
+                else -> Triple(
+                    Color(0xFF4CAF50),            // xanh lá
+                    "Đang diễn ra",
+                    Lucide.Play              // biểu tượng play
+                )
             }
 
             Row(

@@ -40,12 +40,6 @@ fun LichSuSuaMayScreen(
 
     val phongmay = phongMayViewModel.phongmay
 
-    var showDialog by remember { mutableStateOf(false) }
-    var showDeleteWarning by remember { mutableStateOf(false) }
-    var showConfirmDeleteDialog by remember { mutableStateOf(false) }
-
-
-
 
     DisposableEffect(Unit) {
         onDispose {
@@ -81,7 +75,7 @@ fun LichSuSuaMayScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh Sách Đơn Nhập",
+                "Lịch Sử Sửa Máy Theo Đơn Nhập",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)

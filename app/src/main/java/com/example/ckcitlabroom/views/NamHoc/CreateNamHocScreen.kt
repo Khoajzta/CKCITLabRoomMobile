@@ -85,6 +85,14 @@ fun CreateNamHocScreen(
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Tạo Năm Học", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+            }
+
             Text("Mã Năm Học", fontWeight = FontWeight.Bold)
             OutlinedTextField(
                 value = maNam.value,
@@ -98,7 +106,7 @@ fun CreateNamHocScreen(
                     unfocusedTextColor = Color.Black
                 ),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                placeholder = { Text("Nhập thông tin") },
+                placeholder = { Text("VD: NH2526") },
                 shape = RoundedCornerShape(12.dp),
             )
 
@@ -115,7 +123,7 @@ fun CreateNamHocScreen(
                     unfocusedTextColor = Color.Black
                 ),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                placeholder = { Text("Nhập thông tin") },
+                placeholder = { Text("VD: 2025-2026") },
                 shape = RoundedCornerShape(12.dp),
             )
 
@@ -138,7 +146,7 @@ fun CreateNamHocScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                placeholder = { Text("Nhập thông tin") },
+                placeholder = { Text("Chọn ngày bắt đầu") },
                 shape = RoundedCornerShape(12.dp),
             )
 
@@ -161,7 +169,7 @@ fun CreateNamHocScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                placeholder = { Text("Nhập thông tin") },
+                placeholder = { Text("Chọn ngày kết thúc") },
                 shape = RoundedCornerShape(12.dp),
             )
 

@@ -95,6 +95,7 @@ fun StartupCheckScreen(
                 painter = painterResource(R.drawable.logo),
                 contentDescription = "Logo",
                 modifier = Modifier
+                    .padding(top = 100.dp)
                     .size(160.dp)
                     .graphicsLayer {
                         scaleX = scale
@@ -105,7 +106,7 @@ fun StartupCheckScreen(
                     .shadow(8.dp, shape = CircleShape)
             )
             Spacer(modifier = Modifier.height(32.dp))
-            DotLoading()
+            DotLoadingLight()
         }
     }
 

@@ -51,7 +51,11 @@ fun PhongMayChuyenScreen(
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val danhSachMayTinhtheophong = mayTinhViewModel.danhSachAllMayTinhtheophong
+    val danhSachMayTinhtheophong = mayTinhViewModel.danhSachAllMayTinhtheophong.sortedBy { may ->
+        // Trích số từ tên máy, mặc định 0 nếu không trích được
+        Regex("""\d+""").find(may.TenMay)?.value?.toIntOrNull() ?: 0
+    }
+
     val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay.filter { it.LoaiPhong == 1 || it.LoaiPhong == 2 }
     val selectedMayTinhs = mayTinhViewModel.danhSachMayTinhDuocChon
 
@@ -267,13 +271,13 @@ fun PhongMayChuyenScreen(
     if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
-            title = { Text("Lỗi", fontWeight = FontWeight.Bold, color = Color.Black) },
+            title = { Text("Thông báo", fontWeight = FontWeight.Bold, color = Color.Black) },
             containerColor = Color.White,
             text = { Text(errorMessage, color = Color.Black) },
             confirmButton = {
                 Button(
                     onClick = { showErrorDialog = false },
-                    colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50)),
+                    colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("OK", color = Color.White)

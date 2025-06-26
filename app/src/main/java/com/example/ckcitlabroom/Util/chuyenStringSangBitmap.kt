@@ -60,7 +60,7 @@ fun createPdfWithQRCodeBase64(
     var canvas = page.canvas
 
     // Vẽ tiêu đề
-    canvas.drawText("QR máy phòng: $tenphong", (pageWidth / 2).toFloat(), padding.toFloat(), titlePaint)
+    canvas.drawText("QR máy: $tenphong", (pageWidth / 2).toFloat(), padding.toFloat(), titlePaint)
 
     danhSachMay.forEachIndexed { index, may ->
         try {

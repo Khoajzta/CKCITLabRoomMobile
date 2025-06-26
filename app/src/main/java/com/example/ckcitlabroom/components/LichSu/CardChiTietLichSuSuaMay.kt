@@ -118,6 +118,11 @@ fun CardChiTietLichSuSuaMay(
             InfoRow(icon = Lucide.BadgeInfo, label = nguoiBaoHongLabel, value = phieuSuaChuarp.MaNguoiBaoHong)
             Spacer(modifier = Modifier.height(8.dp))
 
+            if(phieuSuaChuarp.TenNguoiSua!=null){
+                InfoRow(icon = Lucide.User, label = "Người Sửa", value = phieuSuaChuarp.TenNguoiSua)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             InfoRow(icon = Lucide.CalendarDays, label = "Ngày Sửa Xong", value = ngaysuaxong)
 
             val (color, statusText, statusIcon) = when (phieuSuaChuarp.TrangThai) {

@@ -337,7 +337,7 @@ fun CreateGiangVienScreen(
                             )
                             snackbarHostState.showSnackbar("Thông báo")
                         }
-                    } else if (Period.between(birthDate, today).years < 22) {
+                    } else if (today.year - birthDate.year < 22) {
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(
                                 message = "Giảng viên phải đủ 22 tuổi trở lên!", type = SnackbarType.ERROR

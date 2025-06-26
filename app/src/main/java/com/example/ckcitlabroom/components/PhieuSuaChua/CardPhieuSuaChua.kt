@@ -112,8 +112,12 @@ fun CardPhieuSuaChua(
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(Lucide.User, "Người Báo Hỏng", phieuSuaChuarp.TenNguoiBaoHong ?: "")
             Spacer(modifier = Modifier.height(8.dp))
-            InfoRow(Lucide.BadgeInfo, "Mã Người Báo Hỏng", phieuSuaChuarp.MaNguoiBaoHong)
+            InfoRow(Lucide.User, "Mã Người Báo Hỏng", phieuSuaChuarp.MaNguoiBaoHong)
             Spacer(modifier = Modifier.height(8.dp))
+            if(phieuSuaChuarp.TenNguoiSua!= null){
+                InfoRow(Lucide.BadgeInfo, "Người Sửa", phieuSuaChuarp.TenNguoiSua)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
             InfoRow(Lucide.CalendarDays, "Ngày Sửa Xong", ngaySuaXong)
 
             Row(
@@ -169,6 +173,7 @@ fun CardPhieuSuaChua(
                                     MoTaLoi = phieuSuaChuarp.MoTaLoi,
                                     MaPhong = phieuSuaChuarp.MaPhong,
                                     MaNguoiBaoHong = phieuSuaChuarp.MaNguoiBaoHong,
+                                    MaGV = giangVien!!.MaGV,
                                     TrangThai = 1
                                 )
                                 phieuSuaChuaViewModel.updatePhieuSuaChua(updatedPhieu)

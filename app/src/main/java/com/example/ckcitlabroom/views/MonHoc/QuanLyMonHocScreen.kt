@@ -23,10 +23,10 @@ fun QuanLyMonHocScreen(
 
     val dsChucNang =
         listOf(
-            ChucNang("Danh Sách Môn Học Đang Dạy", Lucide.BookOpen, Click = {
+            ChucNang("Môn Học Đang Dạy", Lucide.BookOpen, Click = {
                 navController.navigate(NavRoute.LISTMONHOCDANGDAY.route)
             }),
-            ChucNang("Danh Sách Môn Học Ngừng Dạy", Lucide.BookX, Click = {
+            ChucNang("Môn Học Ngừng Dạy", Lucide.BookX, Click = {
                 navController.navigate(NavRoute.LISTMONHOCNGUNGDAY.route)
             }),
             ChucNang("Thêm Môn Học", Lucide.BookPlus, Click = {

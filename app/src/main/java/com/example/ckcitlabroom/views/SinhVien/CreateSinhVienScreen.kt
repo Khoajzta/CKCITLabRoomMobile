@@ -308,25 +308,6 @@ fun CreateSinhVienScreen(
                             unfocusedTextColor = Color.Black
                         )
                     )
-
-//                    Text("Mật Khẩu", fontWeight = FontWeight.Bold, color = Color.Black)
-//                    OutlinedTextField(
-//                        value = matKhauState.value,
-//                        onValueChange = { matKhauState.value = it },
-//                        placeholder = { Text("Nhập mật khẩu") },
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(bottom = 12.dp),
-//                        shape = RoundedCornerShape(12.dp),
-//                        colors = OutlinedTextFieldDefaults.colors(
-//                            unfocusedContainerColor = Color.White,
-//                            focusedContainerColor = Color.White,
-//                            focusedBorderColor = Color.Black,
-//                            unfocusedBorderColor = Color.Black,
-//                            focusedTextColor = Color.Black,
-//                            unfocusedTextColor = Color.Black
-//                        )
-//                    )
                 }
             }
 
@@ -400,7 +381,7 @@ fun CreateSinhVienScreen(
                             )
                             snackbarHostState.showSnackbar("Thông báo")
                         }
-                    } else if (Period.between(birthDate, today).years < 18) {
+                    } else if (today.year - birthDate.year < 18) {
                         coroutineScope.launch {
                             snackbarData.value = CustomSnackbarData(
                                 message = "Sinh viên phải đủ 18 tuổi trở lên!",

@@ -1,6 +1,7 @@
 import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -25,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Snackbar
@@ -41,6 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -494,7 +498,6 @@ fun CreateDonNhapScreen(
                 onClick = {
                     val sdfInput = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                     val sdfNgayNhap = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    val sdfMaMay = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
                     val sdfMaDon = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
 
                     val parsedDate = try {
@@ -535,71 +538,46 @@ fun CreateDonNhapScreen(
 
                         coroutineScope.launch {
                             withContext(Dispatchers.IO) {
-                                val ngayNhap = sdfNgayNhap.format(parsedDate)
-                                val dateMaMay = sdfMaMay.format(parsedDate)
-                                val dateMaDon = sdfMaDon.format(parsedDate)
-                                val randomSuffix = (1000..9999).random().toString()
+                                val ngayNhap = sdfNgayNhap.format(parsedDate!!)
+                                val linhKien = LinhKien(
+                                    main = mainState.value,
+                                    cpu = cpuState.value,
+                                    ram = ramState.value,
+                                    vga = vgaState.value,
+                                    manHinh = manHinhState.value,
+                                    banPhim = banPhimState.value,
+                                    chuot = chuotState.value,
+                                    hdd = hddState.value,
+                                    ssd = ssdState.value
+                                )
 
-                                val maDonNhap = "$dateMaDon$randomSuffix"
-
-                                val danhSachMay = mutableListOf<MayTinh>()
-
-                                for (i in 1..soLuong) {
-                                    val stt = i.toString().padStart(2, '0')
-                                    val maMay = "MAY$stt${randomSuffix}"
-                                    val qrBase64 = bitmapToBase64(generateQRCode(maMay, 512))
-
-                                    danhSachMay.add(
-                                        MayTinh(
-                                            MaMay = maMay,
-                                            TenMay = "MAY_$stt",
-                                            ViTri = "",
-                                            Main = mainState.value,
-                                            CPU = cpuState.value,
-                                            RAM = ramState.value,
-                                            VGA = vgaState.value,
-                                            ManHinh = manHinhState.value,
-                                            BanPhim = banPhimState.value,
-                                            Chuot = chuotState.value,
-                                            HDD = hddState.value,
-                                            SSD = ssdState.value,
-                                            QRCode = qrBase64,
-                                            TrangThai = 0,
-                                            MaPhong = phonkho.MaPhong
-                                        )
-                                    )
-                                }
-
-                                val danhSachChiTiet = danhSachMay.map { mayTinh ->
-                                    ChiTietDonNhap(
-                                        MaDonNhap = maDonNhap,
-                                        MaMay = mayTinh.MaMay
-                                    )
-                                }
+                                val request = DonNhapRequest(
+                                    NgayNhap = ngayNhap,
+                                    SoLuong = soLuong,
+                                    NhaCungCap = nhaCungCap,
+                                    MaPhong = phonkho.MaPhong,
+                                    LinhKien = linhKien
+                                )
 
                                 try {
-                                    donNhapyViewModel.createDonNhap(donNhap = DonNhap(
-                                        MaDonNhap = maDonNhap,
-                                        NgayNhap = ngayNhap,
-                                        SoLuong = soLuong,
-                                        NhaCungCap = nhaCungCap
-                                    ))
-                                    mayTinhViewModel.createNhieuMayTinh(danhSachMay)
-                                    chiTietDonNhapyViewModel.createNhieuChiTietDonNhap(danhSachChiTiet)
-
+                                    val success = donNhapyViewModel.createDonNhapAsync(request)
                                     withContext(Dispatchers.Main) {
-                                        dialogMessage.value = "Tạo đơn nhập $maDonNhap với $soLuong máy thành công!"
+                                        if (success) {
+                                            dialogMessage.value = "Tạo đơn nhập với $soLuong máy thành công!"
+                                        } else {
+                                            dialogMessage.value = "Tạo đơn nhập thất bại!"
+                                        }
                                         openDialog.value = true
                                     }
                                 } catch (e: Exception) {
                                     withContext(Dispatchers.Main) {
-                                        dialogMessage.value = "Lỗi khi tạo đơn nhập. Vui lòng thử lại!"
+                                        dialogMessage.value = "Lỗi khi gửi đơn nhập. Vui lòng thử lại!"
                                         openDialog.value = true
                                     }
                                 }
-                            }
 
-                            loadingState.value = false
+                                loadingState.value = false
+                            }
                         }
                     }
                 },
@@ -610,24 +588,39 @@ fun CreateDonNhapScreen(
                 Text("Nhập đơn hàng", color = Color.White, fontWeight = FontWeight.Bold)
             }
 
-
             if (openDialog.value) {
                 AlertDialog(
-                    containerColor = Color.White,
-                    modifier = Modifier.background(Color.Transparent),
                     onDismissRequest = { openDialog.value = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            openDialog.value = false
-                        }) {
-                            Text("OK",color = Color(0XFF1B8DDE))
-                        }
-                    },
+                    containerColor = Color.White,
+                    shape = RoundedCornerShape(20.dp),
+                    tonalElevation = 8.dp,
                     title = {
-                        Text(text = "Thông báo",color = Color.Black)
+                        Text(
+                            text = "Thông báo",
+                            color = Color.Black,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        )
                     },
                     text = {
-                        Text(dialogMessage.value,color = Color.Black)
+                        Text(
+                            text = dialogMessage.value,
+                            color = Color.DarkGray,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = { openDialog.value = false }
+                        ) {
+                            Button(
+                                onClick = { openDialog.value = false },
+                                colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE)),
+                            ){
+                                Text("OK", color = Color.White)
+                            }
+                        }
                     }
                 )
             }

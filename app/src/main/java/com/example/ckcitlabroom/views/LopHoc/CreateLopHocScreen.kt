@@ -159,45 +159,51 @@ fun CreateLopHocScreen(
 
             Button(
                 onClick = {
-                    val maLopMoi = maLopState.value
+                    val maLopMoi = maLopState.value.trim()
+                    val tenLopMoi = tenLopState.value.trim()
                     val daTonTai = danhSachLopHoc.any { it.MaLopHoc == maLopMoi }
 
-                    if(maLopState.value == "" ){
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Mã lớp không được để trống!", type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
+                    when {
+                        maLopMoi.isEmpty() -> {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Mã lớp không được để trống!", type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
                         }
-                    }
-                    else if (daTonTai) {
-                        // Hiện snackbar lỗi
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Mã lớp đã tồn tại!", type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
+                        tenLopMoi.isEmpty() -> {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Tên lớp không được để trống!", type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
                         }
-
-                    } else {
-
-                        var lopnew = LopHoc(maLopState.value,tenLopState.value,1)
-
-                        lopHocViewModel.createLopHoc(lopnew)
-
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Thêm lớp học thành công",
-                                type = SnackbarType.SUCCESS
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                            delay(1000)
-                            navController.popBackStack()
+                        daTonTai -> {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Mã lớp đã tồn tại!", type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
                         }
+                        else -> {
+                            val lopMoi = LopHoc(maLopMoi, tenLopMoi, 1)
+                            lopHocViewModel.createLopHoc(lopMoi)
 
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Thêm lớp học thành công",
+                                    type = SnackbarType.SUCCESS
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                                delay(1000)
+                                navController.popBackStack()
+                            }
+                        }
                     }
                 },
-
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))

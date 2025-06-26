@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +34,7 @@ import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 
 @Composable
 fun CardThoiKhoaBieuTuan(
+    tuanHienTai:Tuan,
     navController: NavHostController,
     lichHocList: List<LichHocRP>,
     modifier: Modifier = Modifier,
@@ -62,16 +64,15 @@ fun CardThoiKhoaBieuTuan(
             .fillMaxWidth(),
         onClick = {
             navController.navigate(
-                NavRoute.CHITIETLICHHOCTHEOTUAN.route + "?matuan=${lichHocList.getOrNull(0)?.MaTuan}"
+                NavRoute.CHITIETLICHHOCTHEOTUAN.route + "?matuan=${tuanHienTai.MaTuan}"
             )
         },
-        elevation = CardDefaults.cardElevation(6.dp),
-        shape = RoundedCornerShape(16.dp),
+//        elevation = CardDefaults.cardElevation(6.dp),
+//        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(Color(0xFFF9FAFB)) // nền nhẹ
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Column(modifier = Modifier.horizontalScroll(scrollState)) {
-
                 // Header
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -113,8 +114,8 @@ fun CardThoiKhoaBieuTuan(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp)) // Bo góc trước
-                                .background(bgColor)             // Rồi mới tô màu nền
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(bgColor)
                                 .padding(vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {

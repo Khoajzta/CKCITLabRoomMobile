@@ -45,13 +45,12 @@ fun CardMayTinhChuyenMuon2(
     selectedMayTinhs: SnapshotStateList<MayTinh>,
     onLongPress: () -> Unit
 ) {
-    var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
 
     val isSelected = selectedMayTinhs.any { it.MaMay == maytinh.MaMay }
 
-    // Gọi API chỉ 1 lần
-    LaunchedEffect(Unit) {
-        phongMayViewModel.getAllPhongMay()
+    var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
+
+    LaunchedEffect(maytinh.MaPhong) {
         phongMayCard = phongMayViewModel.fetchPhongMayByMaPhong(maytinh.MaPhong)
     }
 
@@ -112,7 +111,6 @@ fun CardMayTinhChuyenMuon2(
             InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = maytinh.TenMay)
             Spacer(Modifier.height(6.dp))
             InfoRow(icon = Lucide.Building2, label = "Phòng hiện tại", value = phongMayCard?.TenPhong ?: "Đang tải...")
-
         }
     }
 }

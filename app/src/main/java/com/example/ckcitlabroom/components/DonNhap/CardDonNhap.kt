@@ -93,7 +93,7 @@ fun CardDonNhap(
             .padding(bottom = 12.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = {
             click()

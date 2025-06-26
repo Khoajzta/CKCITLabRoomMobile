@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.composables.icons.lucide.ClipboardList
 import com.composables.icons.lucide.Lucide
 import com.example.ckcitlabroom.viewmodels.ChiTietPhieuMuonViewModel
@@ -51,6 +52,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun UpdateTraMayScreen(
+    navController: NavHostController,
     maphieumuon: String,
     mayTinhViewModel: MayTinhViewModel,
     phieuMuonMayViewModel: PhieuMuonMayViewModel,
@@ -141,8 +143,11 @@ fun UpdateTraMayScreen(
                     contentColor = Color.White,
                     shape = RoundedCornerShape(12.dp),
                     action = {
-                        TextButton(onClick = { snackbarData.value = null }) {
-                            androidx.compose.material3.Text("Đóng", color = Color.White)
+                        TextButton(onClick = {
+                            snackbarData.value = null
+                            navController.popBackStack()
+                        }) {
+                            Text("Đóng", color = Color.White)
                         }
                     }
                 ) {
@@ -154,7 +159,7 @@ fun UpdateTraMayScreen(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        androidx.compose.material3.Text(text = customData.message)
+                        Text(text = customData.message, color = Color.White)
                     }
                 }
             }
@@ -205,12 +210,13 @@ fun UpdateTraMayScreen(
                         type = SnackbarType.SUCCESS
                     )
                     snackbarHostState.showSnackbar("Thành công")
+                    navController.popBackStack()
                 }
             },
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.White)
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 "Cập nhật trả máy",
                 color = Color(0xFF1B8DDE),
                 fontWeight = FontWeight.SemiBold

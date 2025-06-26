@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -240,11 +242,12 @@ fun EditGiangVienScreen(
                             )
                             ExposedDropdownMenu(
                                 expanded = gioiTinhExpanded,
-                                onDismissRequest = { gioiTinhExpanded = false }
+                                onDismissRequest = { gioiTinhExpanded = false },
+                                containerColor = Color.White
                             ) {
                                 gioiTinhOptions.forEach { selectionOption ->
                                     DropdownMenuItem(
-                                        text = { Text(selectionOption) },
+                                        text = { Text(selectionOption,color = Color.Black) },
                                         onClick = {
                                             gioiTinhState.value = selectionOption
                                             gioiTinhExpanded = false
@@ -331,25 +334,58 @@ fun EditGiangVienScreen(
                     } else {
                         val parts = ngaySinhState.value.split("/") // dd/MM/yyyy
                         val ngaySinhDB = if (parts.size == 3) "${parts[2]}-${parts[1]}-${parts[0]}" else ""
+                        val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                        val today = LocalDate.now()
+                        val birthDate = try {
+                            LocalDate.parse(ngaySinhDB, dateFormat)
+                        } catch (e: Exception) {
+                            null
+                        }
 
-
-                        val giangVienMoi = GiangVien(
-                            MaGV = maGVState.value,
-                            TenGiangVien = tenGVState.value,
-                            NgaySinh = ngaySinhDB, // chuẩn định dạng yyyy-MM-dd để gửi lên API
-                            GioiTinh = gioiTinhState.value,
-                            Email = emailState.value,
-                            MatKhau = giangVien?.MatKhau ?: "",
-                            MaLoaiTaiKhoan = giangVien?.MaLoaiTaiKhoan ?: 2,
-                            TrangThai = giangVien?.TrangThai ?: 1
-                        )
-                        giangVienViewModel.updateGiangVien(giangVienMoi)
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Cập nhật giảng viên thành công!",
-                                type = SnackbarType.SUCCESS
+                        if (birthDate == null) {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Ngày sinh không hợp lệ! (dd/MM/yyyy)",
+                                    type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
+                        } else if (today.year - birthDate.year < 22) {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Giảng viên phải đủ 22 tuổi trở lên!",
+                                    type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
+                        } else if (!isValidEmail(emailState.value)) {
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Email phải có đuôi @caothang.edu.vn!",
+                                    type = SnackbarType.ERROR
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
+                        } else {
+                            val giangVienMoi = GiangVien(
+                                MaGV = maGVState.value,
+                                TenGiangVien = tenGVState.value,
+                                NgaySinh = ngaySinhDB,
+                                GioiTinh = gioiTinhState.value,
+                                Email = emailState.value,
+                                MatKhau = giangVien?.MatKhau ?: "",
+                                MaLoaiTaiKhoan = giangVien?.MaLoaiTaiKhoan ?: 2,
+                                TrangThai = giangVien?.TrangThai ?: 1
                             )
-                            snackbarHostState.showSnackbar("Thông báo")
+                            giangVienViewModel.updateGiangVien(giangVienMoi)
+
+                            coroutineScope.launch {
+                                snackbarData.value = CustomSnackbarData(
+                                    message = "Cập nhật giảng viên thành công!",
+                                    type = SnackbarType.SUCCESS
+                                )
+                                snackbarHostState.showSnackbar("Thông báo")
+                            }
                         }
                     }
                 },
