@@ -11,24 +11,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.material3.*
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
@@ -57,7 +60,7 @@ fun CardPhongMay(
             .padding(bottom = 12.dp)
             .fillMaxWidth()
             .clickable {
-                val route = if (phongmay.MaPhong.contains("KHOLUUTRU", ignoreCase = true)) {
+                val route = if (phongmay.LoaiPhong == 2) {
                     NavRoute.PHONGMAYDONNHAP.route
                 } else {
                     NavRoute.PHONGMAYDETAIL.route
@@ -97,7 +100,12 @@ fun CardPhongMay(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
             ) {
-                Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                Icon(
+                    statusIcon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(Modifier.width(8.dp))
                 Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold)
                 Box(
@@ -124,7 +132,11 @@ fun CardPhongMay(
                     onDismissRequest = { showDialog = false },
                     containerColor = Color.White,
                     title = {
-                        Text("Cập nhật trạng thái", fontWeight = FontWeight.Bold, color = Color.Black)
+                        Text(
+                            "Cập nhật trạng thái",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
                     },
                     text = {
                         Text("Phòng: ${phongmay.TenPhong}", color = Color.Black)
@@ -137,11 +149,18 @@ fun CardPhongMay(
                             Button(
                                 onClick = {
                                     phongMayViewModel.updateTrangThaiPhongMay(
-                                        PhongMay(phongmay.MaPhong, phongmay.TenPhong, phongmay.LoaiPhong,1)
+                                        PhongMay(
+                                            phongmay.MaPhong,
+                                            phongmay.TenPhong,
+                                            phongmay.LoaiPhong,
+                                            1
+                                        )
                                     )
                                     showDialog = false
                                 },
-                                modifier = Modifier.weight(1f).padding(end = 8.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 8.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
                             ) {
@@ -151,7 +170,12 @@ fun CardPhongMay(
                             Button(
                                 onClick = {
                                     phongMayViewModel.updateTrangThaiPhongMay(
-                                        PhongMay(phongmay.MaPhong, phongmay.TenPhong, phongmay.LoaiPhong,0)
+                                        PhongMay(
+                                            phongmay.MaPhong,
+                                            phongmay.TenPhong,
+                                            phongmay.LoaiPhong,
+                                            0
+                                        )
                                     )
                                     showDialog = false
                                 },

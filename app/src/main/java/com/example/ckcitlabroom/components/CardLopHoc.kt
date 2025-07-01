@@ -144,17 +144,6 @@ fun CardLopHoc(
                         Spacer(Modifier.width(8.dp))
                         Text("Cập Nhật Trạng Thái", color = Color.White, fontWeight = FontWeight.Bold)
                     }
-
-//                    Button(
-//                        onClick = { showConfirmDialog = true },
-//                        modifier = Modifier.fillMaxWidth(),
-//                        shape = RoundedCornerShape(12.dp),
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935))
-//                    ) {
-//                        Icon(Lucide.Trash2, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-//                        Spacer(Modifier.width(8.dp))
-//                        Text("Xoá Lớp", color = Color.White, fontWeight = FontWeight.Bold)
-//                    }
                 }
             }
 
@@ -166,27 +155,32 @@ fun CardLopHoc(
                     text = { Text("Lớp: ${lopHoc.TenLopHoc}", fontSize = 16.sp, color = Color.Black) },
                     confirmButton = {
                         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(
-                                onClick = {
-                                    lopHocViewModel.updateLopHoc(lopHoc.copy(TrangThai = 1))
-                                    showDialog = false
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                            ) {
-                                Text("Hoạt Động", color = Color.White)
-                            }
-                            Button(
-                                onClick = {
-                                    lopHocViewModel.updateLopHoc(lopHoc.copy(TrangThai = 0))
-                                    showDialog = false
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(Color(0xFFF44336))
-                            ) {
-                                Text("Không Hoạt Động", color = Color.White)
+                            if(lopHoc.TrangThai == 0){
+                                Button(
+                                    onClick = {
+                                        lopHocViewModel.updateLopHoc(lopHoc.copy(TrangThai = 1))
+                                        lopHocViewModel.getAllLopHoc()
+                                        showDialog = false
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                                ) {
+                                    Text("Hoạt Động", color = Color.White)
+                                }
+                            }else{
+                                Button(
+                                    onClick = {
+                                        lopHocViewModel.updateLopHoc(lopHoc.copy(TrangThai = 0))
+                                        lopHocViewModel.getAllLopHoc()
+                                        showDialog = false
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(Color(0xFFF44336))
+                                ) {
+                                    Text("Không Hoạt Động", color = Color.White)
+                                }
                             }
                         }
                     }

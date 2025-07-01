@@ -1,107 +1,126 @@
-import androidx.compose.foundation.layout.Arrangement
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 
+@Suppress("OptInUsageError")
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun QuanLyNamHocScreen(
     navController: NavHostController,
-    namHocViewModel: NamHocViewModel
-){
-    var danhSachNamHoc = namHocViewModel.danhSachAllNamHoc
+    namHocViewModel: NamHocViewModel,
+    startIndex: Int = 0                      // ← THÊM THAM SỐ
+) {
 
-    LaunchedEffect(Unit) {
-        namHocViewModel.getAllNamHoc()
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            namHocViewModel.stopPollingAllNamHoc()
+    BackHandler {
+        navController.navigate(NavRoute.QUANLY.route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
+            }
         }
     }
+    /* ---------- Pager & Tab state ---------- */
+    val pageCount = 3
+    val pagerState = rememberPagerState(
+        initialPage = startIndex.coerceIn(0, pageCount - 1),
+        pageCount = { pageCount }
+    )
+    val scope = rememberCoroutineScope()
+    val primary = Color(0xFF1B8DDE)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    /* ---------- Tiêu đề tab ---------- */
+    val tabTitles = listOf(
+        "Năm Học Đang Diễn Ra",
+        "Năm Học Đã Kết Thúc",
+        "Năm Học Sắp Diễn Ra"
+    )
+
+    /* ---------- UI ---------- */
+    Scaffold(
+        containerColor = Color.Transparent,
+        floatingActionButton = {
+            FloatingActionButtonCustom {
+                navController.navigate(NavRoute.ADDNAMHOC.route)
+            }
+        }
+    ) { padding ->
+
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    start = padding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = padding.calculateEndPadding(LayoutDirection.Ltr)
+                )
         ) {
-            Text(
-                "Danh Sách Năm Học ",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-            IconButton(
-                onClick = {
-                    navController.navigate(NavRoute.ADDNAMHOC.route)
+
+            /* ---------- Tabs ---------- */
+            ScrollableTabRow(
+                selectedTabIndex = pagerState.currentPage,
+                containerColor = Color.Transparent,
+                edgePadding = 0.dp,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                        color = primary
+                    )
                 }
             ) {
-                Icon(
-                    imageVector = Icons.Filled.AddCircle,
-                    contentDescription = "Thêm năm học",
-                    tint = Color(0xFF1B8DDE),
-                    modifier = Modifier.size(30.dp)
-                )
-            }
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            if (danhSachNamHoc == null || danhSachNamHoc.isEmpty()) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "Chưa có năm học nào",
-                            color = Color.Black,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-
+                tabTitles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        text = { Text(title) },
+                        selectedContentColor = primary,
+                        unselectedContentColor = Color.Black
+                    )
                 }
-            } else {
-                items(danhSachNamHoc) { namhoc ->
-                    CardNamHoc(namhoc, navController, namHocViewModel)
+            }
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = Color(0xFF1B8DDE),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            /* ---------- Pager ---------- */
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> ListNamHocDangDienRaScreen(navController, namHocViewModel)
+                    1 -> ListNamHocKetThucScreen(navController, namHocViewModel)
+                    2 -> ListNamHocSapDienRaScreen(navController, namHocViewModel)
                 }
             }
         }
-
     }
 }
+
+

@@ -1,4 +1,3 @@
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,12 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,8 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -56,7 +49,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -137,40 +129,51 @@ fun LoginSVScreen(
                 elevation = CardDefaults.cardElevation(animatedElevation),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                LoginForm(
-                    email = emailState.value,
-                    onEmailChange = { emailState.value = it },
-                    password = passwordState.value,
-                    onPasswordChange = { passwordState.value = it },
-                    onLoginClick = {
-                        val email = emailState.value.trim()
-                        val password = passwordState.value.trim()
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    LoginForm(
+                        email = emailState.value,
+                        onEmailChange = { emailState.value = it },
+                        password = passwordState.value,
+                        onPasswordChange = { passwordState.value = it },
+                        onLoginClick = {
+                            val email = emailState.value.trim()
+                            val password = passwordState.value.trim()
 
-                        if (email.isEmpty() || password.isEmpty()) {
-                            coroutineScope.launch {
-                                snackbarData.value = CustomSnackbarData(
-                                    message = "Vui lòng nhập đầy đủ Email và Mật khẩu",
-                                    type = SnackbarType.ERROR
-                                )
-                                snackbarHostState.showSnackbar("Thông báo")
+                            if (email.isEmpty() || password.isEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    "Vui lòng nhập đầy đủ thông tin đăng nhập",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else if (email.contains("@") && !email.endsWith("@caothang.edu.vn")) {
+                                Toast.makeText(
+                                    context,
+                                    "Vui lòng sử dụng email caothang.edu.vn",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                sinhVienViewModel.checkLogin(email, password)
                             }
-                        } else if (email.contains("@") && !email.endsWith("@caothang.edu.vn")) {
-                            coroutineScope.launch {
-                                snackbarData.value = CustomSnackbarData(
-                                    message = "Vui lòng sử dụng mail Cao Thắng để đăng nhập",
-                                    type = SnackbarType.ERROR
-                                )
-                                snackbarHostState.showSnackbar("Thông báo")
-                            }
-                        } else {
-                            sinhVienViewModel.checkLogin(email, password)
-                        }
-                    },
-                    showSwitchAccount = true,
-                    onSwitchAccountClick = {
-                        navController.navigate(NavRoute.LOGINGIANGVIEN.route)
+                        },
+                    )
+
+                    TextButton(
+                        modifier = Modifier.padding(bottom = 20.dp),
+                        onClick = { navController.navigate(NavRoute.LOGINGIANGVIEN.route) },
+                        colors = ButtonDefaults.textButtonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color(0xFF1B8DDE)
+                        ),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text("Giảng viên đăng nhập")
                     }
-                )
+                }
+
+
             }
 
             // Xử lý kết quả đăng nhập
@@ -178,7 +181,8 @@ fun LoginSVScreen(
                 if (loginResult?.result == true) {
                     sinhVienViewModel.getSinhVienByMaGOrEmail(emailState.value)
                 } else if (loginResult != null) {
-                    Toast.makeText(context, "Email hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Email hoặc mật khẩu không đúng", Toast.LENGTH_SHORT)
+                        .show()
                     sinhVienViewModel.resetLoginResult()
                 }
             }
@@ -198,7 +202,6 @@ fun LoginSVScreen(
                             coroutineScope.launch {
                                 userPreferences.saveLoginForSinhVien(sinhvienWithToken)
 
-                                // ✅ Chỉ điều hướng 1 lần
                                 if (!isNavigated.value) {
                                     isNavigated.value = true
                                     sinhVienViewModel.setSV(sinhvienWithToken)
@@ -224,24 +227,23 @@ fun LoginForm(
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
-    showSwitchAccount: Boolean = false,
-    onSwitchAccountClick: (() -> Unit)? = null
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
     ) {
         Image(
             painter = painterResource(R.drawable.logo),
             contentDescription = "Logo",
             modifier = Modifier
-                .size(100.dp)
+                .size(150.dp)
                 .clip(CircleShape)
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         OutlinedTextField(
             value = email,
@@ -272,7 +274,8 @@ fun LoginForm(
             shape = RoundedCornerShape(12.dp),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                val icon = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                val icon =
+                    if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(imageVector = icon, contentDescription = "Toggle Password")
                 }
@@ -301,23 +304,15 @@ fun LoginForm(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF1B8DDE),
                 contentColor = Color.White
+            ),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 6.dp,
+                pressedElevation = 8.dp,
+                focusedElevation = 6.dp,
+                hoveredElevation = 6.dp
             )
         ) {
             Text("Đăng nhập", fontWeight = FontWeight.Bold)
-        }
-
-        if (showSwitchAccount && onSwitchAccountClick != null) {
-            TextButton(
-                modifier = Modifier.padding(8.dp),
-                onClick = onSwitchAccountClick,
-                colors = ButtonDefaults.textButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color(0xFF1B8DDE)
-                ),
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Text("Giảng viên đăng nhập")
-            }
         }
     }
 }

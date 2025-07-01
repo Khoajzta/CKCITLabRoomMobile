@@ -4,18 +4,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +30,7 @@ fun LichSuSuaMayScreen(
     mayTinhViewModel: MayTinhViewModel,
     donNhapyViewModel: DonNhapViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel
-){
+) {
     var danhsachdonnhap = donNhapyViewModel.danhSachDonNhap
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinhtheophong
 
@@ -67,33 +63,13 @@ fun LichSuSuaMayScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Lịch Sử Sửa Máy Theo Đơn Nhập",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
 
         // Danh sách đơn nhập
         LazyColumn(
             modifier = Modifier.height(600.dp)
         ) {
 
-            if(danhsachdonnhap.isNullOrEmpty()){
+            if (danhsachdonnhap.isNullOrEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -108,9 +84,14 @@ fun LichSuSuaMayScreen(
                         )
                     }
                 }
-            }else{
+            } else {
                 items(danhsachdonnhap) { donnhap ->
-                    CardDonNhap(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController, click = {navController.navigate(NavRoute.LISTMAYTINHLICHSUSUAMAY.route + "?madonnhap=${donnhap.MaDonNhap}")})
+                    CardDonNhap(
+                        donnhap,
+                        chiTietDonNhapyViewModel,
+                        mayTinhViewModel,
+                        navController,
+                        click = { navController.navigate(NavRoute.LISTMAYTINHLICHSUSUAMAY.route + "?madonnhap=${donnhap.MaDonNhap}") })
                 }
             }
         }

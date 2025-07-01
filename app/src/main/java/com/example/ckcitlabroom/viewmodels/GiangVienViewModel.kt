@@ -52,6 +52,27 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
         pollingJob = null
     }
 
+    fun getAllGiangVien() {
+        if (pollingJob != null) return
+
+        pollingJob = viewModelScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                try {
+                    val response = ITLabRoomRetrofitClient.giangVienAPIService.getAllGiangVien()
+                    if (response.giangvien != null) {
+                        danhSachAllGiangVien = response.giangvien!!
+                    } else {
+                        danhSachAllGiangVien = emptyList()
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("GiangVienViewModel", "Polling lỗi", e)
+                }
+                delay(200)
+            }
+        }
+    }
+
     fun setGV(gv: GiangVien?) {
         giangvienSet = gv
     }
@@ -90,26 +111,7 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
 
-    fun getAllGiangVien() {
-        if (pollingJob != null) return
 
-        pollingJob = viewModelScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                try {
-                    val response = ITLabRoomRetrofitClient.giangVienAPIService.getAllGiangVien()
-                    if (response.giangvien != null) {
-                        danhSachAllGiangVien = response.giangvien!!
-                    } else {
-                        danhSachAllGiangVien = emptyList()
-                    }
-
-                } catch (e: Exception) {
-                    Log.e("GiangVienViewModel", "Polling lỗi", e)
-                }
-                delay(200)
-            }
-        }
-    }
 
     fun getGiangVienByMaGV(magv: String) {
         viewModelScope.launch(Dispatchers.IO) {

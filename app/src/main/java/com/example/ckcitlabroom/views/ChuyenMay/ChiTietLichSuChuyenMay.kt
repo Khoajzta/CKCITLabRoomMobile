@@ -21,10 +21,10 @@ import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
 
 @Composable
 fun ChiTietLichSuChuyenMay(
-    mamay:String,
+    mamay: String,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel,
     phongMayViewModel: PhongMayViewModel,
-){
+) {
 
     var danhsachlichsu = lichSuChuyenMayViewModel.danhSachLichSuTheoMay
 
@@ -44,23 +44,30 @@ fun ChiTietLichSuChuyenMay(
         verticalArrangement = Arrangement.Top
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Lịch sử chuyển phòng" , fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1B8DDE))
-
-            Text("Số lần: ${danhsachlichsu.count()}" , fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1B8DDE))
+            Text(
+                "Số lần chuyển: ${danhsachlichsu.count()}",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF1B8DDE)
+            )
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth(),
             thickness = 2.dp,
             color = Color(0xFF1B8DDE),
         )
 
         LazyColumn {
-            if(danhsachlichsu.isNullOrEmpty()){
+            if (danhsachlichsu.isNullOrEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -72,8 +79,8 @@ fun ChiTietLichSuChuyenMay(
                 }
             }
 
-            items(danhsachlichsu){lichsu ->
-                CardLichSuChuyenMay(lichsu,phongMayViewModel)
+            items(danhsachlichsu) { lichsu ->
+                CardLichSuChuyenMay(lichsu, phongMayViewModel)
             }
         }
     }

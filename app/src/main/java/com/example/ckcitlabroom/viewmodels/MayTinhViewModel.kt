@@ -2,27 +2,30 @@ package com.example.ckcitlabroom.viewmodels
 
 import MayTinh
 import MayTinhTrangThaiUpdateRequest
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
+import com.itlabroom.datastore.SelectedMayTinhPerPhieuPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MayTinhViewModel : ViewModel() {
+class MayTinhViewModel(application: Application) : AndroidViewModel(application) {
 
-    var mt = MayTinh("","",""",""","","","","","","","","","","","",1)
+    var mt = MayTinh("", "", """,""", "", "", "", "", "", "", "", "", "", "", "", 1)
 
     var danhSachAllMayTinh by mutableStateOf(listOf<MayTinh>())
 
@@ -35,7 +38,6 @@ class MayTinhViewModel : ViewModel() {
 
     private val _danhSachMayTinhDuocChon = mutableStateListOf<MayTinh>()
     val danhSachMayTinhDuocChon: SnapshotStateList<MayTinh> get() = _danhSachMayTinhDuocChon // ✅
-
 
 
     fun addMayTinhDuocChon(mayTinh: MayTinh) {
@@ -145,16 +147,23 @@ class MayTinhViewModel : ViewModel() {
     }
 
 
-    fun getMayTinhByPhong(maphong: String) {
-        if (pollingMayTinhTheoPhongJob != null) return
+    fun getMayTinhByPhong(maPhong: String) {
+        // 1. Huỷ job cũ nếu còn
+        pollingMayTinhTheoPhongJob?.cancel()
 
+        // 2. Tạo job mới cho phòng mới
         pollingMayTinhTheoPhongJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
-                    val response = ITLabRoomRetrofitClient.maytinhAPIService.getMayTinhByMaPhong(maphong)
-                    danhSachAllMayTinhtheophong = response.maytinh ?: emptyList()
+                    val res = ITLabRoomRetrofitClient
+                        .maytinhAPIService
+                        .getMayTinhByMaPhong(maPhong)
+
+                    withContext(Dispatchers.Main) {      // ✦ cập nhật trên Main
+                        danhSachAllMayTinhtheophong = res.maytinh ?: emptyList()
+                    }
                 } catch (e: Exception) {
-                    Log.e("PhongMayViewModel", "Polling theo phòng lỗi", e)
+                    Log.e("MayTinhVM", "Polling máy theo phòng lỗi", e)
                 }
                 delay(500)
             }
@@ -177,7 +186,6 @@ class MayTinhViewModel : ViewModel() {
             emptyList()
         }
     }
-
 
 
     fun createMayTinh(maytinh: MayTinh) {
@@ -208,7 +216,6 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
-
 
 
     suspend fun createMayTinhBlocking(maytinh: MayTinh): Boolean {
@@ -259,8 +266,6 @@ class MayTinhViewModel : ViewModel() {
     }
 
 
-
-
     fun deleteMayTinh(mamay: String) {
         viewModelScope.launch {
             isLoading = true
@@ -286,6 +291,17 @@ class MayTinhViewModel : ViewModel() {
             }
         }
     }
+
+    private val prefs = SelectedMayTinhPerPhieuPreferences(application)
+
+    /** Flow ids theo phiếu hiện tại */
+    fun selectedIdsFlow(maPhieu: String): Flow<Set<String>> = prefs.getIds(maPhieu)
+
+    fun toggleMayTinh(maPhieu: String, idMay: String) =
+        viewModelScope.launch { prefs.toggle(maPhieu, idMay) }
+
+    fun clearMayTinhOfPhieu(maPhieu: String) =
+        viewModelScope.launch { prefs.clear(maPhieu) }
 }
 
 

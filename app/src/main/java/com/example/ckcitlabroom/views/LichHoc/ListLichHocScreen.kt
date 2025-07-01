@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -25,7 +26,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -42,12 +50,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListLichHocScreen(
     maTuan: Int,
@@ -150,11 +160,11 @@ fun ListLichHocScreen(
             val tieuDe = when {
                 giangVien != null && giangVien.MaLoaiTaiKhoan == 1 -> {
                     // Admin đang xem lịch của GV được chọn
-                    "Lịch dạy tuần $tenTuan GV ${selectedGV?.TenGiangVien.orEmpty()}"
+                    "Lịch dạy tuần $tenTuan"
                 }
                 giangVien != null -> {
                     // Giảng viên thường
-                    "Lịch dạy tuần $tenTuan GV ${giangVien.TenGiangVien}"
+                    "Lịch dạy tuần $tenTuan"
                 }
                 sinhVien != null -> {
                     // Sinh viên
@@ -191,15 +201,56 @@ fun ListLichHocScreen(
 
         // Dropdown chọn giảng viên (admin)
         if (giangVien?.MaLoaiTaiKhoan == 1) {
-            CustomDropdownSelector(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                label = "Giảng viên",
-                items = danhsachgiangvien,
-                selectedItem = selectedGV,
-                itemLabel = { it.TenGiangVien },
-                onItemSelected = { selectedGV = it }
-            )
+            var expandedGV by remember { mutableStateOf(false) }
+            val primary = Color(0xFF1B8DDE)
+
+            ExposedDropdownMenuBox(
+                expanded = expandedGV,
+                onExpandedChange = { expandedGV = !expandedGV }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White)
+                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedGV?.TenGiangVien ?: "Chọn giảng viên",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        if (expandedGV) Icons.Default.KeyboardArrowUp
+                        else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                ExposedDropdownMenu(
+                    expanded = expandedGV,
+                    onDismissRequest = { expandedGV = false },
+                    containerColor = Color.White
+                ) {
+                    danhsachgiangvien.forEach { gv ->
+                        DropdownMenuItem(
+                            text = { Text(gv.TenGiangVien) },
+                            onClick = {
+                                selectedGV = gv
+                                expandedGV = false
+                            }
+                        )
+                    }
+                }
+            }
         }
 
         // Nhóm theo thứ
@@ -228,8 +279,12 @@ fun ListLichHocScreen(
                             )
                         }
                     } else {
+
                         thuList.forEach { thu ->
-                            val lichTrongThu = grouped[thu] ?: emptyList()
+                            val lichTrongThu = grouped[thu]
+                                ?.sortedBy { it.TenCa }
+                                ?: emptyList()
+
                             if (lichTrongThu.isNotEmpty()) {
                                 item {
                                     Column {
@@ -330,7 +385,11 @@ fun ListLichHocScreen(
                         }
                     } else {
                         thuList.forEach { thu ->
-                            val lichTrongThu = grouped[thu] ?: emptyList()
+
+                            val lichTrongThu = grouped[thu]
+                                ?.sortedBy { it.TenCa }
+                                ?: emptyList()
+
                             if (lichTrongThu.isNotEmpty()) {
                                 item {
                                     Column {
@@ -430,7 +489,11 @@ fun ListLichHocScreen(
                         }
                     } else {
                         thuList.forEach { thu ->
-                            val lichTrongThu = grouped[thu] ?: emptyList()
+
+                            val lichTrongThu = grouped[thu]
+                                ?.sortedBy { it.TenCa }
+                                ?: emptyList()
+
                             if (lichTrongThu.isNotEmpty()) {
                                 item {
                                     Column {

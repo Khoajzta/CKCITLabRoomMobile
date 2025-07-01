@@ -44,6 +44,7 @@ import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.collections.sortedBy
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -250,7 +251,9 @@ fun ListLichHocSuDungMay(
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
             items(thuList) { thu ->
-                val lichTrongThu = lichHocTheoThu[thu].orEmpty()
+                val lichTrongThu = lichHocTheoThu[thu]?.sortedBy { it.TenCa }.orEmpty()
+
+
 
                 if (lichTrongThu.isNotEmpty()) {
                     Column(

@@ -186,6 +186,7 @@ fun CardMonHoc(
                                                     1
                                                 )
                                                 monHocViewModel.updateMonHoc(monhocnew)
+                                                monHocViewModel.getAllMonHoc()
                                                 showDialog = false
                                             },
                                             shape = RoundedCornerShape(12.dp),
@@ -205,6 +206,7 @@ fun CardMonHoc(
                                                     0
                                                 )
                                                 monHocViewModel.updateMonHoc(monhocnew)
+                                                monHocViewModel.getAllMonHoc()
                                                 showDialog = false
                                             },
                                             shape = RoundedCornerShape(12.dp),

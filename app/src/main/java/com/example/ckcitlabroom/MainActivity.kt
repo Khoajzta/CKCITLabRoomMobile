@@ -2,7 +2,6 @@ package com.example.ckcitlabroom
 
 import AnimatedNavigationBar
 import ButtonData
-import GiangVien
 import GiangVienPreferences
 import GiangVienViewModel
 import LichSuSuaMayViewModel
@@ -15,7 +14,6 @@ import PhieuMuonMayViewModel
 import PhieuSuaChuaViewModel
 import PhongMayViewModel
 import RequestPermissionsOnFirstLaunch
-import SinhVien
 import SinhVienPreferences
 import SinhVienViewModel
 import TuanViewModel
@@ -34,28 +32,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -66,11 +56,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,12 +70,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.work.Constraints
@@ -99,32 +86,31 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.composables.icons.lucide.Bell
-import com.composables.icons.lucide.BellDot
 import com.composables.icons.lucide.House
 import com.composables.icons.lucide.LayoutGrid
-import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
-import com.example.ckcitlabroom.viewmodels.CaHocViewModel
-import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.User
+import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
+import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
 import com.example.ckcitlabroom.viewmodels.ChiTietPhieuMuonViewModel
 import com.example.ckcitlabroom.viewmodels.ChiTietSuDungMayViewModel
 import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
+import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
-import androidx.compose.ui.unit.LayoutDirection
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -182,6 +168,8 @@ fun MainScreen() {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val context = LocalContext.current
 
+    Log.d("currentRoute", "currentRoute: $currentRoute")
+
     var gv = giangVienViewModel.giangvienSet
     var sv = sinhVienViewModel.sinhvienSet
 
@@ -203,7 +191,11 @@ fun MainScreen() {
                     val svServer = sinhVienViewModel.getSinhVienByMaGOrEmailNow(localSV.MaSinhVien)
 
                     if (svServer != null && svServer.Token != currentToken) {
-                        Toast.makeText(context, "Tài khoản đã đăng nhập trên thiết bị khác", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Tài khoản đã đăng nhập trên thiết bị khác",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         sinhVienViewModel.logout()
                         SinhVienPreferences.logout()
                         navController.navigate(NavRoute.LOGINSINHVIEN.route) {
@@ -216,7 +208,11 @@ fun MainScreen() {
                     val gvServer = giangVienViewModel.getGiangVienByMaGOrEmailNow(localGV.MaGV)
 
                     if (gvServer != null && gvServer.Token != currentToken) {
-                        Toast.makeText(context, "Tài khoản đã đăng nhập trên thiết bị khác", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Tài khoản đã đăng nhập trên thiết bị khác",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         giangVienViewModel.logout()
                         GiangVienPreferences.logout()
                         navController.navigate(NavRoute.LOGINSINHVIEN.route) {
@@ -233,9 +229,9 @@ fun MainScreen() {
 
     val unreadCount = notificationViewModel.danhSachAllThongBao.count { tb ->
         !tb.DaDoc && (
-            (sv != null && tb.MaNguoiDung == sv.MaSinhVien) ||
-            (gv != null && tb.MaNguoiDung == gv.MaGV)
-        )
+                (sv != null && tb.MaNguoiDung == sv.MaSinhVien) ||
+                        (gv != null && tb.MaNguoiDung == gv.MaGV)
+                )
     }
 
 
@@ -274,65 +270,141 @@ fun MainScreen() {
     ) {
         var textTopbar = "Trở lại"
 
-        when (currentRoute){
+        when (currentRoute) {
             NavRoute.QUANLYDONNHAP.route -> {
                 textTopbar = "Quản Lý Đơn Nhập"
             }
+
             NavRoute.QUANLYPHONGMAY.route -> {
                 textTopbar = "Quản Lý Phòng Máy"
             }
+
             NavRoute.QUANLYCHUYENMAY.route -> {
                 textTopbar = "Quản Lý Chuyển Máy"
             }
-            NavRoute.QUANLYPHIEUSUACHUA.route -> {
+
+            NavRoute.QUANLYPHIEUSUACHUA.route + "?startIndex={startIndex}" -> {
                 textTopbar = "Quản Lý Phiếu Sửa Chữa"
             }
-            NavRoute.QUANLYPHIEUMUONMAY.route -> {
+
+            NavRoute.QUANLYPHIEUMUONMAY.route + "?startIndex={startIndex}" -> {
                 textTopbar = "Quản Lý Phiếu Mượn Máy"
             }
-            NavRoute.QUANLYGIANGVIEN.route -> {
+
+            NavRoute.QUANLYGIANGVIEN.route + "?startIndex={startIndex}" -> {
                 textTopbar = "Quản Lý Giảng Viên"
             }
-            NavRoute.QUANLYSINHVIEN.route -> {
+
+            NavRoute.QUANLYSINHVIEN.route + "?startIndex={startIndex}" -> {
                 textTopbar = "Quản Lý Sinh Viên"
             }
+
             NavRoute.LISTLICHHOCSUDUNGMAY.route -> {
                 textTopbar = "Quản Lý Điểm Danh"
             }
-            NavRoute.QUANLYLICHHOC.route -> {
-                if(gv!=null){
+
+            NavRoute.QUANLYLICHHOC.route + "?startIndex={startIndex}" -> {
+                if (gv != null) {
                     textTopbar = "Quản Lý Lịch Dạy"
-                }else{
+                } else {
                     textTopbar = "Quản Lý Lịch Học"
                 }
             }
+
             NavRoute.QUANLYLOPHOC.route -> {
                 textTopbar = "Quản Lý Lớp Học"
             }
-            NavRoute.QUANLYNAMHOC.route -> {
+
+            NavRoute.QUANLYNAMHOC.route + "?startIndex={startIndex}" -> {
                 textTopbar = "Quản Lý Năm Học"
             }
+
             NavRoute.QUANLYCAHOC.route -> {
                 textTopbar = "Quản Lý Ca Học"
             }
+
             NavRoute.QUANLYMONHOC.route -> {
                 textTopbar = "Quản Lý Môn Học"
             }
+
             NavRoute.ListThongBaoSinhVien.route -> {
                 textTopbar = "Thông Báo"
             }
+
+            NavRoute.CHUYENMAYPHIEUMUON.route + "?maphong={maphong}&maphieumuon={maphieumuon}" -> {
+                textTopbar = "Chọn máy để chuyển"
+            }
+
+            NavRoute.CHITIETPHIEUMUON.route + "?maphieumuon={maphieumuon}" -> {
+                textTopbar = "Chi Tiết Phiếu Mượn"
+            }
+
+            NavRoute.UPDATETRAMAY.route + "?maphieumuon={maphieumuon}" -> {
+                textTopbar = "Cập nhật trả máy"
+            }
+
+            NavRoute.CHITIETDONNHAPCHUYEN.route + "?madonnhap={madonnhap}&maphong={maphong}" -> {
+                textTopbar = "Danh sách máy tính"
+            }
+
+            NavRoute.PHONGMAYCHUYEN.route + "?maphong={maphong}" -> {
+                textTopbar = "Danh sách máy tính"
+            }
+
+            NavRoute.PHONGKHOCHUYEN.route + "?maphong={maphong}" -> {
+                textTopbar = "Danh sách đơn nhập"
+            }
+
+            NavRoute.LISTMAYTINHTHEODONCHUYEN.route + "?madonnhap={madonnhap}" -> {
+                textTopbar = "Danh sách máy tính theo đơn"
+            }
+
+            NavRoute.CHITIETLICHSUCHUYENMAY.route + "?mamay={mamay}" -> {
+                textTopbar = "Lịch sử chuyển phòng"
+            }
+
+            NavRoute.PHONGMAYDETAIL.route + "?maphong={maphong}" -> {
+                textTopbar = "Danh sách máy tính"
+            }
+
+            NavRoute.PHONGMAYDONNHAP.route + "?maphong={maphong}" -> {
+                textTopbar = "Danh sách đơn nhập"
+            }
+
+            NavRoute.CHITIETDONNHAPPHONGMAY.route + "?madonnhap={madonnhap}" -> {
+                textTopbar = "Danh sách máy tính"
+            }
+
+            NavRoute.LISTMAYTINHLICHSUSUAMAY.route + "?madonnhap={madonnhap}" -> {
+                textTopbar = "Danh sách máy tính theo đơn"
+            }
+
+            NavRoute.DETAILLICHSUSUAMAY.route + "?mamay={mamay}" -> {
+                textTopbar = "Lịch sửa sửa máy"
+            }
+
+            NavRoute.ADDDIEMDANH.route -> {
+                textTopbar = "Điểm danh hôm nay"
+            }
+
+            NavRoute.LISTPHIEUBYSINHVIEN.route -> {
+                textTopbar = "Danh sách phiếu đã tạo"
+            }
+
         }
 
         when (currentRoute) {
             NavRoute.STARTSCREEN.route,
             NavRoute.LOGINSINHVIEN.route,
-            NavRoute.LOGINGIANGVIEN.route -> {}
+            NavRoute.LOGINGIANGVIEN.route -> {
+            }
 
             NavRoute.CHUYENMAYPHIEUMUON.route -> {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                     title = {
-                        Text("Trở lại",
+                        Text(
+                            "Trở lại",
                             fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF1B8DDE),
                             modifier = Modifier.padding(start = 10.dp),
@@ -357,7 +429,156 @@ fun MainScreen() {
                                 .clickable {
                                     mayTinhViewModel.clearDanhSachMayTinhDuocChon()
                                     navController.popBackStack()
-                                 },
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBackIosNew,
+                                contentDescription = "Back",
+                                tint = Color(0xFF1B8DDE),
+                                modifier = Modifier.size(25.dp)
+                            )
+                        }
+                    }
+                )
+            }
+
+            NavRoute.CHITIETPHIEUMUON.route + "?maphieumuon={maphieumuon}" -> {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    title = {
+                        Text(
+                            textTopbar,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF1B8DDE),
+                            modifier = Modifier.padding(start = 10.dp),
+                            fontSize = 21.sp,
+                            style = TextStyle(
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.25f),
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 4f
+                                )
+                            )
+                        )
+                    },
+                    navigationIcon = {
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .size(40.dp)
+                                .shadow(4.dp, CircleShape, clip = false)
+                                .background(Color.White, CircleShape)
+                                .border(1.dp, Color.White, CircleShape)
+                                .clickable {
+                                    navController.navigateUp()
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBackIosNew,
+                                contentDescription = "Back",
+                                tint = Color(0xFF1B8DDE),
+                                modifier = Modifier.size(25.dp)
+                            )
+                        }
+                    }
+                )
+            }
+
+            NavRoute.QUANLYDONNHAP.route,
+            NavRoute.QUANLYPHONGMAY.route,
+            NavRoute.QUANLYCHUYENMAY.route,
+            NavRoute.QUANLYPHIEUSUACHUA.route,
+            NavRoute.QUANLYPHIEUMUONMAY.route + "?startIndex={startIndex}",
+            NavRoute.QUANLYGIANGVIEN.route + "?startIndex={startIndex}",
+            NavRoute.QUANLYSINHVIEN.route + "?startIndex={startIndex}",
+            NavRoute.LISTLICHHOCSUDUNGMAY.route,
+            NavRoute.QUANLYLICHHOC.route + "?startIndex={startIndex}",
+            NavRoute.QUANLYLOPHOC.route,
+            NavRoute.QUANLYNAMHOC.route + "?startIndex={startIndex}",
+            NavRoute.QUANLYCAHOC.route,
+            NavRoute.QUANLYMONHOC.route -> {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    title = {
+                        Text(
+                            textTopbar,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF1B8DDE),
+                            modifier = Modifier.padding(start = 10.dp),
+                            fontSize = 21.sp,
+                            style = TextStyle(
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.25f),
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 4f
+                                )
+                            )
+                        )
+                    },
+                    navigationIcon = {
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .size(40.dp)
+                                .shadow(4.dp, CircleShape, clip = false)
+                                .background(Color.White, CircleShape)
+                                .border(1.dp, Color.White, CircleShape)
+                                .clickable {
+                                    navController.navigate(NavRoute.QUANLY.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            inclusive = true
+                                        }
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBackIosNew,
+                                contentDescription = "Back",
+                                tint = Color(0xFF1B8DDE),
+                                modifier = Modifier.size(25.dp)
+                            )
+                        }
+                    }
+                )
+            }
+
+            NavRoute.CHITIETDONNHAP.route + "?madonnhap={madonnhap}" -> {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    title = {
+                        Text(
+                            text = "Chi Tiết Đơn Nhập",
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF1B8DDE),
+                            modifier = Modifier.padding(start = 10.dp),
+                            fontSize = 21.sp,
+                            style = TextStyle(
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.25f),
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 4f
+                                )
+                            )
+                        )
+                    },
+                    navigationIcon = {
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .size(40.dp)
+                                .shadow(4.dp, CircleShape, clip = false)
+                                .background(Color.White, CircleShape)
+                                .border(1.dp, Color.White, CircleShape)
+                                .clickable {
+                                    navController.navigate(NavRoute.QUANLYDONNHAP.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            inclusive = true
+                                        }
+                                    }
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -387,7 +608,11 @@ fun MainScreen() {
                                     .shadow(8.dp, shape = CircleShape)
                                     .clip(CircleShape)
                                     .background(Color.White.copy(alpha = 0.6f))
-                                    .border(1.dp, Color.White.copy(alpha = 0.4f), shape = CircleShape)
+                                    .border(
+                                        1.dp,
+                                        Color.White.copy(alpha = 0.4f),
+                                        shape = CircleShape
+                                    )
                             )
                             Spacer(modifier = Modifier.width(7.dp))
                             Text(
@@ -429,7 +654,10 @@ fun MainScreen() {
                                         modifier = Modifier
                                             .align(Alignment.TopEnd)
                                             .offset(x = 0.dp, y = (-3).dp)
-                                            .background(Color(0xFF1B8DDE), shape = RoundedCornerShape(50.dp))
+                                            .background(
+                                                Color(0xFF1B8DDE),
+                                                shape = RoundedCornerShape(50.dp)
+                                            )
                                             .border(1.dp, Color.White, RoundedCornerShape(50.dp))
                                             .padding(horizontal = 5.dp, vertical = 1.dp)
                                             .defaultMinSize(minWidth = 16.dp),
@@ -495,12 +723,14 @@ fun MainScreen() {
     }
 
     Scaffold(
-        topBar = { TopBar(navController,mayTinhViewModel,currentRoute) },
+        topBar = { TopBar(navController, mayTinhViewModel, currentRoute) },
         bottomBar = {
             when (currentRoute) {
                 NavRoute.STARTSCREEN.route,
                 NavRoute.LOGINSINHVIEN.route,
-                NavRoute.LOGINGIANGVIEN.route -> {}
+                NavRoute.LOGINGIANGVIEN.route -> {
+                }
+
                 else -> {
                     AnimatedNavigationBar(
                         buttons = buttons,

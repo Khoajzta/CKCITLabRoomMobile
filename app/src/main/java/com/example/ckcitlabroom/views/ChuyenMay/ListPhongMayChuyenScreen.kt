@@ -26,7 +26,10 @@ fun ListPhongMayChuyenScreen(
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
 ) {
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay.filter { it.LoaiPhong == 1 || it.LoaiPhong == 2 }
+    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
+        .filter   { it.LoaiPhong == 1 || it.LoaiPhong == 2 }
+        .sortedByDescending { it.LoaiPhong == 2 }
+
 
     LaunchedEffect(Unit) {
         phongMayViewModel.getAllPhongMay()
@@ -44,20 +47,6 @@ fun ListPhongMayChuyenScreen(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
-        Text(
-            modifier = Modifier.padding(bottom = 16.dp),
-            text = "Danh Sách Phòng Máy",
-            color = Color(0xFF1B8DDE),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 20.sp
-        )
-
-        HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {

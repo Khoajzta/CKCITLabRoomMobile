@@ -1,12 +1,14 @@
 package com.example.ckcitlabroom.views.SinhVien
 
 import CustomSnackbarData
+import NavRoute
 import SinhVien
 import SinhVienViewModel
-import SnackbarType
 import android.icu.util.Calendar
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,32 +21,34 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -237,7 +241,7 @@ fun CreateSinhVienScreen(
                         ) {
                             gioiTinhOptions.forEach { selectionOption ->
                                 DropdownMenuItem(
-                                    text = { Text(selectionOption, color = Color.Black)},
+                                    text = { Text(selectionOption, color = Color.Black) },
                                     onClick = {
                                         gioiTinhState.value = selectionOption
                                         gioiTinhExpanded = false
@@ -311,44 +315,6 @@ fun CreateSinhVienScreen(
                 }
             }
 
-
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.padding(16.dp)
-            ) { data ->
-                snackbarData.value?.let { customData ->
-                    Snackbar(
-                        containerColor = Color(0xFF1B8DDE),
-                        contentColor = Color.White,
-                        shape = RoundedCornerShape(12.dp),
-                        action = {
-                            TextButton(onClick = {
-                                maSVState.value = ""
-                                tenSVState.value = ""
-                                ngaySinhHienThi.value = ""
-                                gioiTinhState.value = ""
-                                emailState.value = ""
-                                matKhauState.value = ""
-                                snackbarData.value = null
-                            }) {
-                                Text("Đóng", color = Color.White)
-                            }
-                        }
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = if (customData.type == SnackbarType.SUCCESS) Color.Cyan else Color.Yellow,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = customData.message)
-                        }
-                    }
-                }
-            }
-
             Button(
                 onClick = {
                     val emailRegex = Regex("^[A-Za-z0-9+_.-]+@caothang\\.edu\\.vn$")
@@ -366,47 +332,27 @@ fun CreateSinhVienScreen(
                         ngaySinhDb.value.isBlank() || gioiTinhState.value.isBlank() ||
                         emailState.value.isBlank()
                     ) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Vui lòng nhập đầy đủ thông tin!",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
+                        Toast.makeText(
+                            context,
+                            "Vui lòng điền đầy đủ thông tin",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else if (birthDate == null) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Ngày sinh không hợp lệ! (Định dạng yyyy-MM-dd)",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
+                        Toast.makeText(context, "Ngày sinh không hợp lệ", Toast.LENGTH_SHORT).show()
                     } else if (today.year - birthDate.year < 18) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Sinh viên phải đủ 18 tuổi trở lên!",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
+                        Toast.makeText(context, "Sinh viên phải đủ 18 tuổi", Toast.LENGTH_SHORT)
+                            .show()
                     } else if (!emailRegex.matches(emailState.value)) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Email phải có định dạng @caothang.edu.vn",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
-                    }  else {
+                        Toast.makeText(
+                            context,
+                            "Email phải có định dạng @caothang.edu.vn",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
                         val daTonTai = danhSachSinhVien.any { it.MaSinhVien == maSVState.value }
                         if (daTonTai) {
-                            coroutineScope.launch {
-                                snackbarData.value = CustomSnackbarData(
-                                    message = "Mã sinh viên đã tồn tại!",
-                                    type = SnackbarType.ERROR
-                                )
-                                snackbarHostState.showSnackbar("Thông báo")
-                            }
+                            Toast.makeText(context, "Mã sinh viên đã tồn tại", Toast.LENGTH_SHORT)
+                                .show()
                         } else {
                             val sinhVienMoi = SinhVien(
                                 MaSinhVien = maSVState.value,
@@ -420,19 +366,9 @@ fun CreateSinhVienScreen(
                                 TrangThai = 1
                             )
                             sinhVienViewModel.createSinhVien(sinhVienMoi)
-                            coroutineScope.launch {
-                                snackbarData.value = CustomSnackbarData(
-                                    message = "Thêm sinh viên thành công",
-                                    type = SnackbarType.SUCCESS
-                                )
-                                snackbarHostState.showSnackbar("Thông báo")
-                                maSVState.value = ""
-                                tenSVState.value = ""
-                                ngaySinhHienThi.value = ""
-                                gioiTinhState.value = ""
-                                emailState.value = ""
-                                matKhauState.value = ""
-                            }
+                            Toast.makeText(context, "Thêm sinh viên thành công", Toast.LENGTH_SHORT)
+                                .show()
+                            navController.navigate(NavRoute.QUANLYSINHVIEN.route + "?startIndex={0}")
                         }
                     }
                 },
@@ -440,7 +376,7 @@ fun CreateSinhVienScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {
-                Text("Thêm sinh viên",color = Color.White,fontWeight = FontWeight.Bold)
+                Text("Thêm sinh viên", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }

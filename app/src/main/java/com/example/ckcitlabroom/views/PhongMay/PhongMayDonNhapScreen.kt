@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -42,13 +41,13 @@ import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 
 @Composable
 fun PhongMayDonNhapScreen(
-    maphong:String,
+    maphong: String,
     navController: NavHostController,
     phongMayViewModel: PhongMayViewModel,
     mayTinhViewModel: MayTinhViewModel,
     donNhapyViewModel: DonNhapViewModel,
     chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel
-){
+) {
     val danhSachLoaiPhong = listOf(
         LoaiPhong(1, "Phòng máy"),
         LoaiPhong(2, "Phòng kho"),
@@ -99,33 +98,14 @@ fun PhongMayDonNhapScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Danh Sách Đơn Nhập",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
         // Danh sách đơn nhập
         LazyColumn(
-            modifier = Modifier.height(550.dp)
+            modifier = Modifier
+                .weight(1f)
+                .padding(bottom = 5.dp)
         ) {
 
-            if(danhsachdonnhap.isNullOrEmpty()){
+            if (danhsachdonnhap.isNullOrEmpty()) {
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -140,9 +120,14 @@ fun PhongMayDonNhapScreen(
                         )
                     }
                 }
-            }else{
+            } else {
                 items(danhsachdonnhap) { donnhap ->
-                    CardDonNhap(donnhap,chiTietDonNhapyViewModel,mayTinhViewModel,navController, click = {navController.navigate(NavRoute.CHITIETDONNHAP.route + "?madonnhap=${donnhap.MaDonNhap}")})
+                    CardDonNhapPhongMay(
+                        donnhap,
+                        chiTietDonNhapyViewModel,
+                        mayTinhViewModel,
+                        navController,
+                        click = { navController.navigate(NavRoute.CHITIETDONNHAPPHONGMAY.route + "?madonnhap=${donnhap.MaDonNhap}") })
                 }
             }
         }
@@ -154,16 +139,16 @@ fun PhongMayDonNhapScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (phongmay.LoaiPhong == 2){
+            if (phongmay.LoaiPhong == 2) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { showDialog = true },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text("Chỉnh sửa", color = Color.Black, fontWeight = FontWeight.ExtraBold)
+                    Text("Sửa phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold)
                 }
-            }else{
+            } else {
                 Button(
                     modifier = Modifier.width(180.dp),
                     onClick = { showDialog = true },
@@ -281,7 +266,9 @@ fun PhongMayDonNhapScreen(
 
                     ) {
                         Text(
-                            text = "Mã Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold
+                            text = "Mã Phòng",
+                            color = Color.Black,
+                            fontWeight = FontWeight.ExtraBold
                         )
 
                         Box(
@@ -289,7 +276,11 @@ fun PhongMayDonNhapScreen(
                                 .fillMaxWidth()
                                 .height(55.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -308,7 +299,9 @@ fun PhongMayDonNhapScreen(
                         }
 
                         Text(
-                            text = "Tên Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold
+                            text = "Tên Phòng",
+                            color = Color.Black,
+                            fontWeight = FontWeight.ExtraBold
                         )
 
                         OutlinedTextField(
@@ -365,7 +358,9 @@ fun PhongMayDonNhapScreen(
                         colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
                     ) {
                         Text(
-                            text = "Lưu phòng máy", color = Color.White, fontWeight = FontWeight.Bold
+                            text = "Lưu phòng máy",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 },

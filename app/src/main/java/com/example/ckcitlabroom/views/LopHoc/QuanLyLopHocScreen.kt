@@ -1,105 +1,128 @@
-import androidx.compose.foundation.layout.Arrangement
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.example.ckcitlabroom.components.CardLopHoc
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
+import kotlinx.coroutines.launch
 
+@Suppress("OptInUsageError")
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun QuanLyLopHoc(
     navController: NavHostController,
-    lopHocViewModel: LopHocViewModel
+    lopHocViewModel: LopHocViewModel,
+    startIndex: Int = 0
 ) {
-    val danhSachLopHoc = lopHocViewModel.danhSachAllLopHoc
-
-    LaunchedEffect(Unit) {
-        lopHocViewModel.getAllLopHoc()
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            lopHocViewModel.stopPollingLopHoc()
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Danh Sách Lớp Học",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-            IconButton(
-                onClick = {
-                    navController.navigate(NavRoute.ADDLOPHOC.route)
-                }
-            ) {
-                Icon(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = Icons.Outlined.AddCircle,
-                    contentDescription = "Thêm lớp học",
-                    tint = Color(0xFF1B8DDE)
-                )
+    BackHandler {
+        navController.navigate(NavRoute.QUANLY.route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
             }
         }
+    }
+    /* ---------- Pager & Tab state ---------- */
+    val pageCount = 2
+    val pagerState = rememberPagerState(
+        initialPage = startIndex.coerceIn(0, pageCount - 1),
+        pageCount = { pageCount }
+    )
+    val scope = rememberCoroutineScope()
 
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
+    /* Nếu quay lại với startIndex khác */
+    LaunchedEffect(startIndex) {
+        if (startIndex in 0 until pageCount &&
+            startIndex != pagerState.currentPage
         ) {
-            if (danhSachLopHoc == null || danhSachLopHoc.isEmpty()) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "Chưa có lớp học nào",
-                            color = Color.Black,
-                            modifier = Modifier.padding(16.dp),
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+            pagerState.scrollToPage(startIndex)
+        }
+    }
+
+    /* ---------- Tiêu đề tab ---------- */
+    val tabTitles = listOf("Lớp Hoạt Động", "Lớp Ngừng Hoạt Động")
+    val primary = Color(0xFF1B8DDE)
+
+    /* ---------- UI ---------- */
+    Scaffold(
+        containerColor = Color.Transparent,
+        floatingActionButton = {
+            FloatingActionButtonCustom(
+                onClick = { navController.navigate(NavRoute.ADDLOPHOC.route) }
+            )
+        }
+    ) { padding ->
+
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    top = 0.dp,
+                    bottom = 0.dp,
+                    start = padding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = padding.calculateEndPadding(LayoutDirection.Ltr)
+                )
+        ) {
+
+            /* Tabs */
+            TabRow(
+                selectedTabIndex = pagerState.currentPage,
+                containerColor = Color.Transparent,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                        color = primary
+                    )
                 }
-            } else {
-                items(danhSachLopHoc) { lophoc ->
-                    CardLopHoc(lophoc, navController, lopHocViewModel)
+            ) {
+                tabTitles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        text = { Text(title) },
+                        selectedContentColor = primary,
+                        unselectedContentColor = Color.Black
+                    )
+                }
+            }
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = Color(0xFF1B8DDE),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            /* Pager */
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> ListLopHocDangHoatDongScreen(navController, lopHocViewModel)
+                    1 -> ListLopHocNgungHoatDongScreen(navController, lopHocViewModel)
                 }
             }
         }

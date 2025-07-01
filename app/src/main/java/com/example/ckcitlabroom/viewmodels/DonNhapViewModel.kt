@@ -52,26 +52,20 @@ class DonNhapViewModel : ViewModel() {
     }
 
     // Suspend function gửi DonNhapRequest thay vì DonNhap
-    suspend fun createDonNhapAsync(donNhapRequest: DonNhapRequest): Boolean {
-        return try {
-            val response = withContext(Dispatchers.IO) {
-                ITLabRoomRetrofitClient.donnhapAPIService.createDonNhap(donNhapRequest)
-            }
-            response.message?.contains("thành công", ignoreCase = true) == true
-        } catch (e: Exception) {
-            Log.e("DonNhapViewModel", "Lỗi khi thêm đơn nhập: ${e.message}")
-            false
+    suspend fun createDonNhapAsync(
+        donNhapRequest: DonNhapRequest
+    ): String? = try {
+        withContext(Dispatchers.IO) {
+            ITLabRoomRetrofitClient
+                .donnhapAPIService
+                .createDonNhap(donNhapRequest)
+        }.let { res ->
+            if (res.success) res.maDonNhap
+            else null
         }
-    }
-
-    // Hàm gọi từ UI, nhận DonNhapRequest
-    fun createDonNhap(donNhapRequest: DonNhapRequest) {
-        viewModelScope.launch {
-            isLoading = true
-            val success = createDonNhapAsync(donNhapRequest)
-            donnhapCreateResult = if (success) "Thêm đơn nhập thành công" else "Thêm đơn nhập thất bại"
-            isLoading = false
-        }
+    } catch (e: Exception) {
+        Log.e("DonNhapViewModel", "Lỗi khi thêm đơn nhập: ${e.message}")
+        null
     }
 }
 

@@ -8,13 +8,16 @@ import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class NamHocViewModel : ViewModel() {
 
-    var danhSachAllNamHoc by mutableStateOf(listOf<NamHoc>())
+    var danhSachAllNamHoc by mutableStateOf<List<NamHoc>>(emptyList())
+        private set
 
     private var pollingAllNamHocJob: Job? = null
 
@@ -25,6 +28,10 @@ class NamHocViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
 
+    fun stopPollingAllNamHoc() {
+        pollingAllNamHocJob?.cancel()
+        pollingAllNamHocJob = null
+    }
 
     fun getAllNamHoc() {
         if (pollingAllNamHocJob != null) return
@@ -33,19 +40,20 @@ class NamHocViewModel : ViewModel() {
             while (isActive) {
                 try {
                     val response = ITLabRoomRetrofitClient.namhocAPIService.getAllNamHoc()
-                    danhSachAllNamHoc = response.namhoc ?: emptyList()
+                    if (response.namhoc != null) {
+                        danhSachAllNamHoc = response.namhoc!!
+                    } else {
+                        danhSachAllNamHoc = emptyList()
+                    }
+
                 } catch (e: Exception) {
-                    Log.e("NamHocViewModel", "Polling all năm học lỗi", e)
+                    Log.e("NamHocViewModel", "Polling lỗi", e)
                 }
-                delay(500)
+                delay(200)
             }
         }
     }
 
-    fun stopPollingAllNamHoc() {
-        pollingAllNamHocJob?.cancel()
-        pollingAllNamHocJob = null
-    }
 
     fun createNamHoc(namhoc: NamHoc) {
         viewModelScope.launch {
@@ -80,5 +88,4 @@ class NamHocViewModel : ViewModel() {
             }
         }
     }
-
 }

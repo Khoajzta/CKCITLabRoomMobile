@@ -1,89 +1,129 @@
-import androidx.compose.foundation.layout.Arrangement
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.HorizontalDivider
-import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.UserPlus
-import com.composables.icons.lucide.*
+import kotlinx.coroutines.launch
 
+@Suppress("OptInUsageError")
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun QuanLyGiangVien(
     navController: NavHostController,
+    giangVienViewModel: GiangVienViewModel,
+    startIndex: Int = 0                     // ← THÊM THAM SỐ
 ) {
+    BackHandler {
+        navController.navigate(NavRoute.QUANLY.route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
+            }
+        }
+    }
 
-    val dsChucNang =
-        listOf(
-            // Giảng Viên Đang Dạy
-            ChucNang(
-                "Giảng Viên Đang Công Tác",
-                Lucide.UserCheck ,
-                Click = { navController.navigate(NavRoute.LISTGIANGVIENCONGTAC.route) }
-            ),
+    /* ---------- Pager & Tab state ---------- */
+    val pageCount = 4
+    val pagerState = rememberPagerState(
+        initialPage = startIndex.coerceIn(0, pageCount - 1),   // an toàn 0–3
+        pageCount = { pageCount }
+    )
+    val scope = rememberCoroutineScope()
 
-// Giảng Viên Ngừng Công Tác
-            ChucNang(
-                "Giảng Viên Ngừng Công Tác",
-                Lucide.UserX,
-                Click = { navController.navigate(NavRoute.LISTGIANGVIENNGUNGCONGTAC.route) }
-            ),
 
-// Phân Quyền Admin
-            ChucNang(
-                "Phân Quyền Admin",
-                Lucide.ShieldCheck,
-                Click = { navController.navigate(NavRoute.PHANQUYENADMIN.route) }
-            ),
+    /* ---------- Tiêu đề tab ---------- */
+    val tabTitles = listOf(
+        "Giảng Viên Công Tác",
+        "Giảng Viên Ngừng Công Tác",
+        "Phân Quyền Admin",
+        "Xóa Quyền Admin"
+    )
 
-// Phân Quyền Giảng Viên
-            ChucNang(
-                "Xóa Quyền Admin",
-                Lucide.UserCog,
-                Click = { navController.navigate(NavRoute.PHANQUYENGIANGVIEN.route) }
-            ),
+    /* ---------- UI ---------- */
+    Scaffold(
+        containerColor = Color.Transparent,
+        floatingActionButton = {
+            FloatingActionButtonCustom {
+                navController.navigate(NavRoute.ADDGIANGVIEN.route)
+            }
+        }
+    ) { padding ->
 
-// Thêm Giảng Viên
-            ChucNang(
-                "Thêm Giảng Viên",
-                Lucide.UserPlus,
-                Click = { navController.navigate(NavRoute.ADDGIANGVIEN.route) }
-            ),
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    start = padding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = padding.calculateEndPadding(LayoutDirection.Ltr)
+                )
+        ) {
 
+            /* Tabs */
+            ScrollableTabRow(
+                selectedTabIndex = pagerState.currentPage,
+                edgePadding = 0.dp,
+                containerColor = Color.Transparent,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                        color = Color(0xFF1B8DDE)
+                    )
+                }
+            ) {
+                tabTitles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        text = { Text(title) },
+                        selectedContentColor = Color(0xFF1B8DDE),
+                        unselectedContentColor = Color.Black
+                    )
+                }
+            }
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = Color(0xFF1B8DDE),
+                modifier = Modifier.padding(bottom = 12.dp)
             )
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(dsChucNang) { chucNang ->
-                CardChucNang(chucNang)
+            /* Pager */
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> ListGiangVienCongTac(navController, giangVienViewModel)
+                    1 -> ListGiangVienNgungCongTac(navController, giangVienViewModel)
+                    2 -> PhanQuyenAdminGVScreen(navController, giangVienViewModel)
+                    3 -> PhanQuyenGiangVienScreen(navController, giangVienViewModel)
+                }
             }
         }
     }
 }
+
+
+

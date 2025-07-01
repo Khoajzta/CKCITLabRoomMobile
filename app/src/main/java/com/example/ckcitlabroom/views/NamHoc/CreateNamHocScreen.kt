@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -105,7 +104,9 @@ fun CreateNamHocScreen(
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 placeholder = { Text("VD: NH2526") },
                 shape = RoundedCornerShape(12.dp),
             )
@@ -122,7 +123,9 @@ fun CreateNamHocScreen(
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 placeholder = { Text("VD: 2025-2026") },
                 shape = RoundedCornerShape(12.dp),
             )
@@ -142,10 +145,16 @@ fun CreateNamHocScreen(
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { showDatePickerStart = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Chọn ngày bắt đầu", tint = Color.Black)
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = "Chọn ngày bắt đầu",
+                            tint = Color.Black
+                        )
                     }
                 },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 placeholder = { Text("Chọn ngày bắt đầu") },
                 shape = RoundedCornerShape(12.dp),
             )
@@ -165,10 +174,16 @@ fun CreateNamHocScreen(
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { showDatePickerEnd = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Chọn ngày kết thúc", tint = Color.Black)
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = "Chọn ngày kết thúc",
+                            tint = Color.Black
+                        )
                     }
                 },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 placeholder = { Text("Chọn ngày kết thúc") },
                 shape = RoundedCornerShape(12.dp),
             )
@@ -179,7 +194,9 @@ fun CreateNamHocScreen(
             ) { data ->
                 snackbarData.value?.let { customData ->
                     Snackbar(
-                        containerColor = if (customData.type == SnackbarType.SUCCESS) Color(0xFF1B8DDE) else Color(0xFFD32F2F),
+                        containerColor = if (customData.type == SnackbarType.SUCCESS) Color(
+                            0xFF1B8DDE
+                        ) else Color(0xFFD32F2F),
                         contentColor = Color.White,
                         shape = RoundedCornerShape(12.dp),
                         action = {
@@ -208,7 +225,11 @@ fun CreateNamHocScreen(
             Button(
                 onClick = {
                     if (maNam.value.isBlank() || tenNam.value.isBlank() || ngayBatDau.value.isBlank() || ngayKetThuc.value.isBlank()) {
-                        Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Vui lòng nhập đầy đủ thông tin!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         return@Button
                     }
                     showConfirmDialog = true // Hiện dialog xác nhận
@@ -265,7 +286,10 @@ fun CreateNamHocScreen(
                         onClick = {
                             if (maNam.value.isBlank() || tenNam.value.isBlank() || ngayBatDau.value.isBlank() || ngayKetThuc.value.isBlank()) {
                                 coroutineScope.launch {
-                                    snackbarData.value = CustomSnackbarData("Vui lòng nhập đầy đủ thông tin!", SnackbarType.ERROR)
+                                    snackbarData.value = CustomSnackbarData(
+                                        "Vui lòng nhập đầy đủ thông tin!",
+                                        SnackbarType.ERROR
+                                    )
                                     snackbarHostState.showSnackbar(snackbarData.value!!.message)
                                     snackbarData.value = null
                                 }
@@ -280,21 +304,13 @@ fun CreateNamHocScreen(
                                 TenNam = tenNam.value,
                                 NgayBatDau = ngayBatDau.value.format(formatter),
                                 NgayKetThuc = ngayKetThuc.value.format(formatter),
-                                TrangThai = 1
+                                TrangThai = 2
                             )
 
-                            danhsachnamhoc.filter { it.TrangThai == 1 }.forEach {
-                                namHocViewModel.updateNamHoc(it.copy(TrangThai = 0))
-                            }
-
                             namHocViewModel.createNamHoc(namHoc)
-
-                            coroutineScope.launch {
-                                snackbarData.value = CustomSnackbarData("Tạo năm học thành công", SnackbarType.SUCCESS)
-                                snackbarHostState.showSnackbar(snackbarData.value!!.message)
-                                snackbarData.value = null
-                                navController.popBackStack()
-                            }
+                            Toast.makeText(context, "Tạo năm học thành công", Toast.LENGTH_SHORT)
+                                .show()
+                            navController.navigate(NavRoute.QUANLYNAMHOC.route + "?startIndex=2")
                         }
                     ) {
                         Text("Xác nhận", color = Color(0xFF1B8DDE), fontWeight = FontWeight.Bold)
@@ -307,7 +323,11 @@ fun CreateNamHocScreen(
                 },
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF1B8DDE))
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = null,
+                            tint = Color(0xFF1B8DDE)
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Xác nhận tạo năm học",
@@ -319,11 +339,27 @@ fun CreateNamHocScreen(
                 },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Vui lòng kiểm tra lại thông tin:", fontWeight = FontWeight.Medium, color = Color.Black)
+                        Text(
+                            "Vui lòng kiểm tra lại thông tin:",
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Black
+                        )
                         InfoRow(icon = Icons.Default.Code, label = "Mã năm", value = maNam.value)
-                        InfoRow(icon = Icons.Default.CalendarToday, label = "Tên năm", value = tenNam.value)
-                        InfoRow(icon = Icons.Default.DateRange, label = "Từ ngày", value = formatNgay(ngayBatDau.value))
-                        InfoRow(icon = Icons.Default.DateRange, label = "Đến ngày", value = formatNgay(ngayKetThuc.value))
+                        InfoRow(
+                            icon = Icons.Default.CalendarToday,
+                            label = "Tên năm",
+                            value = tenNam.value
+                        )
+                        InfoRow(
+                            icon = Icons.Default.DateRange,
+                            label = "Từ ngày",
+                            value = formatNgay(ngayBatDau.value)
+                        )
+                        InfoRow(
+                            icon = Icons.Default.DateRange,
+                            label = "Đến ngày",
+                            value = formatNgay(ngayKetThuc.value)
+                        )
                     }
                 },
                 containerColor = Color.White,

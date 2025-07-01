@@ -93,7 +93,7 @@ fun CardCaHoc(
 
                 val (color, statusText, statusIcon) = when (caHoc.TrangThai) {
                     1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
-                    0 -> Triple(Color(0xFFF44336), "Bận", Lucide.CircleX)
+                    0 -> Triple(Color(0xFFF44336), "Ngừng Hoạt Động", Lucide.CircleX)
                     else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
                 }
 
@@ -157,32 +157,38 @@ fun CardCaHoc(
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Button(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        onClick = {
-                                            caHocViewModel.updateTrangThaiCaHoc(
-                                                CaHoc(caHoc.MaCaHoc, caHoc.TenCa, caHoc.GioBatDau, caHoc.GioKetThuc, 1)
-                                            )
-                                            showDialog = false
-                                        },
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
-                                    ) {
-                                        Text("Hoạt Động", color = Color.White)
-                                    }
 
-                                    Button(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        onClick = {
-                                            caHocViewModel.updateTrangThaiCaHoc(
-                                                CaHoc(caHoc.MaCaHoc, caHoc.TenCa, caHoc.GioBatDau, caHoc.GioKetThuc, 0)
-                                            )
-                                            showDialog = false
-                                        },
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
-                                    ) {
-                                        Text("Ngừng Hoạt Động", color = Color.White)
+                                    when(caHoc.TrangThai){
+                                        1->{
+                                            Button(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                onClick = {
+                                                    var cahocnew = caHoc.copy(TrangThai = 0)
+                                                    caHocViewModel.updateCaHoc(cahocnew)
+                                                    caHocViewModel.getAllCaHoc()
+                                                    showDialog = false
+                                                },
+                                                shape = RoundedCornerShape(12.dp),
+                                                colors = ButtonDefaults.buttonColors(Color(0xFFE53935))
+                                            ) {
+                                                Text("Ngừng Hoạt Động", color = Color.White)
+                                            }
+                                        }
+                                        0->{
+                                            Button(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                onClick = {
+                                                    var cahocnew = caHoc.copy(TrangThai = 1)
+                                                    caHocViewModel.updateCaHoc(cahocnew)
+                                                    caHocViewModel.getAllCaHoc()
+                                                    showDialog = false
+                                                },
+                                                shape = RoundedCornerShape(12.dp),
+                                                colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                                            ) {
+                                                Text("Hoạt Động", color = Color.White)
+                                            }
+                                        }
                                     }
                                 }
                             }

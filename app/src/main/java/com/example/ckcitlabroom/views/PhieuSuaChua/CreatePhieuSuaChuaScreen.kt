@@ -1,5 +1,4 @@
 import android.app.DatePickerDialog
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,8 +49,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -61,13 +58,13 @@ import java.util.Locale
 
 @Composable
 fun CreatePhieuSuaChuaScreen(
-    mamay:String,
+    mamay: String,
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
     giangvienViewmodel: GiangVienViewModel,
     sinhVienViewModel: SinhVienViewModel,
     navController: NavHostController,
     notificationViewModel: NotificationViewModel
-){
+) {
 
     var sinhvien = sinhVienViewModel.sinhvienSet
     var giangvien = giangvienViewmodel.giangvienSet
@@ -85,7 +82,8 @@ fun CreatePhieuSuaChuaScreen(
     var danhsachphieusuachua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChua
     var danhsachTokenAdmin = giangvienViewmodel.danhSachTokenAdmin.filter { it != giangvien?.Token }
     var danhsacallgiangvien = giangvienViewmodel.danhSachAllGiangVien
-    val danhsachadmin = danhsacallgiangvien.filter { it.MaLoaiTaiKhoan == 1 && it.MaGV != giangvien?.MaGV }
+    val danhsachadmin =
+        danhsacallgiangvien.filter { it.MaLoaiTaiKhoan == 1 && it.MaGV != giangvien?.MaGV }
 
 
     var mayTinhViewModel: MayTinhViewModel = viewModel()
@@ -173,7 +171,9 @@ fun CreatePhieuSuaChuaScreen(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -186,7 +186,8 @@ fun CreatePhieuSuaChuaScreen(
 
             LazyColumn(
                 modifier = Modifier
-                    .weight(1f).height(550.dp)
+                    .weight(1f)
+                    .height(550.dp)
                     .fillMaxWidth()
             ) {
 
@@ -202,7 +203,11 @@ fun CreatePhieuSuaChuaScreen(
                             .fillMaxWidth()
                             .height(50.dp)
                             .background(Color.White)
-                            .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(12.dp)
+                            ),
                     ) {
                         Row(
                             modifier = Modifier
@@ -232,7 +237,11 @@ fun CreatePhieuSuaChuaScreen(
                             .fillMaxWidth()
                             .height(50.dp)
                             .background(Color.White)
-                            .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(12.dp)
+                            ),
                     ) {
                         Row(
                             modifier = Modifier
@@ -475,7 +484,7 @@ fun CreatePhieuSuaChuaScreen(
                             disabledBorderColor = Color.White,
                             disabledContainerColor = Color.White,
 
-                        ),
+                            ),
                         placeholder = { Text("Nhập thông tin") },
                         shape = RoundedCornerShape(12.dp),
                         readOnly = true
@@ -548,14 +557,22 @@ fun CreatePhieuSuaChuaScreen(
                             maNguoiBaoHong.value.isBlank()
 
                     if (isEmpty) {
-                        Toast.makeText(context, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Vui lòng điền đầy đủ thông tin!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         val hasOpenPhieu = danhsachphieusuachua.any {
                             it.MaMay == mamay && it.TrangThai == 0
                         }
 
                         if (hasOpenPhieu) {
-                            Toast.makeText(context, "Máy này đang có phiếu sửa chữa chưa hoàn tất", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Máy này đang có phiếu sửa chữa chưa hoàn tất",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } else {
                             val phieuSuaChua = PhieuSuaChua(
                                 MaPhieuSuaChua = 0,
@@ -564,7 +581,7 @@ fun CreatePhieuSuaChuaScreen(
                                 MoTaLoi = moTaLoiState.value,
                                 MaPhong = maytinh.MaPhong,
                                 MaNguoiBaoHong = maNguoiBaoHong.value,
-                                MaGV= null,
+                                MaGV = null,
                                 TrangThai = 0
                             )
 
@@ -576,8 +593,13 @@ fun CreatePhieuSuaChuaScreen(
                             val uniqueTokens = danhsachTokenAdmin.distinct()
                             if (uniqueTokens.isNotEmpty()) {
                                 val title = "Thông báo phiếu sửa chữa"
-                                val body = "Máy tính ${maytinh.ViTri} ở phòng ${maytinh.MaPhong} bị ${moTaLoiState.value}"
-                                notificationViewModel.sendNotificationToTokens(uniqueTokens, title, body)
+                                val body =
+                                    "Máy tính ${maytinh.ViTri} ở phòng ${maytinh.MaPhong} bị ${moTaLoiState.value}"
+                                notificationViewModel.sendNotificationToTokens(
+                                    uniqueTokens,
+                                    title,
+                                    body
+                                )
                             }
 
                             val now = LocalDateTime.now()
@@ -597,15 +619,12 @@ fun CreatePhieuSuaChuaScreen(
                                 notificationViewModel.createThongBao(thongBao)
                             }
 
-                            coroutineScope.launch {
-                                snackbarData.value = CustomSnackbarData(
-                                    message = "Tạo phiếu sửa chữa thành công",
-                                    type = SnackbarType.SUCCESS
-                                )
-                                snackbarHostState.showSnackbar("Thông báo")
-                                delay(500)
-                                navController.popBackStack()
-                            }
+                            Toast.makeText(
+                                context,
+                                "Tạo phiếu sửa chữa thành công",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            navController.popBackStack()
                         }
                     }
                 },

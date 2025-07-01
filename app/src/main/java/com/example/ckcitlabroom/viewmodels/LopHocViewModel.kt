@@ -37,8 +37,6 @@ class LopHocViewModel: ViewModel() {
         pollingJob = null
     }
 
-
-
     fun getAllLopHoc() {
         if (pollingJob != null) return
 

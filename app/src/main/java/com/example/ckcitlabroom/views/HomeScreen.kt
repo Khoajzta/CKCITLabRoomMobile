@@ -1,27 +1,25 @@
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -32,11 +30,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,9 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -58,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -70,13 +67,12 @@ fun HomeScreen(
     sinhVienViewModel: SinhVienViewModel,
     navController: NavHostController,
     namHocViewModel: NamHocViewModel,
-    tuanViewModel: TuanViewModel
+    tuanViewModel: TuanViewModel,
+    mayTinhViewModel: MayTinhViewModel
 ) {
     BackHandler {}
 
-
-    Log.d("Home", "HOME")
-
+    var danhsachAllMayTnh = mayTinhViewModel.danhSachAllMayTinh2.collectAsState()
     LaunchedEffect(Unit) {
         namHocViewModel.getAllNamHoc()
         tuanViewModel.getAllTuan()
@@ -92,10 +88,15 @@ fun HomeScreen(
         sinhvien?.MaLop?.let { lichhocviewmodel.startPollingLichHocByMaLopHoc(it) }
     }
 
+    LaunchedEffect(Unit) {
+        mayTinhViewModel.getAllMayTinh2()
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             lichhocviewmodel.stopPolling()
             lichhocviewmodel.stopPollingSV()
+            mayTinhViewModel.stopPollingAllMayTinh()
         }
     }
 
@@ -150,18 +151,18 @@ fun HomeScreen(
 
 //===============================================================================================================
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent)
     ) {
 
-        if(danhSachNamHoc.isNullOrEmpty()){
+        if (danhSachNamHoc.isNullOrEmpty()) {
             DotLoadingLight()
-            return@Box
+            return@Column
         }
 
-        if(selectedNamHoc == null){
+        if (selectedNamHoc == null) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -192,7 +193,6 @@ fun HomeScreen(
                         modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                     )
                 }
-
 
 
                 val text = when {
@@ -237,7 +237,7 @@ fun HomeScreen(
 
             }
 
-            return@Box
+            return@Column
         }
         Column(
             modifier = Modifier
@@ -256,14 +256,14 @@ fun HomeScreen(
                     fontSize = 22.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF1B8DDE),
-                    modifier = Modifier.padding(start = 8.dp,bottom = 4.dp)
+                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
                 )
                 Text(
                     text = "Hôm nay: $today",
                     fontSize = 16.sp,
                     color = Color.DarkGray,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(start = 8.dp,bottom = 4.dp)
+                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
                 )
 
 
@@ -374,7 +374,10 @@ fun HomeScreen(
                         if (lichHocTheoNgay.size > 1) {
                             Row(
                                 modifier = Modifier.padding(top = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    8.dp,
+                                    Alignment.CenterHorizontally
+                                ),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 repeat(lichHocTheoNgay.size) { index ->
@@ -383,7 +386,10 @@ fun HomeScreen(
                                     // 👇 Size & color có animation
                                     val dotSize by animateDpAsState(
                                         targetValue = if (selected) 13.dp else 8.dp,
-                                        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+                                        animationSpec = tween(
+                                            durationMillis = 300,
+                                            easing = FastOutSlowInEasing
+                                        )
                                     )
 
                                     val dotColor by animateColorAsState(
@@ -407,11 +413,117 @@ fun HomeScreen(
                                 }
                             }
                         }
-
-
                     }
                 }
-                Spacer(modifier = Modifier.height(40.dp))
+
+            }
+
+            if (giangVien != null) {
+                var tongMayTinh = danhsachAllMayTnh.value.size
+                var tongMayTinhDangHoatDong =
+                    danhsachAllMayTnh.value.filter { it.TrangThai == 1 }.size
+                var tongMayTinhHong = danhsachAllMayTnh.value.filter { it.TrangThai == 0 }.size
+
+                Text(
+                    text = "Thông tin nhanh",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    modifier = Modifier.padding(start = 15.dp, top = 12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatCard(
+                        title = "Tổng máy tính",
+                        value = tongMayTinh,
+                        accentColor = Color(0xFF1B8DDE),
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+
+                        }
+                    )
+                    StatCard(
+                        title = "Đang hoạt động",
+                        value = tongMayTinhDangHoatDong,
+                        accentColor = Color(0xff119638),
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatCard(
+                        title = "Máy cần sửa chữa",
+                        value = tongMayTinhHong,
+                        accentColor = Color(0xffc11010),
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            navController.navigate(NavRoute.QUANLYPHIEUSUACHUA.route + "?startIndex=0")
+                        }
+                    )
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+fun StatCard(
+    title: String,
+    value: Int,
+    accentColor: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = modifier
+            .height(150.dp)
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp),
+        onClick = {
+            onClick()
+        }
+    ) {
+
+        Box {             /* lớp tô màu viền trái */
+            Box(
+                modifier = Modifier
+                    .width(6.dp)
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
+                    .background(accentColor)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 20.dp, top = 20.dp, end = 12.dp, bottom = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 16.sp,
+                    color = Color(0xFF555555),
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = value.toString(),
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1C1C1E)
+                )
             }
         }
     }

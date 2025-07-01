@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -52,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -212,67 +216,45 @@ fun ListLichHocDaDayScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
-            horizontalArrangement = Arrangement.Start,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = if (giangVien != null) "Lịch Đã Dạy " else "Lịch Đã Học ",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-
             val primary = Color(0xFF1B8DDE)
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.width(100.dp)          // khung ngoài 200 dp
+                onExpandedChange = { expanded = !expanded }
             ) {
-                // ── Anchor ───────────────────────────────────────────────
+                /* ---------- Anchor ---------- */
                 Row(
                     modifier = Modifier
-                        .menuAnchor()
-                        .width(100.dp)
+                        .menuAnchor()                       // bắt sự kiện mở menu
                         .clip(RoundedCornerShape(12.dp))
-                        .padding(vertical = 6.dp)          // KHÔNG padding start
-                        .clickable { expanded = !expanded },
+                        .background(Color.White)
+                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                        .widthIn(min = 80.dp, max = 100.dp) // khung co-giãn
+                        .wrapContentWidth(),                // không ép Intrinsic
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 1️⃣  Text dính trái, chiếm hết khoảng còn lại
-                    BasicTextField(
-                        value = selectedTuan?.TenTuan ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        singleLine = true,
-                        textStyle = TextStyle(
-                            fontSize = 20.sp,
-                            color = primary,
-                            fontWeight = FontWeight.SemiBold
-                        ),
-                        modifier = Modifier
-                            .weight(1f)                    // đẩy icon về phải
-                            .padding(start = 0.dp)
+                    Text(
+                        text = selectedTuan?.TenTuan ?: "Chọn tuần",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = primary,
+                        modifier = Modifier.weight(1f)
                     )
-
-                    // 2️⃣  IconButton sát chữ
-                    IconButton(
-                        onClick = { expanded = !expanded },
-                        modifier = Modifier
-                            .size(24.dp)                   // ripple / hit-box tiêu chuẩn
-                    ) {
-                        Icon(
-                            imageVector = if (expanded)
-                                Icons.Default.KeyboardArrowUp
-                            else
-                                Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = primary
-                        )
-                    }
+                    Icon(
+                        if (expanded) Icons.Default.KeyboardArrowUp
+                        else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = primary,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
 
-                // ── Menu ────────────────────────────────────────────────
+                /* ---------- Menu ---------- */
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
@@ -280,12 +262,7 @@ fun ListLichHocDaDayScreen(
                 ) {
                     danhsachtuantheonam.forEach { tuan ->
                         DropdownMenuItem(
-                            text = {
-                                androidx.compose.material3.Text(
-                                    tuan.TenTuan,
-                                    color = Color.Black
-                                )
-                            },
+                            text = { Text(tuan.TenTuan) },
                             onClick = {
                                 selectedTuan = tuan
                                 expanded = false
@@ -294,37 +271,64 @@ fun ListLichHocDaDayScreen(
                     }
                 }
             }
-        }
 
-        HorizontalDivider(
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
+            Spacer(modifier = Modifier.width(12.dp))
 
-        // Dropdown chọn tuần (và giảng viên nếu là admin)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
             if (giangVien?.MaLoaiTaiKhoan == 1) {
-                CustomDropdownSelector(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = "Giảng viên",
-                    items = danhsachgiangvien,
-                    selectedItem = selectedGV,
-                    itemLabel = { it.TenGiangVien },
-                    onItemSelected = { selectedGV = it }
-                )
+                var expandedGV by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = expandedGV,
+                    onExpandedChange = { expandedGV = !expandedGV }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .menuAnchor()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White)
+                            .padding(horizontal = 8.dp, vertical = 6.dp)
+                            .widthIn(min = 120.dp, max = 280.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = selectedGV?.TenGiangVien ?: "Chọn giảng viên",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = primary,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            if (expandedGV) Icons.Default.KeyboardArrowUp
+                            else Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    ExposedDropdownMenu(
+                        expanded = expandedGV,
+                        onDismissRequest = { expandedGV = false },
+                        containerColor = Color.White
+                    ) {
+                        danhsachgiangvien.forEach { gv ->
+                            DropdownMenuItem(
+                                text = { Text(gv.TenGiangVien) },
+                                onClick = {
+                                    selectedGV = gv
+                                    expandedGV = false
+                                }
+                            )
+                        }
+                    }
+                }
+
             }
         }
 
-        // Hàm nhóm lịch học theo thứ
-
+        //Hàm gom lịch theo thứ
         fun groupLichHocByThu(danhSach: List<LichHocRP>): Map<String, List<LichHocRP>> {
             return danhSach.groupBy { it.Thu }
         }
@@ -355,7 +359,9 @@ fun ListLichHocDaDayScreen(
                         }
                     } else {
                         thuList.forEach { thu ->
-                            val lichTrongThu = grouped[thu] ?: emptyList()
+                            val lichTrongThu = grouped[thu]
+                                ?.sortedBy { it.TenCa }
+                                ?: emptyList()
                             if (lichTrongThu.isNotEmpty()) {
                                 item {
                                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -465,7 +471,9 @@ fun ListLichHocDaDayScreen(
                         }
                     } else {
                         thuList.forEach { thu ->
-                            val lichTrongThu = grouped[thu] ?: emptyList()
+                            val lichTrongThu = grouped[thu]
+                                ?.sortedBy { it.TenCa }
+                                ?: emptyList()
                             if (lichTrongThu.isNotEmpty()) {
                                 item {
                                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -570,7 +578,9 @@ fun ListLichHocDaDayScreen(
                         }
                     } else {
                         thuList.forEach { thu ->
-                            val lichTrongThu = grouped[thu] ?: emptyList()
+                            val lichTrongThu = grouped[thu]
+                                ?.sortedBy { it.TenCa }
+                                ?: emptyList()
                             if (lichTrongThu.isNotEmpty()) {
                                 item {
                                     Column(modifier = Modifier.fillMaxWidth()) {

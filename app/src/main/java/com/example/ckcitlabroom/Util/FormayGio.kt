@@ -4,9 +4,10 @@ fun formatGio(gio: String?): String {
         if (parts != null && parts.size >= 2) {
             val h = parts[0].toIntOrNull() ?: return ""
             val m = parts[1].toIntOrNull() ?: return ""
-            if (m == 0) "$h giờ" else "$h giờ $m"
+            String.format("%02d:%02d", h, m)
         } else ""
     } catch (e: Exception) {
         ""
     }
 }
+

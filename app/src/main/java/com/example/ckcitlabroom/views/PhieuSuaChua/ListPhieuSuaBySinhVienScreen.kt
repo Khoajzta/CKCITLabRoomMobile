@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -19,17 +18,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 
 @Composable
 fun ListPhieuSuaBySinhVienScreen(
+    navController: NavHostController,
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
     mayTinhViewModel: MayTinhViewModel,
     lichSuSuaMayViewModel: LichSuSuaMayViewModel,
     sinhVienViewModel: SinhVienViewModel,
     giangVienViewModel: GiangVienViewModel
-){
+) {
     var sinhVien = sinhVienViewModel.sinhvienSet
 
     val danhsachAllPhieuSuaChua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChua
@@ -57,27 +57,6 @@ fun ListPhieuSuaBySinhVienScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Danh Sách Phiếu Đã Tạo",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -104,7 +83,8 @@ fun ListPhieuSuaBySinhVienScreen(
                         phieuSuaChuaViewModel,
                         lichSuSuaMayViewModel,
                         mayTinhViewModel,
-                        giangVienViewModel
+                        giangVienViewModel,
+                        navController
                     )
                 }
             }

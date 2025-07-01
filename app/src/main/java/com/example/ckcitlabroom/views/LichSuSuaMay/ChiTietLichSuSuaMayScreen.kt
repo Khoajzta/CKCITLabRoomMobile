@@ -19,10 +19,10 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ChiTietLichSuSuaMayScreen(
-    mamay:String,
+    mamay: String,
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
     lichSuSuaMayViewModel: LichSuSuaMayViewModel,
-){
+) {
     var danhsachphieusuachua = phieuSuaChuaViewModel.danhSachAllPhieuSuaChuaTheoMa
 
     var solan = danhsachphieusuachua.count()
@@ -45,14 +45,7 @@ fun ChiTietLichSuSuaMayScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Lịch sử sửa máy",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-
-            Text(
-                "Số lần: $solan",
+                "Số lần sửa: $solan",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
@@ -61,7 +54,9 @@ fun ChiTietLichSuSuaMayScreen(
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth(),
             thickness = 2.dp,
             color = Color(0xFF1B8DDE),
         )
@@ -87,7 +82,7 @@ fun ChiTietLichSuSuaMayScreen(
                 }
             } else {
                 items(danhsachphieusuachua) { phieusuachua ->
-                    CardChiTietLichSuSuaMay(phieusuachua,lichSuSuaMayViewModel)
+                    CardChiTietLichSuSuaMay(phieusuachua, lichSuSuaMayViewModel)
                 }
             }
         }

@@ -1,43 +1,32 @@
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -59,6 +48,8 @@ fun UpdateTraMayScreen(
     chitetPhieuMuonViewModel: ChiTietPhieuMuonViewModel,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel
 ) {
+
+    var context = LocalContext.current
     // Load dữ liệu khi màn hình được tạo
     LaunchedEffect(maphieumuon) {
         chitetPhieuMuonViewModel.getChiTietPhieuMuonTheoMaPhieuOnce(maphieumuon)
@@ -68,9 +59,6 @@ fun UpdateTraMayScreen(
 
     val phieumuon = phieuMuonMayViewModel.phieuMuonMay
     val danhSachAllMayTinh = mayTinhViewModel.danhSachAllMayTinh
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
 
     val chiTietList by remember { derivedStateOf { chitetPhieuMuonViewModel.danhSachChiTietPhieuMuonTheoMaPhieu } }
 
@@ -88,9 +76,9 @@ fun UpdateTraMayScreen(
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top
     ) {
-        LazyColumn(modifier = Modifier.height(550.dp)) {
+        LazyColumn(modifier = Modifier.height(600.dp)) {
             items(chiTietList) { chitiet ->
                 val maMay = chitiet.MaMay
                 val mayTinh = danhSachAllMayTinh.find { it.MaMay == maMay }
@@ -133,38 +121,6 @@ fun UpdateTraMayScreen(
             }
         }
 
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.padding(16.dp)
-        ) { data ->
-            snackbarData.value?.let { customData ->
-                Snackbar(
-                    containerColor = Color(0xFF1B8DDE),
-                    contentColor = Color.White,
-                    shape = RoundedCornerShape(12.dp),
-                    action = {
-                        TextButton(onClick = {
-                            snackbarData.value = null
-                            navController.popBackStack()
-                        }) {
-                            Text("Đóng", color = Color.White)
-                        }
-                    }
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
-                            contentDescription = null,
-                            tint = if (customData.type == SnackbarType.SUCCESS) Color.Cyan else Color.Yellow,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = customData.message, color = Color.White)
-                    }
-                }
-            }
-        }
-
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
@@ -173,7 +129,8 @@ fun UpdateTraMayScreen(
 
                 // Nếu trống thì gán "Hoạt động bình thường"
                 val listChiTietUpdate = chiTietList.map { chitiet ->
-                    val tinhTrang = tinhTrangMap[chitiet.MaMay]?.takeIf { it.isNotBlank() } ?: "Hoạt động"
+                    val tinhTrang =
+                        tinhTrangMap[chitiet.MaMay]?.takeIf { it.isNotBlank() } ?: "Hoạt động"
                     chitiet.copy(TinhTrangTra = tinhTrang)
                 }
 
@@ -205,11 +162,7 @@ fun UpdateTraMayScreen(
                         lichSuChuyenMayViewModel.createLichSuChuyenMay(lichSu)
                     }
 
-                    snackbarData.value = CustomSnackbarData(
-                        message = "Cập nhật trả máy thành công!",
-                        type = SnackbarType.SUCCESS
-                    )
-                    snackbarHostState.showSnackbar("Thành công")
+                    Toast.makeText(context, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
                     navController.popBackStack()
                 }
             },

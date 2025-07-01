@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
@@ -29,38 +28,131 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.composables.icons.lucide.CalendarClock
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.Clock
 import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Play
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+
 
 @Composable
 fun CardLichHocDiemDanh(
     lichHoc: LichHocRP,
-    click:() -> Unit
-){
+    click: () -> Unit
+) {
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")      // đổi nếu cần
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")        // "09:00:00"
+
+    val lessonDate = try {
+        LocalDate.parse(lichHoc.NgayDay, dateFormatter)
+    } catch (e: DateTimeParseException) {
+        null
+    }        // chống crash
+
+    val timeStart = LocalTime.parse(lichHoc.GioBatDau, timeFormatter)
+    val timeEnd = LocalTime.parse(lichHoc.GioKetThuc, timeFormatter)
+    val today = LocalDate.now()
+    val now = LocalTime.now()
+
+    val (color, statusText, statusIcon) = if (lessonDate == null) {
+        // Ngày sai định dạng
+        Triple(Color.Gray, "Ngày không hợp lệ", Lucide.CircleAlert)
+    } else when {
+        lessonDate.isAfter(today) -> Triple(
+            Color(0xFFFFA000),            // cam nhạt
+            "Sắp diễn ra",
+            Lucide.CalendarClock          // biểu tượng lịch-đồng hồ
+        )
+
+        lessonDate.isBefore(today) -> Triple(
+            Color(0xFF9E9E9E),            // xám
+            "Đã kết thúc",
+            Lucide.CircleCheck
+        )
+
+        /* ----- Cùng ngày -> so sánh giờ ----- */
+        now.isBefore(timeStart) -> Triple(
+            Color(0xFFFFA000),            // cam nhạt
+            "Sắp diễn ra",
+            Lucide.Clock
+        )
+
+        now.isAfter(timeEnd) -> Triple(
+            Color(0xFF9E9E9E),            // xám
+            "Đã kết thúc",
+            Lucide.CircleCheck
+        )
+
+        else -> Triple(
+            Color(0xFF4CAF50),            // xanh lá
+            "Đang diễn ra",
+            Lucide.Play              // biểu tượng play
+        )
+    }
+
     Card(
         modifier = Modifier
             .padding(bottom = 8.dp)
             .fillMaxWidth(),
-        onClick = {click()},
+        onClick = { click() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        )
+        {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                /* ---------- Tên môn ---------- */
                 Text(
                     text = lichHoc.TenMonHoc,
                     color = Color(0xFF1B8DDE),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 15.sp
                 )
+
+                /* ---------- Chip trạng thái ---------- */
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = color.lighten(0.85f),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .clip(RoundedCornerShape(12.dp))
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = statusIcon,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = color
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = statusText,
+                                color = color,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
             }
 
             HorizontalDivider(
@@ -72,44 +164,34 @@ fun CardLichHocDiemDanh(
             )
 
 
-            InfoRow(icon = Icons.Filled.MeetingRoom, label = "Phòng", value = lichHoc.TenPhong.toString())
-            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                InfoRow(icon = Icons.Filled.MeetingRoom, label = "Phòng", value = lichHoc.TenPhong)
+                Text(
+                    text = "${formatGio(lichHoc.GioBatDau)} - ${formatGio(lichHoc.GioKetThuc)}",
+                    color = Color(0xFF9E9E9E),
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
 
-            InfoRow(icon = Icons.Filled.Schedule, label = "Ca học", value = lichHoc.TenCa.toString())
-            Spacer(modifier = Modifier.height(8.dp))
+            InfoRow(
+                icon = Icons.Filled.Schedule,
+                label = "Ca học",
+                value = lichHoc.TenCa
+            )
+            Spacer(modifier = Modifier.height(4.dp))
 
             InfoRow(icon = Icons.Filled.Today, label = "Thứ", value = lichHoc.Thu)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-            InfoRow(icon = Icons.Filled.Event, label = "Ngày học", value = formatNgay(lichHoc.NgayDay))
-
-            val (color, statusText, statusIcon) = when (lichHoc.TrangThai) {
-                0 -> Triple(Color(0xFF1B8DDE), "Đã Kết Thúc", Lucide.CircleCheck)
-                1 -> Triple(Color(0xFF4CAF50), "Đang Diễn Ra", Lucide.Clock)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Icon(
-                    statusIcon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ", fontWeight = FontWeight.ExtraBold)
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(text = statusText, color = color, fontWeight = FontWeight.Bold)
-            }
+            InfoRow(
+                icon = Icons.Filled.Event,
+                label = "Ngày học",
+                value = formatNgay(lichHoc.NgayDay)
+            )
         }
     }
 }

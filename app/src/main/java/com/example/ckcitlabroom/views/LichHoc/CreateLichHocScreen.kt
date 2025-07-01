@@ -311,6 +311,21 @@ fun CreateLichHocScreen(
                                         showDialog = true
                                         return@Button
                                     }
+                                    //kiểm tra trùng ca của lớp
+                                    val isTrungCaCuaLop = danhsachAllLichHoc.any {
+                                        it.NgayDay == ngayDay &&
+                                                it.MaLopHoc == selectedLop!!.MaLopHoc &&
+                                                it.MaCaHoc == selectedCaHoc!!.MaCaHoc           // so khớp cả ca
+                                    }
+
+                                    if (isTrungCaCuaLop) {
+                                        conflictMessage =
+                                            "Trùng lịch lớp:\nTuần ${tuan.TenTuan}\n" +
+                                                    "Ngày ${formatNgay(ngayDay)}, lớp ${selectedLop?.TenLopHoc} " +
+                                                    "đã có lịch ${selectedCaHoc?.TenCa}!"
+                                        showDialog = true
+                                        return@Button
+                                    }
 
                                     // 🔹 Kiểm tra trùng ca của giảng viên
                                     val isTrungCaCuaGV = danhsachAllLichHoc.any {
@@ -348,7 +363,7 @@ fun CreateLichHocScreen(
                             lichhocViewModel.createListLichHoc(lichHocList)
 
                             Toast.makeText(context, "Đã tạo ${lichHocList.size} lịch học", Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
+                            navController.navigate(NavRoute.QUANLYLICHHOC.route+ "?startIndex=0")
                         } else {
                             Toast.makeText(context, "Tuần bắt đầu/kết thúc không hợp lệ", Toast.LENGTH_SHORT).show()
                         }

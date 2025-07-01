@@ -1,4 +1,3 @@
-
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,14 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -59,8 +56,6 @@ fun PhongMayDetailScreen(
     val phongmay = phongMayViewModel.phongmay
 
 
-
-
     var showDialog by remember { mutableStateOf(false) }
     var showDeleteWarning by remember { mutableStateOf(false) }
     var showConfirmDeleteDialog by remember { mutableStateOf(false) }
@@ -87,30 +82,13 @@ fun PhongMayDetailScreen(
 
 
     Column(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Danh Sách Máy Tính",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
         LazyColumn(
-            modifier = Modifier.height(550.dp)
+            modifier = Modifier
+                .weight(1f)
+                .padding(bottom = 5.dp)
         ) {
 
             if (danhSachMayTinh == null || danhSachMayTinh.isEmpty()) {
@@ -129,37 +107,58 @@ fun PhongMayDetailScreen(
                 }
             } else {
                 items(danhSachMayTinh) { maytinh ->
-                    CardMayTinh(maytinh, navController, mayTinhViewModel,phongMayViewModel)
+                    CardMayTinh(maytinh, navController, mayTinhViewModel, phongMayViewModel)
                 }
             }
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (phongmay.LoaiPhong == 2){
+            if (phongmay.LoaiPhong == 2) {
                 Button(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.weight(1f),
                     onClick = { showDialog = true },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text("Chỉnh sửa", color = Color.Black, fontWeight = FontWeight.ExtraBold)
-                }
-            }else{
-                Button(
-                    modifier = Modifier.width(120.dp),
-                    onClick = { showDialog = true },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-                ) {
-                    Text("Chỉnh sửa", color = Color.Black, fontWeight = FontWeight.ExtraBold)
+                    Text("Sửa phòng", color = Color.Black, fontWeight = FontWeight.SemiBold)
                 }
 
                 Button(
-                    modifier = Modifier.width(120.dp),
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        if (danhSachMayTinh.isNullOrEmpty()) {
+                            Toast.makeText(
+                                context,
+                                "Phòng máy hiện hưa có máy tính nào",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            createPdfWithQRCodeBase64(context, phongmay.TenPhong, danhSachMayTinh)
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                ) {
+                    Text("In QR", color = Color.Black, fontWeight = FontWeight.SemiBold)
+                }
+            } else {
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = { showDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                ) {
+                    Text("Sửa phòng", color = Color.Black, fontWeight = FontWeight.SemiBold)
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
                     onClick = {
                         if (danhSachMayTinh.isNullOrEmpty()) {
                             showConfirmDeleteDialog = true
@@ -170,22 +169,26 @@ fun PhongMayDetailScreen(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
                 ) {
-                    Text("Xóa", color = Color.White, fontWeight = FontWeight.ExtraBold)
+                    Text("Xóa", color = Color.White, fontWeight = FontWeight.SemiBold)
                 }
 
                 Button(
-                    modifier = Modifier.width(120.dp),
+                    modifier = Modifier.weight(1f),
                     onClick = {
-                        if(danhSachMayTinh.isNullOrEmpty()){
-                            Toast.makeText(context, "Phòng máy hiện hưa có máy tính nào", Toast.LENGTH_SHORT).show()
-                        }else{
-                            createPdfWithQRCodeBase64(context, phongmay.TenPhong , danhSachMayTinh)
+                        if (danhSachMayTinh.isNullOrEmpty()) {
+                            Toast.makeText(
+                                context,
+                                "Phòng máy hiện hưa có máy tính nào",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            createPdfWithQRCodeBase64(context, phongmay.TenPhong, danhSachMayTinh)
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    Text("In QR", color = Color.Black, fontWeight = FontWeight.ExtraBold)
+                    Text("In QR", color = Color.Black, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -281,7 +284,9 @@ fun PhongMayDetailScreen(
 
                     ) {
                         Text(
-                            text = "Mã Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold
+                            text = "Mã Phòng",
+                            color = Color.Black,
+                            fontWeight = FontWeight.ExtraBold
                         )
 
                         Box(
@@ -289,7 +294,11 @@ fun PhongMayDetailScreen(
                                 .fillMaxWidth()
                                 .height(55.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -308,7 +317,9 @@ fun PhongMayDetailScreen(
                         }
 
                         Text(
-                            text = "Tên Phòng", color = Color.Black, fontWeight = FontWeight.ExtraBold
+                            text = "Tên Phòng",
+                            color = Color.Black,
+                            fontWeight = FontWeight.ExtraBold
                         )
 
                         OutlinedTextField(
@@ -362,7 +373,9 @@ fun PhongMayDetailScreen(
                         colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
                     ) {
                         Text(
-                            text = "Lưu phòng máy", color = Color.White, fontWeight = FontWeight.Bold
+                            text = "Lưu phòng máy",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 },

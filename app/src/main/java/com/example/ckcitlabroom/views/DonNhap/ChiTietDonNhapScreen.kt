@@ -1,3 +1,4 @@
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
@@ -35,6 +37,13 @@ fun ChiTietDonNhapScreen(
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel
 ) {
+    BackHandler {
+        navController.navigate(NavRoute.QUANLYDONNHAP.route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
+            }
+        }
+    }
     val context = LocalContext.current
     val danhsachchitietdonnhap = chiTietDonNhapyViewModel.danhSachChiTietDonNhaptheoMaDonNhap
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
@@ -76,7 +85,7 @@ fun ChiTietDonNhapScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Danh sách máy tính theo đơn",
+                "Mã đơn nhập: $madonnhap",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = Color(0xFF1B8DDE)
@@ -84,13 +93,17 @@ fun ChiTietDonNhapScreen(
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth(),
             thickness = 2.dp,
             color = Color(0xFF1B8DDE),
         )
 
         LazyColumn(
-            modifier = Modifier.height(530.dp).fillMaxWidth()
+            modifier = Modifier
+                .height(530.dp)
+                .fillMaxWidth()
         ) {
             if (danhSachMayTheoDon.isEmpty()) {
                 item {
@@ -114,9 +127,17 @@ fun ChiTietDonNhapScreen(
         }
 
         Button(
-            modifier = Modifier.padding(top = 12.dp).height(45.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .height(45.dp)
+                .fillMaxWidth(),
             onClick = {
-                createPdfWithQRCodeBase64(context, madonnhap , danhSachMayTheoDon,"QR_Don_Nhap_${madonnhap}.pdf")
+                createPdfWithQRCodeBase64(
+                    context,
+                    madonnhap,
+                    danhSachMayTheoDon,
+                    "QR_Don_Nhap_${madonnhap}.pdf"
+                )
             },
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.White)

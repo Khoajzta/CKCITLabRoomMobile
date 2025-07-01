@@ -1,19 +1,15 @@
 import android.app.DatePickerDialog
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,9 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -37,9 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -48,8 +39,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -57,6 +48,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatePhieuMuonMayScreen(
+    navController: NavHostController,
     phongMayViewModel: PhongMayViewModel,
     phieuMuonMayViewModel: PhieuMuonMayViewModel,
 ) {
@@ -76,10 +68,6 @@ fun CreatePhieuMuonMayScreen(
     var selectdMaPhong by remember { mutableStateOf("") }
     var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
     val maPhongState = remember { mutableStateOf("") }
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
-    val coroutineScope = rememberCoroutineScope()
 
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -140,12 +128,12 @@ fun CreatePhieuMuonMayScreen(
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                placeholder = { Text("Nhập thông tin") },
+                placeholder = { Text("Nhập tên người mượn") },
                 shape = RoundedCornerShape(12.dp),
             )
 
             Text(
-                text = "Ngày Mươn", color = Color.Black, fontWeight = FontWeight.Bold
+                text = "Ngày Mượn", color = Color.Black, fontWeight = FontWeight.Bold
             )
             OutlinedTextField(
                 modifier = Modifier
@@ -171,7 +159,7 @@ fun CreatePhieuMuonMayScreen(
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                placeholder = { Text("Chọn ngày") },
+                placeholder = { Text("Chọn ngày ->") },
                 shape = RoundedCornerShape(12.dp),
             )
 
@@ -184,7 +172,11 @@ fun CreatePhieuMuonMayScreen(
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
                 value = soluongState.value,
-                onValueChange = { soluongState.value = it },
+                onValueChange = { newText ->
+                    if (newText.isEmpty() || newText.all { it.isDigit() }) {
+                        soluongState.value = newText
+                    }
+                },
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
                     focusedContainerColor = Color.White,
@@ -194,7 +186,7 @@ fun CreatePhieuMuonMayScreen(
                     unfocusedTextColor = Color.Black
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                placeholder = { Text("Nhập thông tin") },
+                placeholder = { Text("Nhập số lượng") },
                 shape = RoundedCornerShape(12.dp),
             )
 
@@ -208,7 +200,7 @@ fun CreatePhieuMuonMayScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor()
-                        .padding(vertical = 8.dp),
+                        .padding(bottom = 8.dp),
                     value = selectedTenPhong,
                     onValueChange = {},
                     readOnly = true,
@@ -244,34 +236,6 @@ fun CreatePhieuMuonMayScreen(
                 }
             }
 
-            SnackbarHost(
-                hostState = snackbarHostState, modifier = Modifier.padding(16.dp)
-            ) { data ->
-                snackbarData.value?.let { customData ->
-                    Snackbar(
-                        containerColor = Color(0xFF1B8DDE),
-                        contentColor = Color.White,
-                        shape = RoundedCornerShape(12.dp),
-                        action = {
-                            TextButton(onClick = {
-                                snackbarData.value = null
-                            }) {
-                                Text("Đóng", color = Color.White)
-                            }
-                        }) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = if (customData.type == SnackbarType.SUCCESS) Color.Cyan else Color.Yellow,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = customData.message)
-                        }
-                    }
-                }
-            }
 
             Button(
                 onClick = {
@@ -283,13 +247,11 @@ fun CreatePhieuMuonMayScreen(
                     val soLuong = soLuongText.toIntOrNull()
 
                     if (tenNguoiMuon.isEmpty() || ngayMuon.isEmpty() || soLuongText.isEmpty() || soLuong == null || soLuong <= 0 || maPhong.isEmpty()) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Vui lòng nhập đầy đủ thông tin!",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thiếu thông tin")
-                        }
+                        Toast.makeText(
+                            context,
+                            "Vui lòng nhập đầy đủ thông tin",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         val phieumuonmay = PhieuMuonMay(
                             MaPhieuMuon = 0,
@@ -302,19 +264,9 @@ fun CreatePhieuMuonMayScreen(
                         )
 
                         phieuMuonMayViewModel.createPhieuMuonMay(phieumuonmay)
+                        Toast.makeText(context, "Tạo Phiếu Mượn Máy Thành Công", Toast.LENGTH_SHORT)
+                        navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route + "?startIndex=0")
 
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Tạo phiếu mượn thành công!",
-                                type = SnackbarType.SUCCESS
-                            )
-                            snackbarHostState.showSnackbar("Thành công")
-                        }
-
-                        // Reset input
-                        tenNguoiMuonState.value = ""
-                        ngayMuonState.value = ""
-                        soluongState.value = ""
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -325,8 +277,6 @@ fun CreatePhieuMuonMayScreen(
             }
 
         }
-
-
 
 
         if (loadingState.value) {

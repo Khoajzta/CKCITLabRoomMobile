@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -17,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
@@ -30,7 +28,7 @@ fun ListMayTinhLichSuSuaMayScreen(
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
     lichSuSuaMayViewModel: LichSuSuaMayViewModel,
-){
+) {
     val danhsachchitietdonnhap = chiTietDonNhapyViewModel.danhSachChiTietDonNhaptheoMaDonNhap
     val danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
 
@@ -54,27 +52,6 @@ fun ListMayTinhLichSuSuaMayScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Danh sách máy tính theo đơn",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -95,7 +72,10 @@ fun ListMayTinhLichSuSuaMayScreen(
                 }
             } else {
                 items(danhSachMayTheoDon) { maytinh ->
-                    CardMayTinhLichSu(maytinh, phongMayViewModel, click = {navController.navigate(NavRoute.DETAILLICHSUSUAMAY.route + "?mamay=${maytinh.MaMay}")})
+                    CardMayTinhLichSu(
+                        maytinh,
+                        phongMayViewModel,
+                        click = { navController.navigate(NavRoute.DETAILLICHSUSUAMAY.route + "?mamay=${maytinh.MaMay}") })
                 }
             }
         }

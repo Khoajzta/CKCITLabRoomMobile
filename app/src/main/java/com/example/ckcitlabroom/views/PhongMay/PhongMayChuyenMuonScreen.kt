@@ -59,10 +59,11 @@ fun PhongMayChuyenMuonScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    val danhSachMayTinhtheophong = mayTinhViewModel.danhSachAllMayTinhtheophong.filter { it.TrangThai == 1 }.sortedBy { may ->
-        // Trích số từ tên máy, mặc định 0 nếu không trích được
-        Regex("""\d+""").find(may.TenMay)?.value?.toIntOrNull() ?: 0
-    }
+    val danhSachMayTinhtheophong =
+        mayTinhViewModel.danhSachAllMayTinhtheophong.filter { it.TrangThai == 1 }.sortedBy { may ->
+            // Trích số từ tên máy, mặc định 0 nếu không trích được
+            Regex("""\d+""").find(may.TenMay)?.value?.toIntOrNull() ?: 0
+        }
     val phongmaymuon = phongMayViewModel.phongmay
 
 
@@ -80,7 +81,6 @@ fun PhongMayChuyenMuonScreen(
     }
 
     val phieuMuon = phieuMuonMayViewModel.phieuMuonMay
-    Log.d("phieumuon", maphieumuon)
 
     val selectedMayTinhs = mayTinhViewModel.danhSachMayTinhDuocChon
 
@@ -110,7 +110,9 @@ fun PhongMayChuyenMuonScreen(
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth(),
             thickness = 2.dp,
             color = Color(0xFF1B8DDE),
         )
@@ -188,7 +190,9 @@ fun PhongMayChuyenMuonScreen(
                 }
 
                 HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .fillMaxWidth(),
                     thickness = 2.dp,
                     color = Color(0xFFDDDDDD),
                 )
@@ -204,7 +208,7 @@ fun PhongMayChuyenMuonScreen(
                     items(selectedMayTinhs) { mayTinh ->
 
                         Column {
-                            Row (
+                            Row(
                             ) {
                                 Text(
                                     text = "Mã máy:",
@@ -235,7 +239,9 @@ fun PhongMayChuyenMuonScreen(
                             }
 
                             HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp)
+                                    .fillMaxWidth(),
                                 thickness = 2.dp,
                                 color = Color(0xFFDDDDDD),
                             )
@@ -256,14 +262,18 @@ fun PhongMayChuyenMuonScreen(
                                 errorMessage = "Vui lòng chọn ít nhất một máy tính để chuyển."
                                 showErrorDialog = true
                             }
+
                             soLuongDangChon > soLuongChoPhep -> {
                                 errorMessage = "Phiếu mượn chỉ mượn $soLuongChoPhep máy tính."
                                 showErrorDialog = true
                             }
+
                             soLuongDangChon < soLuongChoPhep -> {
-                                errorMessage = "Không đủ số lượng máy để chuyển. Cần $soLuongChoPhep máy."
+                                errorMessage =
+                                    "Không đủ số lượng máy để chuyển. Cần $soLuongChoPhep máy."
                                 showErrorDialog = true
                             }
+
                             else -> {
                                 showDialog = true
                             }
@@ -277,7 +287,6 @@ fun PhongMayChuyenMuonScreen(
                 }
             }
         }
-
 
 
         // Dialog xác nhận chuyển máy

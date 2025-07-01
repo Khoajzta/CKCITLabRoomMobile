@@ -29,9 +29,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.composables.icons.lucide.BadgeInfo
 import com.composables.icons.lucide.CalendarDays
 import com.composables.icons.lucide.CircleAlert
@@ -53,12 +53,14 @@ fun CardPhieuSuaChua(
     phieuSuaChuaViewModel: PhieuSuaChuaViewModel,
     lichSuSuaMayViewModel: LichSuSuaMayViewModel,
     mayTinhViewModel: MayTinhViewModel,
-    giangVienViewModel: GiangVienViewModel
+    giangVienViewModel: GiangVienViewModel,
+    navController: NavHostController
 ) {
     val giangVien = giangVienViewModel.giangvienSet
     var showDialog by remember { mutableStateOf(false) }
 
-    val lichSuSuaMay = lichSuSuaMayViewModel.lichSuSuaMayMap[phieuSuaChuarp.MaPhieuSuaChua.toString()]
+    val lichSuSuaMay =
+        lichSuSuaMayViewModel.lichSuSuaMayMap[phieuSuaChuarp.MaPhieuSuaChua.toString()]
 
     LaunchedEffect(phieuSuaChuarp.MaPhieuSuaChua) {
         lichSuSuaMayViewModel.getLichSuTheoMaPhieu(phieuSuaChuarp.MaPhieuSuaChua.toString())
@@ -114,7 +116,7 @@ fun CardPhieuSuaChua(
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(Lucide.User, "Mã Người Báo Hỏng", phieuSuaChuarp.MaNguoiBaoHong)
             Spacer(modifier = Modifier.height(8.dp))
-            if(phieuSuaChuarp.TenNguoiSua!= null){
+            if (phieuSuaChuarp.TenNguoiSua != null) {
                 InfoRow(Lucide.BadgeInfo, "Người Sửa", phieuSuaChuarp.TenNguoiSua)
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -124,7 +126,12 @@ fun CardPhieuSuaChua(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(vertical = 8.dp)
             ) {
-                Icon(statusIcon, contentDescription = null, tint = statusColor, modifier = Modifier.size(20.dp))
+                Icon(
+                    statusIcon,
+                    contentDescription = null,
+                    tint = statusColor,
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(Modifier.width(6.dp))
                 Text("Trạng thái: ", fontWeight = FontWeight.Medium)
                 Box(
@@ -161,7 +168,10 @@ fun CardPhieuSuaChua(
                         )
                     },
                     text = {
-                        Text("Bạn có chắc muốn đánh dấu phiếu này là đã sửa chữa?", color = Color.Black)
+                        Text(
+                            "Bạn có chắc muốn đánh dấu phiếu này đã sửa chữa?",
+                            color = Color.Black
+                        )
                     },
                     confirmButton = {
                         Button(
@@ -190,6 +200,8 @@ fun CardPhieuSuaChua(
                                 mayTinhViewModel.updateTrangThaiMayTinh(
                                     MayTinhTrangThaiUpdateRequest(phieuSuaChuarp.MaMay, 1)
                                 )
+                                phieuSuaChuaViewModel.getAllPhieuSuaChua()
+                                navController.navigate(NavRoute.QUANLYPHIEUSUACHUA.route + "?startIndex=1")
 
                                 showDialog = false
                             },

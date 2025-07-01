@@ -1,20 +1,38 @@
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.shape.RoundedCornerShape
 
 @Composable
 fun DoiMatKhauSvScreen(
@@ -55,7 +73,9 @@ fun DoiMatKhauSvScreen(
                 value = emailState,
                 onValueChange = { emailState = it },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
@@ -74,7 +94,9 @@ fun DoiMatKhauSvScreen(
                 value = matkhaucuState,
                 onValueChange = { matkhaucuState = it },
                 label = { Text("Mật khẩu cũ") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 shape = RoundedCornerShape(12.dp),
                 visualTransformation = if (showPasswordOld) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -102,7 +124,9 @@ fun DoiMatKhauSvScreen(
                 value = matkhaumoiState,
                 onValueChange = { matkhaumoiState = it },
                 label = { Text("Mật khẩu mới") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 shape = RoundedCornerShape(12.dp),
                 visualTransformation = if (showPasswordNew) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -130,7 +154,9 @@ fun DoiMatKhauSvScreen(
                 value = matkhaumoi2State,
                 onValueChange = { matkhaumoi2State = it },
                 label = { Text("Nhập lại mật khẩu mới") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 shape = RoundedCornerShape(12.dp),
                 visualTransformation = if (showPasswordConfirm) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -163,11 +189,16 @@ fun DoiMatKhauSvScreen(
 
                     when {
                         email.isEmpty() || oldPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty() -> {
-                            Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Vui lòng nhập đầy đủ thông tin",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
                         sinhvien == null -> {
-                            Toast.makeText(context, "Không tìm thấy sinh viên", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Không tìm thấy sinh viên", Toast.LENGTH_SHORT)
+                                .show()
                         }
 
                         sinhvien.Email != email -> {
@@ -175,26 +206,40 @@ fun DoiMatKhauSvScreen(
                         }
 
                         sinhvien.MatKhau != oldPass -> {
-                            Toast.makeText(context, "Mật khẩu cũ không đúng", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Mật khẩu cũ không đúng", Toast.LENGTH_SHORT)
+                                .show()
                         }
 
                         newPass != confirmPass -> {
-                            Toast.makeText(context, "Mật khẩu mới không khớp", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Mật khẩu mới không khớp", Toast.LENGTH_SHORT)
+                                .show()
                         }
 
                         !newPass.matches(Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*()_+=-]).{8,}$")) -> {
-                            Toast.makeText(context, "Mật khẩu mới phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường và ký tự đặc biệt", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                context,
+                                "Mật khẩu mới phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường và ký tự đặc biệt",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
 
                         else -> {
                             val updatedSV = sinhvien.copy(MatKhau = newPass)
                             sinhVienViewModel.updateSinhVien(updatedSV)
-                            Toast.makeText(context, "Đổi mật khẩu thành công", Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
+                            Toast.makeText(context, "Đổi mật khẩu thành công", Toast.LENGTH_SHORT)
+                                .show()
+                            sinhVienViewModel.logout()
+                            navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = true
+                                }
+                            }
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(45.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE)),
                 shape = RoundedCornerShape(12.dp)
             ) {

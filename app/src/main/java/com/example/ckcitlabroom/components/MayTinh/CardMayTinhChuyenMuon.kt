@@ -1,7 +1,6 @@
-import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,12 +9,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,13 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,104 +37,90 @@ import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Monitor
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardMayTinhChuyenMuon(
-    maytinh: MayTinh,
+    mayTinh: MayTinh,
     phongMayViewModel: PhongMayViewModel,
-    selectedMayTinhs: SnapshotStateList<MayTinh>,
+    isSelected: Boolean,          // ← cờ đã chọn
+    onToggleSelect: () -> Unit    // ← callback
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
-    var selectdMaPhong by remember { mutableStateOf("") }
-    var phongMayCard by remember { mutableStateOf<PhongMay?>(null) }
-    val maPhongState = remember { mutableStateOf("") }
+    /* ------ Lấy phòng hiện tại của máy ------ */
+    var phongMay by remember { mutableStateOf<PhongMay?>(null) }
 
-    LaunchedEffect(Unit) {
-        phongMayViewModel.getAllPhongMay()
+    LaunchedEffect(mayTinh.MaPhong) {
+        phongMay = phongMayViewModel.fetchPhongMayByMaPhong(mayTinh.MaPhong)
     }
 
-    LaunchedEffect(maytinh.MaPhong) {
-        phongMayCard = phongMayViewModel.fetchPhongMayByMaPhong(maytinh.MaPhong)
-    }
-
-    LaunchedEffect(selectdMaPhong) {
-        maPhongState.value = selectdMaPhong
-    }
-
-    LaunchedEffect(danhSachPhongMay) {
-        if (danhSachPhongMay.isNotEmpty() && selectdMaPhong.isEmpty()) {
-            selectdMaPhong = danhSachPhongMay[0].MaPhong
-        }
-    }
-
-    val isSelected = selectedMayTinhs.contains(maytinh)
-
+    /* ------ Card ------ */
     Card(
         modifier = Modifier
-            .padding(bottom = 12.dp)
             .fillMaxWidth()
-            .shadow(7.dp, shape = RoundedCornerShape(16.dp))
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onLongPress = {
-                        if (selectedMayTinhs.any { it.MaMay == maytinh.MaMay }) {
-                            selectedMayTinhs.removeAll { it.MaMay == maytinh.MaMay }
-                        } else {
-                            selectedMayTinhs.add(maytinh)
-                        }
-                        Log.d("SelectedMachines", "Máy đã chọn: ${selectedMayTinhs.map { it.MaMay }}")
-                    },
-                )
-            },
+            .padding(bottom = 8.dp)
+            .shadow(6.dp, shape = RoundedCornerShape(16.dp))
+            .border(
+                width = if (isSelected) 2.dp else 1.dp,
+                color = if (isSelected) Color(0xFF1B8DDE) else Color(0xFFE0E0E0),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .combinedClickable(
+                onClick = { onToggleSelect() },   // 1 chạm đổi trạng thái
+                onLongClick = { onToggleSelect() }    // giữ lâu cũng vậy
+            ),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFFBBDEFB) else Color.White
+            containerColor = if (isSelected) Color(0xFFE3F2FD) else Color.White
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Thông tin máy tính",
-                color = Color(0xFF1B8DDE),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
 
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-                thickness = 2.dp,
-                color = Color(0xFFDDDDDD),
-            )
+        /* ---------- Nội dung ---------- */
+        Column(Modifier.padding(16.dp)) {
 
-            InfoRow(icon = Lucide.Monitor, label = "Mã Máy", value = maytinh.MaMay)
-            Spacer(Modifier.height(8.dp))
-            InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = maytinh.TenMay)
-            Spacer(Modifier.height(8.dp))
-            InfoRow(icon = Lucide.Building2, label = "Phòng hiện tại", value = phongMayCard?.TenPhong ?: "Đang tải...")
-
-            val (color, statusText, statusIcon) = when (maytinh.TrangThai) {
-                1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
-                0 -> Triple(Color(0xFFF44336), "Đang bảo trì", Lucide.CircleX)
-                else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
-                Icon(statusIcon, contentDescription = "Trạng thái", tint = color, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Trạng thái: ", fontWeight = FontWeight.Medium)
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(color)
+            /* --- Dòng tiêu đề --- */
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Mã máy: ${mayTinh.MaMay}",
+                    color = Color(0xFF1B8DDE),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
-                Spacer(Modifier.width(4.dp))
-                Text(statusText, color = color, fontWeight = FontWeight.Bold)
+
+                val (color, status, icon) = when (mayTinh.TrangThai) {
+                    1 -> Triple(Color(0xFF4CAF50), "Hoạt động", Lucide.CircleCheck)
+                    0 -> Triple(Color(0xFFF44336), "Bảo trì", Lucide.CircleX)
+                    else -> Triple(Color.Gray, "Không rõ", Lucide.CircleAlert)
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(status, color = color, fontWeight = FontWeight.SemiBold)
+                }
             }
+
+            Divider(
+                Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
+                thickness = 1.dp,
+                color = Color(0xffdddcdc)
+            )
+
+            InfoRow(icon = Lucide.Monitor, label = "Tên Máy", value = mayTinh.TenMay)
+            Spacer(Modifier.height(6.dp))
+            InfoRow(
+                icon = Lucide.Building2,
+                label = "Phòng hiện tại",
+                value = phongMay?.TenPhong ?: "Đang tải…"
+            )
         }
     }
-
 }
+
+
 
 

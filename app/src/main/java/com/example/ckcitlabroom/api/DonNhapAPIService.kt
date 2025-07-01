@@ -28,6 +28,12 @@ data class LinhKien(
 )
 
 
+data class DonNhapCreateResponse(
+    val success: Boolean,
+    val maDonNhap: String?,              // nullable vì lỗi có thể null
+    val message: String
+)
+
 
 interface DonNhapAPIService {
     @GET("DonNhap/read.php")
@@ -36,5 +42,5 @@ interface DonNhapAPIService {
     @POST("DonNhap/create.php")
     suspend fun createDonNhap(
         @Body donNhapRequest: DonNhapRequest
-    ): CreateResponse
+    ): DonNhapCreateResponse
 }

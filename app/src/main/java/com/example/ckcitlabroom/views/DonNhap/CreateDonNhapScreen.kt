@@ -1,24 +1,21 @@
 import android.app.DatePickerDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,16 +24,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,22 +37,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
 import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.util.Locale
-import kotlinx.coroutines.*
 import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun CreateDonNhapScreen(
@@ -67,20 +60,18 @@ fun CreateDonNhapScreen(
     mayTinhViewModel: MayTinhViewModel,
     phongMayViewModel: PhongMayViewModel,
     donNhapyViewModel: DonNhapViewModel,
-    chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel
 ) {
-    val hideButtonNhap = remember { mutableStateOf(false) }
 
-    var danhSachMayTinh = mayTinhViewModel.danhSachAllMayTinh
+    var maDonNhapNew = remember { mutableStateOf("") }
+
+    val isSuccess = remember { mutableStateOf(false) }   // ← NEW
+
     val loadingState = remember { mutableStateOf(false) }
 
     var phonkho = phongMayViewModel.phongmay
 
     val openDialog = remember { mutableStateOf(false) }
     val dialogMessage = remember { mutableStateOf("") }
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -105,7 +96,6 @@ fun CreateDonNhapScreen(
     val hddState = remember { mutableStateOf("") }
     val ssdState = remember { mutableStateOf("") }
 
-
     if (showDatePicker) {
         val datePickerDialog = DatePickerDialog(
             context,
@@ -128,12 +118,22 @@ fun CreateDonNhapScreen(
         datePickerDialog.show()
     }
 
+    val density = LocalDensity.current
+    val ime = WindowInsets.ime
+
+    val imeBottomPx by remember {             // recomposition khi ime thay đổi
+        derivedStateOf { ime.getBottom(density) }
+    }
+
+    val rawBottomDp = with(density) { (imeBottomPx * 0.7f).toDp() }
+    val targetBottomDp = rawBottomDp.coerceAtMost(300.dp)
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
-            .height(640.dp),
+            .padding(bottom = targetBottomDp)
+            .heightIn(max = 640.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(
@@ -151,7 +151,9 @@ fun CreateDonNhapScreen(
             }
 
             HorizontalDivider(
-                modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .fillMaxWidth(),
                 thickness = 2.dp,
                 color = Color.Gray,
             )
@@ -172,7 +174,11 @@ fun CreateDonNhapScreen(
                             .fillMaxWidth()
                             .padding(bottom = 12.dp),
                         value = soluongState.value,
-                        onValueChange = { soluongState.value = it },
+                        onValueChange = { newText ->
+                            if (newText.isEmpty() || newText.all { it.isDigit() }) {
+                                soluongState.value = newText
+                            }
+                        },
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedContainerColor = Color.White,
                             focusedContainerColor = Color.White,
@@ -182,7 +188,7 @@ fun CreateDonNhapScreen(
                             unfocusedTextColor = Color.Black
                         ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập số lượng") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -196,7 +202,8 @@ fun CreateDonNhapScreen(
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 12.dp),
+                            .padding(bottom = 12.dp)
+                            .clickable { showDatePicker = true },
                         value = ngayNhapState.value,
                         onValueChange = { ngayNhapState.value = it },
                         readOnly = true,
@@ -213,7 +220,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Chọn ngày") },
+                        placeholder = { Text("Chọn ngày ->") },
                         shape = RoundedCornerShape(12.dp),
                     )
 
@@ -238,7 +245,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập tên nhà cung cấp") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -277,7 +284,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập thông tin main") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -301,7 +308,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập thông tin CPU") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -325,7 +332,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập thông tin RAM") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -349,7 +356,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập thông tin VGA") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -373,7 +380,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập thông tin màn hình") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -397,7 +404,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập thông tin bàn phím") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -421,7 +428,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập thông tin chuột") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -445,7 +452,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập thông tin HDD") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -469,7 +476,7 @@ fun CreateDonNhapScreen(
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
                         ),
-                        placeholder = { Text("Nhập thông tin") },
+                        placeholder = { Text("Nhập thông tin SSD") },
                         shape = RoundedCornerShape(12.dp),
                     )
                 }
@@ -477,20 +484,13 @@ fun CreateDonNhapScreen(
 
 
             if (loadingState.value) {
-                DotLoading()
-                if (openDialog.value) {
-                    AlertDialog(
-                        onDismissRequest = { openDialog.value = false },
-                        confirmButton = {
-                            TextButton(onClick = {
-                                openDialog.value = false
-                            }) {
-                                Text("OK")
-                            }
-                        },
-                        title = { Text("Thông báo") },
-                        text = { Text(dialogMessage.value) }
-                    )
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    DotLoading()
                 }
             }
 
@@ -498,7 +498,6 @@ fun CreateDonNhapScreen(
                 onClick = {
                     val sdfInput = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                     val sdfNgayNhap = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    val sdfMaDon = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
 
                     val parsedDate = try {
                         sdfInput.parse(ngayNhapState.value)
@@ -531,52 +530,54 @@ fun CreateDonNhapScreen(
                         dialogMessage.value = "Vui lòng nhập nhà cung cấp!"
                         openDialog.value = true
                     } else if (fields.any { it.isBlank() }) {
-                        dialogMessage.value = "Vui lòng nhập đầy đủ thông tin linh kiện. Nếu không có thì nhập trống"
+                        dialogMessage.value =
+                            "Vui lòng nhập đầy đủ thông tin linh kiện. Nếu không có thì nhập NONE"
                         openDialog.value = true
                     } else {
                         loadingState.value = true
 
                         coroutineScope.launch {
-                            withContext(Dispatchers.IO) {
-                                val ngayNhap = sdfNgayNhap.format(parsedDate!!)
-                                val linhKien = LinhKien(
-                                    main = mainState.value,
-                                    cpu = cpuState.value,
-                                    ram = ramState.value,
-                                    vga = vgaState.value,
-                                    manHinh = manHinhState.value,
-                                    banPhim = banPhimState.value,
-                                    chuot = chuotState.value,
-                                    hdd = hddState.value,
-                                    ssd = ssdState.value
-                                )
-
-                                val request = DonNhapRequest(
-                                    NgayNhap = ngayNhap,
-                                    SoLuong = soLuong,
-                                    NhaCungCap = nhaCungCap,
-                                    MaPhong = phonkho.MaPhong,
-                                    LinhKien = linhKien
-                                )
-
-                                try {
-                                    val success = donNhapyViewModel.createDonNhapAsync(request)
-                                    withContext(Dispatchers.Main) {
-                                        if (success) {
-                                            dialogMessage.value = "Tạo đơn nhập với $soLuong máy thành công!"
-                                        } else {
-                                            dialogMessage.value = "Tạo đơn nhập thất bại!"
-                                        }
-                                        openDialog.value = true
-                                    }
-                                } catch (e: Exception) {
-                                    withContext(Dispatchers.Main) {
-                                        dialogMessage.value = "Lỗi khi gửi đơn nhập. Vui lòng thử lại!"
-                                        openDialog.value = true
-                                    }
+                            try {
+                                /* 1. Gọi API trong IO dispatcher */
+                                val maDon = withContext(Dispatchers.IO) {
+                                    val ngayNhapStr = sdfNgayNhap.format(parsedDate!!)
+                                    val request = DonNhapRequest(
+                                        NgayNhap = ngayNhapStr,
+                                        SoLuong = soLuong,
+                                        NhaCungCap = nhaCungCap,
+                                        MaPhong = phonkho.MaPhong,
+                                        LinhKien = LinhKien(
+                                            main = mainState.value,
+                                            cpu = cpuState.value,
+                                            ram = ramState.value,
+                                            vga = vgaState.value,
+                                            manHinh = manHinhState.value,
+                                            banPhim = banPhimState.value,
+                                            chuot = chuotState.value,
+                                            hdd = hddState.value,
+                                            ssd = ssdState.value
+                                        )
+                                    )
+                                    donNhapyViewModel.createDonNhapAsync(request)   // suspend -> String?
                                 }
 
-                                loadingState.value = false
+                                /* 2. Xử lý kết quả (trên Main thread) */
+                                if (maDon != null) {
+                                    maDonNhapNew.value = maDon
+                                    isSuccess.value = true
+                                    dialogMessage.value =
+                                        "Tạo đơn nhập $maDon với $soLuong máy thành công!"
+                                } else {
+                                    isSuccess.value = false
+                                    dialogMessage.value = "Tạo đơn nhập thất bại!"
+                                }
+
+                            } catch (e: Exception) {
+                                isSuccess.value = false
+                                dialogMessage.value = "Lỗi khi gửi đơn nhập. Vui lòng thử lại!"
+                            } finally {
+                                loadingState.value = false   // ← chỉ tắt khi đã có dialogMessage
+                                openDialog.value = true      // mở dialog thông báo
                             }
                         }
                     }
@@ -596,31 +597,26 @@ fun CreateDonNhapScreen(
                     tonalElevation = 8.dp,
                     title = {
                         Text(
-                            text = "Thông báo",
-                            color = Color.Black,
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.SemiBold
-                            )
+                            "Thông báo",
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0XFF1B8DDE)
                         )
                     },
-                    text = {
-                        Text(
-                            text = dialogMessage.value,
-                            color = Color.DarkGray,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    },
+                    text = { Text(dialogMessage.value, color = Color.Black) },
                     confirmButton = {
-                        TextButton(
-                            onClick = { openDialog.value = false }
-                        ) {
-                            Button(
-                                onClick = { openDialog.value = false },
-                                colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE)),
-                            ){
-                                Text("OK", color = Color.White)
-                            }
-                        }
+                        Button(
+                            onClick = {
+                                openDialog.value = false
+                                if (isSuccess.value) {
+                                    navController.navigate(
+                                        NavRoute.CHITIETDONNHAP.route +
+                                                "?madonnhap=${maDonNhapNew.value}"
+                                    )
+                                    isSuccess.value = false
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE))
+                        ) { Text("OK", color = Color.White) }
                     }
                 )
             }

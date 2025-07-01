@@ -1,13 +1,40 @@
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
-import androidx.compose.foundation.layout.*
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.models.CaHoc
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -26,6 +52,7 @@ fun CreateCaHocScreen(
     navController: NavHostController,
     caHocViewModel: CaHocViewModel
 ) {
+    var context = LocalContext.current
     val danhSachCaHoc = caHocViewModel.danhSachAllCaHoc
 
     LaunchedEffect(Unit) {
@@ -50,7 +77,9 @@ fun CreateCaHocScreen(
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 15.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -67,7 +96,9 @@ fun CreateCaHocScreen(
             Text("Tên Ca Học", color = Color.Black, fontWeight = FontWeight.Bold)
 
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 value = tenCaHocState.value,
                 onValueChange = { tenCaHocState.value = it },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -132,6 +163,7 @@ fun CreateCaHocScreen(
                                 snackbarHostState.showSnackbar("Thông báo")
                             }
                         }
+
                         batDau.isEmpty() -> {
                             coroutineScope.launch {
                                 snackbarData.value = CustomSnackbarData(
@@ -141,6 +173,7 @@ fun CreateCaHocScreen(
                                 snackbarHostState.showSnackbar("Thông báo")
                             }
                         }
+
                         ketThuc.isEmpty() -> {
                             coroutineScope.launch {
                                 snackbarData.value = CustomSnackbarData(
@@ -150,6 +183,7 @@ fun CreateCaHocScreen(
                                 snackbarHostState.showSnackbar("Thông báo")
                             }
                         }
+
                         daTonTai -> {
                             coroutineScope.launch {
                                 snackbarData.value = CustomSnackbarData(
@@ -159,6 +193,7 @@ fun CreateCaHocScreen(
                                 snackbarHostState.showSnackbar("Thông báo")
                             }
                         }
+
                         else -> {
                             val caHocMoi = CaHoc(
                                 MaCaHoc = 0,
@@ -170,19 +205,12 @@ fun CreateCaHocScreen(
 
                             caHocViewModel.createCaHoc(caHocMoi)
 
-                            coroutineScope.launch {
-                                snackbarData.value = CustomSnackbarData(
-                                    message = "Thêm ca học thành công",
-                                    type = SnackbarType.SUCCESS
-                                )
-                                snackbarHostState.showSnackbar("Thông báo")
-                                delay(1000)
-                                navController.popBackStack()
-                            }
+                            Toast.makeText(context, "Thêm ca học thành công", Toast.LENGTH_SHORT)
+                                .show()
+                            navController.popBackStack()
                         }
                     }
-                }
-                ,
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))

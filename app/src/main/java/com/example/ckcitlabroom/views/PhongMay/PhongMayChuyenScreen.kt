@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LichSuChuyenMayViewModel
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
@@ -49,241 +50,228 @@ fun PhongMayChuyenScreen(
     phongMayViewModel: PhongMayViewModel,
     mayTinhViewModel: MayTinhViewModel,
     lichSuChuyenMayViewModel: LichSuChuyenMayViewModel,
+    navController: NavHostController
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val danhSachMayTinhtheophong = mayTinhViewModel.danhSachAllMayTinhtheophong.sortedBy { may ->
-        // Trích số từ tên máy, mặc định 0 nếu không trích được
-        Regex("""\d+""").find(may.TenMay)?.value?.toIntOrNull() ?: 0
-    }
+    val scope = rememberCoroutineScope()
 
-    val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay.filter { it.LoaiPhong == 1 || it.LoaiPhong == 2 }
+    /* ---------- DỮ LIỆU ---------- */
+    val danhSachMayTinhtheophong = remember(mayTinhViewModel.danhSachAllMayTinhtheophong) {
+        mayTinhViewModel.danhSachAllMayTinhtheophong.sortedBy { may ->
+            Regex("""\d+""").find(may.TenMay)?.value?.toIntOrNull() ?: 0
+        }
+    }
+    val danhSachPhongMay =
+        phongMayViewModel.danhSachAllPhongMay.filter { it.LoaiPhong == 1 || it.LoaiPhong == 2 }
     val selectedMayTinhs = mayTinhViewModel.danhSachMayTinhDuocChon
 
+    /* ---------- STATE ---------- */
+    var selectedPhongMoi by remember { mutableStateOf<PhongMay?>(null) }
     var selectedMaPhongMoi by remember { mutableStateOf<String?>(null) }
-    var isExpanded by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
-    var showErrorDialog by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
+    var showConfirm by remember { mutableStateOf(false) }
+    var showError by remember { mutableStateOf(false) }
+    var errorMsg by remember { mutableStateOf("") }
+
+    /* ---------- LOAD DỮ LIỆU ---------- */
+    LaunchedEffect(maphong) {
         mayTinhViewModel.getMayTinhByPhong(maphong)
         phongMayViewModel.getAllPhongMay()
     }
-
-
     DisposableEffect(Unit) {
-        onDispose {
-            mayTinhViewModel.stopPollingMayTinhTheoPhong()
-        }
+        onDispose { mayTinhViewModel.stopPollingMayTinhTheoPhong() }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Tiêu đề
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Danh Sách Máy Tính",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Color(0xFF1B8DDE)
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
-
-        // Danh sách máy
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            if (danhSachMayTinhtheophong.isNullOrEmpty()) {
+    /* ---------- UI ---------- */
+    Column(Modifier.fillMaxSize()) {
+        LazyColumn(Modifier.weight(1f)) {
+            if (danhSachMayTinhtheophong.isEmpty()) {
                 item {
                     Box(
-                        modifier = Modifier.fillMaxWidth(),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 32.dp),
                         contentAlignment = Alignment.Center
-                    ) {
-                        Text("Chưa có máy tính nào", color = Color.Gray)
-                    }
+                    ) { Text("Chưa có máy tính nào", color = Color.Gray) }
                 }
             } else {
-                items(danhSachMayTinhtheophong) { maytinh ->
+                items(danhSachMayTinhtheophong) { may ->
                     CardMayTinhChuyenMuon2(
-                        maytinh = maytinh,
+                        maytinh = may,
                         phongMayViewModel = phongMayViewModel,
                         selectedMayTinhs = selectedMayTinhs,
                         onLongPress = {
-                            if (!selectedMayTinhs.contains(maytinh)) {
-                                selectedMayTinhs.add(maytinh)
-                            } else {
-                                selectedMayTinhs.remove(maytinh)
-                            }
+                            if (!selectedMayTinhs.contains(may)) selectedMayTinhs.add(may)
+                            else selectedMayTinhs.remove(may)
                         }
                     )
                 }
             }
         }
 
-        // Khung thông tin và nút chuyển
         Card(
-            modifier = Modifier
-                .padding(top = 12.dp)
+            Modifier
                 .fillMaxWidth()
-                .shadow(8.dp, shape = RoundedCornerShape(16.dp)),
+                .padding(top = 12.dp)
+                .shadow(8.dp, RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(Modifier.padding(16.dp)) {
 
+                /* Số lượng máy đã chọn */
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    Modifier.fillMaxWidth(),
+                    Arrangement.SpaceBetween,
+                    Alignment.CenterVertically
                 ) {
-                    Text(
-                        "Danh sách máy",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp
-                    )
-
+                    Text("Danh sách máy", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                     Text(
                         "${selectedMayTinhs.size}",
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp
                     )
-
                 }
 
                 Spacer(Modifier.height(8.dp))
-
                 HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                     thickness = 2.dp,
-                    color = Color(0xFFDDDDDD),
+                    color = Color(0xFFDDDDDD)
                 )
+
+                /* Dropdown chọn phòng mới */
                 CustomDropdownSelector(
                     label = "Phòng muốn chuyển đến",
                     items = danhSachPhongMay.filter { it.MaPhong != maphong },
-                    selectedItem = danhSachPhongMay.find { it.MaPhong == selectedMaPhongMoi },
+                    selectedItem = selectedPhongMoi,
                     itemLabel = { it.TenPhong },
-                    onItemSelected = { selectedMaPhongMoi = it.MaPhong },
+                    onItemSelected = { phong ->
+                        selectedPhongMoi = phong
+                        selectedMaPhongMoi = phong.MaPhong       // GÁN GIÁ TRỊ Ở ĐÂY
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(Modifier.height(12.dp))
 
+                /* Danh sách máy vừa chọn (trong bottom card) */
                 LazyColumn(
-                    modifier = Modifier
+                    Modifier
                         .fillMaxWidth()
                         .heightIn(max = 150.dp)
                 ) {
-                    items(selectedMayTinhs) { mayTinh ->
+                    items(selectedMayTinhs) { may ->
                         Column {
-                            Text("Mã máy: ${mayTinh.MaMay}", fontWeight = FontWeight.SemiBold)
-                            Text("Tên máy: ${mayTinh.TenMay}", color = Color.Black)
-                            Divider(modifier = Modifier.padding(vertical = 6.dp))
+                            Text("Mã máy: ${may.MaMay}", fontWeight = FontWeight.SemiBold)
+                            Text("Tên máy: ${may.TenMay}")
+                            Divider(Modifier.padding(vertical = 6.dp))
                         }
                     }
                 }
 
-
+                /* Nút chuyển máy */
                 Button(
                     onClick = {
                         when {
                             selectedMayTinhs.isEmpty() -> {
-                                errorMessage = "Vui lòng chọn ít nhất một máy tính để chuyển."
-                                showErrorDialog = true
+                                errorMsg = "Vui lòng chọn ít nhất một máy tính để chuyển."
+                                showError = true
                             }
 
-                            selectedMaPhongMoi == null -> {
-                                errorMessage = "Vui lòng chọn phòng đích để chuyển máy."
-                                showErrorDialog = true
+                            selectedPhongMoi == null -> {
+                                errorMsg = "Vui lòng chọn phòng đích để chuyển máy."
+                                showError = true
                             }
 
-                            else -> {
-                                showDialog = true
-                            }
+                            else -> showConfirm = true
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE)),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE))
                 ) {
-                    Text("Chuyển máy", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("Chuyển máy", fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }
     }
 
-    // Dialog xác nhận
-    if (showDialog) {
+    /* ---------- DIALOG XÁC NHẬN ---------- */
+    if (showConfirm) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Xác nhận chuyển máy", fontWeight = FontWeight.Bold, color = Color.Black) },
+            onDismissRequest = { showConfirm = false },
             containerColor = Color.White,
+            title = {
+                Text("Xác nhận chuyển máy", fontWeight = FontWeight.Bold, color = Color.Black)
+            },
             text = {
                 Text(
-                    "Bạn có chắc muốn chuyển ${selectedMayTinhs.size} máy đến phòng ${danhSachPhongMay.find { it.MaPhong == selectedMaPhongMoi }?.TenPhong}?",
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold
+                    "Bạn có chắc muốn chuyển ${selectedMayTinhs.size} máy đến phòng ${selectedPhongMoi?.TenPhong}?",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            val ngayChuyen = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                            selectedMayTinhs.forEach { mayTinh ->
-                                val mayTinhCapNhat = mayTinh.copy(
-                                    MaPhong = selectedMaPhongMoi!!,
-                                    TenMay = "MAY${selectedMaPhongMoi}"
+                        scope.launch {
+                            val phongMoi = selectedPhongMoi ?: return@launch
+                            val maPhongMoi = phongMoi.MaPhong
+                            val ngayChuyen =
+                                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+                            selectedMayTinhs.forEach { may ->
+                                val mayCapNhat = may.copy(
+                                    MaPhong = maPhongMoi,
+                                    TenMay = if (phongMoi.LoaiPhong == 2) {
+                                        may.MaMay
+                                    } else {
+                                        "MAY$maPhongMoi"
+                                    }
                                 )
-                                mayTinhViewModel.updateMayTinh(mayTinhCapNhat)
+                                mayTinhViewModel.updateMayTinh(mayCapNhat)
 
                                 val lichSu = LichSuChuyenMay(
                                     MaLichSu = 0,
-                                    MaPhongCu = mayTinh.MaPhong,
-                                    MaPhongMoi = selectedMaPhongMoi!!,
+                                    MaPhongCu = may.MaPhong,
+                                    MaPhongMoi = maPhongMoi,
                                     NgayChuyen = ngayChuyen,
-                                    MaMay = mayTinh.MaMay
+                                    MaMay = may.MaMay
                                 )
                                 lichSuChuyenMayViewModel.createLichSuChuyenMay(lichSu)
                             }
+
                             mayTinhViewModel.clearDanhSachMayTinhDuocChon()
-                            showDialog = false
+                            mayTinhViewModel.getMayTinhByPhong(maphong) // refresh
+                            navController.popBackStack()
+                            showConfirm = false
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE))
-                ) {
-                    Text("Chuyển", color = Color.White, fontWeight = FontWeight.Bold)
-                }
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE))
+                ) { Text("Chuyển", color = Color.White, fontWeight = FontWeight.Bold) }
             }
         )
     }
 
-    // Dialog báo lỗi
-    if (showErrorDialog) {
+    /* ---------- DIALOG LỖI ---------- */
+    if (showError) {
         AlertDialog(
-            onDismissRequest = { showErrorDialog = false },
-            title = { Text("Thông báo", fontWeight = FontWeight.Bold, color = Color.Black) },
+            onDismissRequest = { showError = false },
             containerColor = Color.White,
-            text = { Text(errorMessage, color = Color.Black) },
+            title = { Text("Thông báo", fontWeight = FontWeight.Bold, color = Color.Black) },
+            text = { Text(errorMsg, color = Color.Black) },
             confirmButton = {
                 Button(
-                    onClick = { showErrorDialog = false },
-                    colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("OK", color = Color.White)
-                }
+                    onClick = { showError = false },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE))
+                ) { Text("OK", color = Color.White) }
             }
         )
     }
 }
+
 

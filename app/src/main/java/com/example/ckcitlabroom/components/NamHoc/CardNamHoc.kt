@@ -1,3 +1,4 @@
+import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 
 
@@ -51,6 +54,12 @@ fun CardNamHoc(
     namHocViewModel: NamHocViewModel,
 ) {
     var showUpdateButton by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var danhsachnamhoc = namHocViewModel.danhSachAllNamHoc
+
+    LaunchedEffect(Unit) {
+        namHocViewModel.getAllNamHoc()
+    }
 
     Card(
         modifier = Modifier
@@ -89,27 +98,43 @@ fun CardNamHoc(
                 val (color, statusText, statusIcon) = when (namHoc.TrangThai) {
                     0 -> Triple(Color(0xFF1B8DDE), "Đã Kết Thúc", Lucide.CircleCheck)
                     1 -> Triple(Color(0xFF4CAF50), "Đang Diễn Ra", Lucide.Clock)
+                    2 -> Triple(Color(0xFF1B8DDE), "Sắp Diễn Ra", Lucide.Clock)
                     else -> Triple(Color.Gray, "Không xác định", Lucide.CircleAlert)
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                    Icon(
+                        statusIcon,
+                        contentDescription = null,
+                        tint = color,
+                        modifier = Modifier.size(20.dp)
+                    )
                     Spacer(Modifier.width(4.dp))
                     Text(statusText, color = color, fontWeight = FontWeight.SemiBold)
                 }
             }
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
                 thickness = 2.dp,
                 color = Color(0xFFDDDDDD),
             )
 
             InfoRow(icon = Lucide.BookOpen, label = "Tên Năm Học", value = namHoc.TenNam)
             Spacer(modifier = Modifier.height(8.dp))
-            InfoRow(icon = Icons.Default.CalendarToday, label = "Ngày Bắt Đầu", value = formatNgay(namHoc.NgayBatDau))
+            InfoRow(
+                icon = Icons.Default.CalendarToday,
+                label = "Ngày Bắt Đầu",
+                value = formatNgay(namHoc.NgayBatDau)
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            InfoRow(icon = Icons.Default.CalendarToday, label = "Ngày Kết Thúc", value = formatNgay(namHoc.NgayKetThuc))
+            InfoRow(
+                icon = Icons.Default.CalendarToday,
+                label = "Ngày Kết Thúc",
+                value = formatNgay(namHoc.NgayKetThuc)
+            )
 
             // Chỉ hiển thị nút nếu trạng thái != 0
             AnimatedVisibility(
@@ -119,19 +144,71 @@ fun CardNamHoc(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            val namHocNew = namHoc.copy(TrangThai = 0)
-                            namHocViewModel.updateNamHoc(namHocNew)
-                            showUpdateButton = false
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(Icons.Default.Update, contentDescription = null, tint = Color.White)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Đã Hoàn Thành", color = Color.White, fontWeight = FontWeight.Bold)
+
+                    when (namHoc.TrangThai) {
+                        1 -> {
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    val namHocNew = namHoc.copy(TrangThai = 0)
+                                    namHocViewModel.updateNamHoc(namHocNew)
+                                    namHocViewModel.getAllNamHoc()
+                                    showUpdateButton = false
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF4CAF50
+                                    )
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Update,
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    "Đã Hoàn Thành",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        2 -> {
+                            Button(
+                                onClick = {
+                                    val hasRunning = danhsachnamhoc.any { it.TrangThai == 1 }
+                                    if (hasRunning) {
+                                        Toast.makeText(
+                                            context,
+                                            "Đang có năm học diễn ra",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        namHocViewModel.updateNamHoc(namHoc.copy(TrangThai = 1))
+                                        namHocViewModel.getAllNamHoc()
+                                        showUpdateButton = false
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF4CAF50
+                                    )
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Update, null, tint = Color.White)
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Bắt Đầu Năm Học",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                     }
                 }
             }

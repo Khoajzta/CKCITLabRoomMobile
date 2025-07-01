@@ -1,61 +1,112 @@
-import androidx.compose.foundation.layout.Arrangement
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.composables.icons.lucide.*
+import kotlinx.coroutines.launch
 
+@Suppress("OptInUsageError")
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class      // HorizontalPager
+)
 @Composable
 fun QuanLyMonHocScreen(
     navController: NavHostController,
+    monHocViewModel: MonHocViewModel
 ) {
+    BackHandler {
+        navController.navigate(NavRoute.QUANLY.route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
+            }
+        }
+    }
 
-    val dsChucNang =
-        listOf(
-            ChucNang("Môn Học Đang Dạy", Lucide.BookOpen, Click = {
-                navController.navigate(NavRoute.LISTMONHOCDANGDAY.route)
-            }),
-            ChucNang("Môn Học Ngừng Dạy", Lucide.BookX, Click = {
-                navController.navigate(NavRoute.LISTMONHOCNGUNGDAY.route)
-            }),
-            ChucNang("Thêm Môn Học", Lucide.BookPlus, Click = {
-                navController.navigate(NavRoute.ADDMONHOC.route)
-            })
-        )
+    /* ---------- Pager & Tab state ---------- */
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
+    val scope = rememberCoroutineScope()
+    val primary = Color(0xFF1B8DDE)
 
+    /* ---------- Tiêu đề tab ---------- */
+    val tabTitles = listOf("Môn Học Đang Dạy", "Môn Học Ngừng Dạy")
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-            thickness = 2.dp,
-            color = Color(0xFF1B8DDE),
-        )
+    /* ---------- UI ---------- */
+    Scaffold(
+        containerColor = Color.Transparent,
+        floatingActionButton = {
+            FloatingActionButtonCustom(
+                onClick = { navController.navigate(NavRoute.ADDMONHOC.route) }
+            )
+        }
+    ) { padding ->
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    start = padding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = padding.calculateEndPadding(LayoutDirection.Ltr)
+                )
         ) {
-            items(dsChucNang) { chucNang ->
-                CardChucNang(chucNang)
+
+            /* ---------- Tabs (không cuộn) ---------- */
+            TabRow(
+                selectedTabIndex = pagerState.currentPage,
+                containerColor = Color.Transparent,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                        color = primary
+                    )
+                }
+            ) {
+                tabTitles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        text = { Text(title) },
+                        selectedContentColor = primary,
+                        unselectedContentColor = Color.Black
+                    )
+                }
+            }
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = Color(0xFF1B8DDE),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            /* ---------- Pager ---------- */
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> ListMonHocDangDayScreen(navController, monHocViewModel)
+                    1 -> ListMonHocNgungDayScreen(navController, monHocViewModel)
+                }
             }
         }
     }

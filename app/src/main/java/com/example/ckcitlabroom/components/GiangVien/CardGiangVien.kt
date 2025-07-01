@@ -163,6 +163,7 @@ fun CardGiangVien(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         giangVienViewModel.updateTrangThaiGiangVien(giangVien.copy(TrangThai = newTrangThai))
+                        giangVienViewModel.getAllGiangVien()
                         showDialog = false
                     },
                     colors = ButtonDefaults.buttonColors(buttonColor),

@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -52,13 +53,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun EditMayTinhScreen(
     maMay: String,
-    phongMayViewModel:PhongMayViewModel
-){
-
-    var mayTinhViewModel: MayTinhViewModel = viewModel()
+    mayTinhViewModel: MayTinhViewModel = viewModel(),
+    phongMayViewModel: PhongMayViewModel
+) {
     var maytinh = mayTinhViewModel.maytinh
 
     val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
+    var danhsachmaytinhtheophong = mayTinhViewModel.danhSachAllMayTinhtheophong
+
 
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -70,7 +72,14 @@ fun EditMayTinhScreen(
         maPhongState.value = selectdMaPhong
     }
 
-    val selectedTenPhong = danhSachPhongMay.find { it.MaPhong == selectdMaPhong }?.TenPhong ?: ""
+    LaunchedEffect(maMay) {
+        mayTinhViewModel.getMayTinhByMaMay(maMay)
+        phongMayViewModel.getAllPhongMay()
+    }
+
+
+    Log.d("MaPhnong", selectdMaPhong.toString())
+
 
     // Đồng bộ giá trị selectdMaPhong khi danhSachPhongMay load xong (có dữ liệu)
     LaunchedEffect(danhSachPhongMay) {
@@ -97,10 +106,7 @@ fun EditMayTinhScreen(
     val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(maMay) {
-        mayTinhViewModel.getMayTinhByMaMay(maMay)
-        phongMayViewModel.getAllPhongMay()
-    }
+
 
     LaunchedEffect(maytinh) {
         maytinh?.let {
@@ -123,6 +129,12 @@ fun EditMayTinhScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        mayTinhViewModel.getMayTinhByPhong(selectdMaPhong)
+    }
+
+    Log.d("danhsachmaytinh", danhsachmaytinhtheophong.toString())
+
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -137,7 +149,9 @@ fun EditMayTinhScreen(
                 .padding(16.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text("Chỉnh Sửa Cấu hình", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
@@ -148,7 +162,7 @@ fun EditMayTinhScreen(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                if(maytinh!=null){
+                if (maytinh != null) {
                     item {
                         Text(
                             text = "Mã Máy",
@@ -161,7 +175,11 @@ fun EditMayTinhScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(Color.White)
-                                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier
@@ -217,7 +235,11 @@ fun EditMayTinhScreen(
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp),
                             value = viTriState.value,
-                            onValueChange = { viTriState.value = it },
+                            onValueChange = { newText ->
+                                if (newText.isEmpty() || newText.all { it.isDigit() }) {
+                                    viTriState.value = newText
+                                }
+                            },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedContainerColor = Color.White,
                                 focusedContainerColor = Color.White,
@@ -465,7 +487,7 @@ fun EditMayTinhScreen(
                             shape = RoundedCornerShape(12.dp),
                         )
                     }
-                }else{
+                } else {
                     item {
                         Text("Lỗi khi lấy API")
                     }
@@ -506,25 +528,45 @@ fun EditMayTinhScreen(
 
             Button(
                 onClick = {
-                    val viTriDaThayDoi = viTriState.value != maytinh.ViTri
+                    /* ─── 1. Chuẩn hoá vị trí người dùng nhập ─── */
+                    val viTriFormatted = viTriState.value.trim()
+                        .let { it.toIntOrNull()?.let { "%02d".format(it) } ?: it }
 
-                    val tenMayGoc = tenMayState.value
-                    val tenMayMoi = if (viTriDaThayDoi) {
-                        if (tenMayGoc.contains(".")) {
-                            // Tách phần trước dấu chấm
-                            val tenTruocDauCham = tenMayGoc.substringBefore(".")
-                            "$tenTruocDauCham.${viTriState.value}"
-                        } else {
-                            "$tenMayGoc.${viTriState.value}"
+                    if (viTriFormatted.isBlank()) {
+                        coroutineScope.launch {
+                            snackbarData.value = CustomSnackbarData(
+                                message = "Vị trí không được trống!",
+                                type = SnackbarType.ERROR
+                            )
+                            snackbarHostState.showSnackbar("Thông báo")
                         }
-                    } else {
-                        tenMayGoc
+                        return@Button
                     }
 
-                    val mayTinhMoi = MayTinh(
-                        MaMay = maMayState.value,
+                    val viTriDaThayDoi = viTriFormatted != maytinh.ViTri
+
+                    /* ─── 2. Nếu vị trí thay đổi → xoá vị trí máy khác trùng ─── */
+                    if (viTriDaThayDoi) {
+                        danhsachmaytinhtheophong        // (đã lọc theo phòng sẵn)
+                            .filter { it.ViTri == viTriFormatted && it.MaMay != maytinh.MaMay }
+                            .forEach { m ->
+                                val cleared = m.copy(
+                                    ViTri = "",
+                                    TenMay = m.TenMay.substringBefore(".")   // bỏ đuôi .xx nếu có
+                                )
+                                mayTinhViewModel.updateMayTinh(cleared)
+                            }
+                    }
+
+                    /* ─── 3. Tính lại tên máy cho máy đang chỉnh ─── */
+                    val tenMayMoi = if (viTriDaThayDoi)
+                        "${tenMayState.value.substringBefore(".")}.$viTriFormatted"
+                    else tenMayState.value
+
+                    /* ─── 4. Tạo bản ghi mới & lưu ─── */
+                    val mayTinhMoi = maytinh.copy(
                         TenMay = tenMayMoi,
-                        ViTri = viTriState.value,
+                        ViTri = viTriFormatted,
                         Main = mainState.value,
                         CPU = cpuState.value,
                         RAM = ramState.value,
@@ -534,13 +576,12 @@ fun EditMayTinhScreen(
                         Chuot = chuotState.value,
                         HDD = hddState.value,
                         SSD = ssdState.value,
-                        MaPhong = maytinh.MaPhong,
-                        QRCode = maytinh.QRCode,
                         TrangThai = trangThaiState.value.toIntOrNull() ?: 0
                     )
 
                     mayTinhViewModel.updateMayTinh(mayTinhMoi)
 
+                    /* ─── 5. Thông báo thành công ─── */
                     coroutineScope.launch {
                         snackbarData.value = CustomSnackbarData(
                             message = "Cập nhật máy tính thành công!",
@@ -551,13 +592,9 @@ fun EditMayTinhScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
+                colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE))
             ) {
-                Text(
-                    text = "Lưu Cấu Hình",
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Text("Lưu Cấu Hình", color = Color.White, fontWeight = FontWeight.SemiBold)
             }
         }
     }
