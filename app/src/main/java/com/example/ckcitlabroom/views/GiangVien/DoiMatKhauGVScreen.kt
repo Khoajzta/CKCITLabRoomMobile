@@ -52,7 +52,7 @@ fun DoiMatKhauGVScreen(
     var showPasswordNew by remember { mutableStateOf(false) }
     var showPasswordConfirm by remember { mutableStateOf(false) }
 
-    val giangvien = giangVienViewModel.giangvien
+    val giangvienhientai = giangVienViewModel.giangvien
 
     LaunchedEffect(maGiangVien) {
         giangVienViewModel.getGiangVienByMaGOrEmail(maGiangVien)
@@ -187,13 +187,12 @@ fun DoiMatKhauGVScreen(
 
             Button(
                 onClick = {
-                    val email = emailState.trim()
-                    val oldPass = matkhaucuState
-                    val newPass = matkhaumoiState
-                    val confirmPass = matkhaumoi2State
+                    var matkhaucunhap = hashPasswordMD5(matkhaucuState)
+                    var matkhaumoinhap = hashPasswordMD5(matkhaumoiState)
+                    var xacnhanmatkhaumoi = hashPasswordMD5(matkhaumoi2State)
 
                     when {
-                        email.isEmpty() || oldPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty() -> {
+                        emailState.isEmpty() || matkhaucuState.isEmpty() || matkhaumoiState.isEmpty() || matkhaumoi2State.isEmpty() -> {
                             Toast.makeText(
                                 context,
                                 "Vui lòng nhập đầy đủ thông tin",
@@ -201,26 +200,34 @@ fun DoiMatKhauGVScreen(
                             ).show()
                         }
 
-                        giangvien == null -> {
-                            Toast.makeText(context, "Không tìm thấy sinh viên", Toast.LENGTH_SHORT)
+                        giangvienhientai == null -> {
+                            Toast.makeText(
+                                context,
+                                "Không tìm thấy giang viên hiện tại",
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
                         }
 
-                        giangvien.Email != email -> {
+                        emailState != giangvienhientai.Email -> {
                             Toast.makeText(context, "Email không đúng", Toast.LENGTH_SHORT).show()
                         }
 
-                        giangvien.MatKhau != oldPass -> {
+                        giangvienhientai.MatKhau != matkhaucunhap -> {
                             Toast.makeText(context, "Mật khẩu cũ không đúng", Toast.LENGTH_SHORT)
                                 .show()
                         }
 
-                        newPass != confirmPass -> {
-                            Toast.makeText(context, "Mật khẩu mới không khớp", Toast.LENGTH_SHORT)
+                        xacnhanmatkhaumoi != matkhaumoinhap -> {
+                            Toast.makeText(
+                                context,
+                                "Xác nhận mật khẩu mới không khớp",
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
                         }
 
-                        !newPass.matches(Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*()_+=-]).{8,}$")) -> {
+                        !matkhaumoi2State.matches(Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*()_+=-]).{8,}$")) -> {
                             Toast.makeText(
                                 context,
                                 "Mật khẩu mới phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường và ký tự đặc biệt",
@@ -228,12 +235,29 @@ fun DoiMatKhauGVScreen(
                             ).show()
                         }
 
+                        hashPasswordMD5(matkhaumoi2State) == giangvienhientai.MatKhau -> {
+                            Toast.makeText(
+                                context,
+                                "Mật khẩu mới không được trùng với mật khẩu cũ",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
                         else -> {
-                            val updatedGV = giangvien.copy(MatKhau = newPass)
+                            val updatedGV =
+                                giangvienhientai.copy(MatKhau = hashPasswordMD5(matkhaumoi2State))
                             giangVienViewModel.updateGiangVien(updatedGV)
-                            Toast.makeText(context, "Đổi mật khẩu thành công", Toast.LENGTH_SHORT)
+                            Toast.makeText(
+                                context,
+                                "Đổi mật khẩu thành công, vui lòng đăng nhập lại",
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
+                            
+                            giangVienViewModel.setGV(null)
+                            giangVienViewModel.resetLoginResult()
                             giangVienViewModel.logout()
+
                             navController.navigate(NavRoute.LOGINSINHVIEN.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     inclusive = true

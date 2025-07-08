@@ -1,5 +1,8 @@
 import android.content.Context
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -20,7 +23,6 @@ data class LoginSinhVienState(
     val token: String? = null,
     val trangThai: Int = 0
 )
-
 
 
 class SinhVienPreferences(private val context: Context) {
@@ -103,25 +105,13 @@ class SinhVienPreferences(private val context: Context) {
 
 
     suspend fun logout() {
-        dataStore.edit { prefs ->
-            prefs[LOGIN_KEY] = false
-            prefs.remove(MASV_KEY)
-            prefs.remove(TENSV_KEY)
-            prefs.remove(NGAYSINH_KEY)
-            prefs.remove(GIOITINH_KEY)
-            prefs.remove(EMAIL_KEY)
-            prefs.remove(MALOP_KEY)
-            prefs.remove(MATKHAU_KEY)
-            prefs[LOAITK_KEY] = 0
-            prefs[TOKEN_KEY] = ""
-            prefs[TRANGTHAI_KEY] = 0
-        }
+        dataStore.edit { it.clear() }
         UserTypePreferences(context).clearUserType()
     }
 
     suspend fun clearLogin() {
         dataStore.edit { prefs ->
-            prefs.clear() // Xoá tất cả key liên quan
+            prefs.clear()
         }
         UserTypePreferences(context).clearUserType()
     }

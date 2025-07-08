@@ -19,12 +19,12 @@ import SinhVienViewModel
 import TuanViewModel
 import UpdateLichHocWorker
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,7 +56,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -76,7 +79,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.work.Constraints
@@ -91,7 +94,9 @@ import com.composables.icons.lucide.LayoutGrid
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.User
+import com.example.ckcitlabroom.components.NoInternetScreen
 import com.example.ckcitlabroom.ui.theme.CKCITLabRoomTheme
+import com.example.ckcitlabroom.utils.NetworkUtils
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
 import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
 import com.example.ckcitlabroom.viewmodels.ChiTietPhieuMuonViewModel
@@ -109,23 +114,43 @@ import java.util.concurrent.TimeUnit
 
 
 class MainActivity : ComponentActivity() {
+
+
+    private lateinit var navController: NavHostController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
             CKCITLabRoomTheme {
-                MainScreen()
-                scheduleUpdateLichHocWorker(applicationContext)
+                navController = rememberNavController()
+
+                fun handleIntentDeepLink(intent: Intent?) {
+                    navController.handleDeepLink(intent)
+                }
+
+                LaunchedEffect(Unit) {
+                    handleIntentDeepLink(intent)
+
+                    addOnNewIntentListener { newIntent ->
+                        setIntent(newIntent)
+                        handleIntentDeepLink(newIntent)
+                    }
+
+                    scheduleUpdateLichHocWorker(applicationContext)
+                }
+
+                MainScreen(navController)
             }
         }
     }
-
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavHostController) {
 
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = true
@@ -144,7 +169,6 @@ fun MainScreen() {
 
     RequestPermissionsOnFirstLaunch()
 
-    val navController = rememberNavController()
     val lichHocViewModel: LichHocViewModel = viewModel()
     val giangVienViewModel: GiangVienViewModel = viewModel()
     val mayTinhViewModel: MayTinhViewModel = viewModel()
@@ -176,53 +200,106 @@ fun MainScreen() {
     var SinhVienPreferences = remember { SinhVienPreferences(context) }
     var GiangVienPreferences = remember { GiangVienPreferences(context) }
 
+    // Network checking - đặt ở đầu để kiểm tra trước
+    val mainContext = LocalContext.current
+    var hasInternet by remember { mutableStateOf(true) } // Default true để app có thể khởi động
+    var isNetworkChecked by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
+        // Kiểm tra lần đầu với timeout
+        try {
+            hasInternet = NetworkUtils.isNetworkAvailable(mainContext)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Lỗi kiểm tra network ban đầu: ${e.message}")
+            hasInternet = true // Mặc định là có internet để không block app
+        }
+        isNetworkChecked = true
+
+        // Đợi 1 giây trước khi bắt đầu loop kiểm tra
+        delay(1000)
+
+        // Sau đó kiểm tra định kỳ
         while (true) {
-            delay(15_000)
-
+            delay(5000) // Tăng thời gian delay lên 5 giây
             try {
-                val localSV = SinhVienPreferences.getSinhVienFromDataStore()
-                val localGV = GiangVienPreferences.getGiangVienFromDataStore()
-
-                val currentToken = FirebaseMessaging.getInstance().token.await()
-
-                if (localSV != null) {
-                    // Gọi từ API, không dùng state cũ trong ViewModel
-                    val svServer = sinhVienViewModel.getSinhVienByMaGOrEmailNow(localSV.MaSinhVien)
-
-                    if (svServer != null && svServer.Token != currentToken) {
-                        Toast.makeText(
-                            context,
-                            "Tài khoản đã đăng nhập trên thiết bị khác",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        sinhVienViewModel.logout()
-                        SinhVienPreferences.logout()
-                        navController.navigate(NavRoute.LOGINSINHVIEN.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
-                }
-
-                if (localGV != null) {
-                    val gvServer = giangVienViewModel.getGiangVienByMaGOrEmailNow(localGV.MaGV)
-
-                    if (gvServer != null && gvServer.Token != currentToken) {
-                        Toast.makeText(
-                            context,
-                            "Tài khoản đã đăng nhập trên thiết bị khác",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        giangVienViewModel.logout()
-                        GiangVienPreferences.logout()
-                        navController.navigate(NavRoute.LOGINSINHVIEN.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
-                }
-
+                val networkStatus = NetworkUtils.isNetworkAvailable(mainContext)
+                hasInternet = networkStatus
             } catch (e: Exception) {
-                Log.e("AutoLogout", "Lỗi kiểm tra thiết bị khác: ${e.message}")
+                Log.e("MainActivity", "Lỗi kiểm tra network: ${e.message}")
+                // Không thay đổi trạng thái nếu có lỗi để tránh flicker
+            }
+        }
+    }
+
+    LaunchedEffect(hasInternet) {
+        if (hasInternet) {
+            while (hasInternet) {
+                delay(15_000)
+
+                try {
+                    val localSV = SinhVienPreferences.getSinhVienFromDataStore()
+                    val localGV = GiangVienPreferences.getGiangVienFromDataStore()
+
+                    // Kiểm tra lại internet trước khi gọi Firebase
+                    if (!NetworkUtils.isNetworkAvailable(mainContext)) {
+                        break
+                    }
+
+                    val currentToken = FirebaseMessaging.getInstance().token.await()
+
+                    if (localSV != null) {
+                        // Gọi từ API, không dùng state cũ trong ViewModel
+                        val svServer =
+                            sinhVienViewModel.getSinhVienByMaGOrEmailNow(localSV.MaSinhVien)
+
+                        if (svServer != null && svServer.Token != currentToken) {
+                            Toast.makeText(
+                                context,
+                                "Tài khoản đã đăng nhập trên thiết bị khác",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            sinhVienViewModel.logout()
+                            SinhVienPreferences.logout()
+                            navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    }
+
+                    if (localGV != null) {
+                        val gvServer = giangVienViewModel.getGiangVienByMaGOrEmailNow(localGV.MaGV)
+
+                        if (gvServer != null && gvServer.Token != currentToken) {
+                            Toast.makeText(
+                                context,
+                                "Tài khoản đã đăng nhập trên thiết bị khác",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            giangVienViewModel.logout()
+                            GiangVienPreferences.logout()
+                            navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("AutoLogout", "Lỗi kiểm tra thiết bị khác: ${e.message}")
+                    // Nếu có lỗi network, break khỏi loop
+                    if (!NetworkUtils.isNetworkAvailable(mainContext)) {
+                        break
+                    }
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(hasInternet) {
+        if (hasInternet) {
+            try {
+                notificationViewModel.getAllThongBao()
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Lỗi khi load thông báo: ${e.message}")
             }
         }
     }
@@ -233,7 +310,6 @@ fun MainScreen() {
                         (gv != null && tb.MaNguoiDung == gv.MaGV)
                 )
     }
-
 
     val buttons = listOf(
         ButtonData("Home", Lucide.House) {
@@ -257,10 +333,6 @@ fun MainScreen() {
             }
         }
     )
-
-    LaunchedEffect(Unit) {
-        notificationViewModel.getAllThongBao()
-    }
 
     @Composable
     fun TopBar(
@@ -384,13 +456,16 @@ fun MainScreen() {
             }
 
             NavRoute.ADDDIEMDANH.route -> {
-                textTopbar = "Điểm danh hôm nay"
+                textTopbar = "Điểm danh"
             }
 
             NavRoute.LISTPHIEUBYSINHVIEN.route -> {
                 textTopbar = "Danh sách phiếu đã tạo"
             }
 
+            NavRoute.LISTMAYTINHDIEMDANH.route + "?malichhoc={malichhoc}" -> {
+                textTopbar = "Điểm danh"
+            }
         }
 
         when (currentRoute) {
@@ -486,7 +561,56 @@ fun MainScreen() {
                 )
             }
 
-            NavRoute.QUANLYDONNHAP.route,
+            NavRoute.QUANLYDONNHAP.route -> {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    title = {
+                        Text(
+                            textTopbar,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF1B8DDE),
+                            modifier = Modifier.padding(start = 10.dp),
+                            fontSize = 21.sp,
+                            style = TextStyle(
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.25f),
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 4f
+                                )
+                            )
+                        )
+                    },
+                    navigationIcon = {
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .size(40.dp)
+                                .shadow(4.dp, CircleShape, clip = false)
+                                .background(Color.White, CircleShape)
+                                .border(1.dp, Color.White, CircleShape)
+                                .clickable {
+                                    navController.navigate(
+                                        NavRoute.QUANLY.route
+                                    ) {
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBackIosNew,
+                                contentDescription = "Back",
+                                tint = Color(0xFF1B8DDE),
+                                modifier = Modifier.size(25.dp)
+                            )
+                        }
+                    }
+                )
+            }
+
             NavRoute.QUANLYPHONGMAY.route,
             NavRoute.QUANLYCHUYENMAY.route,
             NavRoute.QUANLYPHIEUSUACHUA.route,
@@ -526,11 +650,7 @@ fun MainScreen() {
                                 .background(Color.White, CircleShape)
                                 .border(1.dp, Color.White, CircleShape)
                                 .clickable {
-                                    navController.navigate(NavRoute.QUANLY.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            inclusive = true
-                                        }
-                                    }
+                                    navController.popBackStack()
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -573,11 +693,7 @@ fun MainScreen() {
                                 .background(Color.White, CircleShape)
                                 .border(1.dp, Color.White, CircleShape)
                                 .clickable {
-                                    navController.navigate(NavRoute.QUANLYDONNHAP.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            inclusive = true
-                                        }
-                                    }
+                                    navController.popBackStack()
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -723,74 +839,93 @@ fun MainScreen() {
     }
 
     Scaffold(
-        topBar = { TopBar(navController, mayTinhViewModel, currentRoute) },
+        topBar = {
+            if (hasInternet) {
+                TopBar(navController, mayTinhViewModel, currentRoute)
+            }
+        },
         bottomBar = {
-            when (currentRoute) {
-                NavRoute.STARTSCREEN.route,
-                NavRoute.LOGINSINHVIEN.route,
-                NavRoute.LOGINGIANGVIEN.route -> {
-                }
+            if (hasInternet) {
+                when (currentRoute) {
+                    NavRoute.STARTSCREEN.route,
+                    NavRoute.LOGINSINHVIEN.route,
+                    NavRoute.LOGINGIANGVIEN.route -> {
+                    }
 
-                else -> {
-                    AnimatedNavigationBar(
-                        buttons = buttons,
-                        barColor = Color.White,
-                        circleColor = Color.White,
-                        selectedColor = Color.Black,
-                        unselectedColor = Color.Black,
-                        currentRoute = currentRoute
-                    )
+                    else -> {
+                        AnimatedNavigationBar(
+                            buttons = buttons,
+                            barColor = Color.White,
+                            circleColor = Color.White,
+                            selectedColor = Color.Black,
+                            unselectedColor = Color.Black,
+                            currentRoute = currentRoute
+                        )
+                    }
                 }
             }
         },
         containerColor = Color.Transparent
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color.White, Color(0xFF1B8DDE)),
-                        startY = 0f,
-                        endY = Float.POSITIVE_INFINITY
-                    )
-                )
-                .padding(
-                    top = 90.dp,
-                    bottom = 110.dp,
-                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                    end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                )
-        ) {
-            Column(
+        if (!hasInternet) {
+            NoInternetScreen(
+                onRetry = {
+                    try {
+                        hasInternet = NetworkUtils.isNetworkAvailable(mainContext)
+                    } catch (e: Exception) {
+                        Log.e("MainActivity", "Lỗi kiểm tra network trong onRetry: ${e.message}")
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.White, Color(0xFF1B8DDE)),
+                            startY = 0f,
+                            endY = Float.POSITIVE_INFINITY
+                        )
+                    )
+                    .padding(
+                        top = 90.dp,
+                        bottom = 110.dp,
+                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+                    )
             ) {
-                NavgationGraph(
-                    navController,
-                    lichHocViewModel,
-                    giangVienViewModel,
-                    mayTinhViewModel,
-                    phongMayViewModel,
-                    lopHocViewModel,
-                    lichSuChuyenMayViewModel,
-                    donNhapyViewModel,
-                    chitietdonNhapyViewModel,
-                    sinhVienViewModel,
-                    namHocViewModel,
-                    tuanViewModel,
-                    phieuSuaChuaViewModel,
-                    chiTietSuDungMayViewModel,
-                    lichSuSuaMayViewModel,
-                    phieuMuonMayViewModel,
-                    chiTietPhieuMuonViewModel,
-                    caHocViewModel,
-                    monHocViewModel,
-                    notificationViewModel
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    NavgationGraph(
+                        navController,
+                        lichHocViewModel,
+                        giangVienViewModel,
+                        mayTinhViewModel,
+                        phongMayViewModel,
+                        lopHocViewModel,
+                        lichSuChuyenMayViewModel,
+                        donNhapyViewModel,
+                        chitietdonNhapyViewModel,
+                        sinhVienViewModel,
+                        namHocViewModel,
+                        tuanViewModel,
+                        phieuSuaChuaViewModel,
+                        chiTietSuDungMayViewModel,
+                        lichSuSuaMayViewModel,
+                        phieuMuonMayViewModel,
+                        chiTietPhieuMuonViewModel,
+                        caHocViewModel,
+                        monHocViewModel,
+                        notificationViewModel
+                    )
+                }
             }
         }
     }
@@ -817,9 +952,3 @@ fun scheduleUpdateLichHocWorker(context: Context) {
         periodicWork
     )
 }
-
-
-
-
-
-

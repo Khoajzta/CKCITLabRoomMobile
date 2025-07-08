@@ -8,8 +8,6 @@ import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -83,6 +81,33 @@ class NamHocViewModel : ViewModel() {
             } catch (e: Exception) {
                 namhocUpdateResult = "Lỗi khi cập nhật môn học: ${e.message}"
                 Log.e("NamHocViewModel", "Lỗi khi cập nhật môn học: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun deleteNamHoc(maNam: String) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val apiResp = withContext(Dispatchers.IO) {
+                    ITLabRoomRetrofitClient.namhocAPIService
+                        .deleteNamHoc(DeleteNamHocRequest(maNam))
+                }
+
+                namhocDeleteResult = when {
+                    apiResp.isSuccessful -> {
+                        apiResp.body()?.message ?: "Xoá thành công"
+                    }
+
+                    else -> {
+                        "Xoá thất bại (code ${apiResp.code()})"
+                    }
+                }
+            } catch (e: Exception) {
+                namhocDeleteResult = "Lỗi khi xoá năm học: ${e.message}"
+                Log.e("NamHocViewModel", namhocDeleteResult)
             } finally {
                 isLoading = false
             }

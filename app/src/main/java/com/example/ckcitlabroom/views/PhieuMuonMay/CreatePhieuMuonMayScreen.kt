@@ -265,7 +265,12 @@ fun CreatePhieuMuonMayScreen(
 
                         phieuMuonMayViewModel.createPhieuMuonMay(phieumuonmay)
                         Toast.makeText(context, "Tạo Phiếu Mượn Máy Thành Công", Toast.LENGTH_SHORT)
-                        navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route + "?startIndex=0")
+                        navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route + "?startIndex=0") {
+                            popUpTo(NavRoute.ADDPHIEUMUONMAY.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
 
                     }
                 },

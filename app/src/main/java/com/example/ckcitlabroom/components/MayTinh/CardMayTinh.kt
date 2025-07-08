@@ -55,6 +55,7 @@ import com.composables.icons.lucide.MapPin
 import com.composables.icons.lucide.MemoryStick
 import com.composables.icons.lucide.Monitor
 import com.composables.icons.lucide.Mouse
+import com.composables.icons.lucide.Pen
 import com.composables.icons.lucide.QrCode
 import com.composables.icons.lucide.Truck
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
@@ -109,7 +110,11 @@ fun CardMayTinh(
                 Button(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
                     onClick = {
-                        var maytinhnew = maytinh.copy(MaPhong = selectedMaPhongMoi.toString())
+                        var maytinhnew = maytinh.copy(
+                            TenMay = "MAY${selectedMaPhongMoi}",
+                            MaPhong = selectedMaPhongMoi.toString(),
+                            ViTri = ""
+                        )
                         maytinhViewModel.updateMayTinh(maytinhnew)
                         maytinhViewModel.getAllMayTinh()
                         Toast.makeText(
@@ -250,7 +255,13 @@ fun CardMayTinh(
 
                     Text("Lịch sử sửa", color = Color(0xFF1B8DDE), fontSize = 11.sp)
                 }
+            }
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
                 OutlinedButton(
                     onClick = {
                         showDialog = true
@@ -271,12 +282,44 @@ fun CardMayTinh(
                     Text("Chuyển máy", color = Color(0xFF1B8DDE), fontSize = 11.sp)
                 }
 
+                OutlinedButton(
+                    onClick = {
+                        navController.navigate(NavRoute.EDITMAYTINH.route + "?mamay=${maytinh.MaMay}")
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1B8DDE)),
+                    border = BorderStroke(1.dp, Color(0xFF1B8DDE)),
+                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp)
+                ) {
+                    Icon(
+                        Lucide.Pen,
+                        contentDescription = null,
+                        tint = Color(0xFF1B8DDE),
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Chỉnh sửa", color = Color(0xFF1B8DDE), fontSize = 11.sp)
+                }
             }
 
             if (expanded) {
                 Spacer(Modifier.height(8.dp))
 
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Thông tin cấu hình",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        )
+                    }
                     InfoRow(icon = Lucide.Cpu, label = "Main", value = maytinh.Main)
                     InfoRow(icon = Lucide.Cpu, label = "CPU", value = maytinh.CPU)
                     InfoRow(icon = Lucide.MemoryStick, label = "RAM", value = maytinh.RAM)
@@ -286,18 +329,6 @@ fun CardMayTinh(
                     InfoRow(icon = Lucide.Monitor, label = "Màn hình", value = maytinh.ManHinh)
                     InfoRow(icon = Lucide.Keyboard, label = "Bàn phím", value = maytinh.BanPhim)
                     InfoRow(icon = Lucide.Mouse, label = "Chuột", value = maytinh.Chuot)
-
-
-                    Button(
-                        onClick = {
-                            navController.navigate(NavRoute.EDITMAYTINH.route + "?mamay=${maytinh.MaMay}")
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8DDE))
-                    ) {
-                        Text("Chỉnh sửa", color = Color.White, fontWeight = FontWeight.Bold)
-                    }
                 }
             }
         }

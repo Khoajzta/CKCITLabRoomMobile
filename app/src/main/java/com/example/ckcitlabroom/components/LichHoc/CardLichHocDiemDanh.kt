@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Class
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Schedule
@@ -34,6 +35,7 @@ import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.Clock
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Play
+import com.composables.icons.lucide.User
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -181,6 +183,20 @@ fun CardLichHocDiemDanh(
                 icon = Icons.Filled.Schedule,
                 label = "Ca học",
                 value = lichHoc.TenCa
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+
+            InfoRow(
+                icon = Lucide.User,
+                label = "GV",
+                value = lichHoc.TenGiangVien
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+
+            InfoRow(
+                icon = Icons.Filled.Class,
+                label = "Lớp",
+                value = lichHoc.TenLopHoc
             )
             Spacer(modifier = Modifier.height(4.dp))
 

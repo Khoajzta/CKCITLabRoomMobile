@@ -17,7 +17,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
 import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
@@ -43,11 +42,7 @@ fun QuanLyPhieuSuaChuaScreen(
 ) {
 
     BackHandler {
-        navController.navigate(NavRoute.QUANLY.route) {
-            popUpTo(navController.graph.findStartDestination().id) {
-                inclusive = true
-            }
-        }
+        navController.popBackStack()
     }
     /* ---------- Pager & Tab state ---------- */
     val pageCount = 3

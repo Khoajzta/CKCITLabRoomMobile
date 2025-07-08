@@ -35,13 +35,13 @@ fun DiemDanhScreen(
 
     LaunchedEffect(Unit) {
         sinhvien?.let {
-            lichhocViewModel.getLichHocByMaLopHoc(it.MaLop)
+            lichhocViewModel.getAllLichHoc()
             caHocViewModel.getAllCaHoc()
         }
     }
 
     val danhSachCaHoc = caHocViewModel.danhSachAllCaHoc
-    val danhSachLichHoc = lichhocViewModel.danhSachLichHoctheomalop
+    val danhSachLichHoc = lichhocViewModel.danhSachLichHoc
 
     // Lấy giờ hiện tại
     val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")

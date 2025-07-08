@@ -1,4 +1,5 @@
 package com.example.ckcitlabroom.components.GiangVien
+
 import GiangVien
 import GiangVienViewModel
 import InfoRow
@@ -49,14 +50,16 @@ fun CardGiangVienPhanQuyen(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "GV: ${giangVien.TenGiangVien}",
+                text = "${giangVien.TenGiangVien}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 color = Color(0xFF1B8DDE)
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
                 thickness = 2.dp,
                 color = Color(0xFFDDDDDD),
             )
@@ -92,14 +95,18 @@ fun CardGiangVienPhanQuyen(
                         Text("Phân quyền", color = Color.Black, fontWeight = FontWeight.Bold)
                     },
                     text = {
-                        Text("Giảng viên: ${giangVien.TenGiangVien}", fontWeight = FontWeight.SemiBold, color = Color.Black)
+                        Text(
+                            "Giảng viên: ${giangVien.TenGiangVien}",
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Black
+                        )
                     },
                     confirmButton = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            if(giangVien.MaLoaiTaiKhoan == 1){
+                            if (giangVien.MaLoaiTaiKhoan == 1) {
                                 Button(
                                     modifier = Modifier.fillMaxWidth(),
                                     onClick = {
@@ -107,13 +114,14 @@ fun CardGiangVienPhanQuyen(
                                             giangVien.copy(MaLoaiTaiKhoan = 2) // 2 = Giảng viên
                                         )
                                         showDialog = false
+                                        giangVienViewModel.getAllGiangVien()
                                     },
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(Color(0xFF2196F3))
                                 ) {
                                     Text("Giảng viên", color = Color.White)
                                 }
-                            }else{
+                            } else {
                                 Button(
                                     modifier = Modifier
                                         .fillMaxWidth(),
@@ -122,6 +130,7 @@ fun CardGiangVienPhanQuyen(
                                             giangVien.copy(MaLoaiTaiKhoan = 1) // 1 = Admin
                                         )
                                         showDialog = false
+                                        giangVienViewModel.getAllGiangVien()
                                     },
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))

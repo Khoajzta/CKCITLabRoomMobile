@@ -22,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -30,16 +29,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -53,9 +54,21 @@ fun CreateGiangVienScreen(
     giangVienViewModel: GiangVienViewModel,
 ) {
     val danhSachGiangVien = giangVienViewModel.danhSachAllGiangVien
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
-    val coroutineScope = rememberCoroutineScope()
+    val suffix = "@caothang.edu.vn"
+
+    val suffixTransformation = remember {
+        object : VisualTransformation {
+            override fun filter(text: AnnotatedString): TransformedText {
+                val out = AnnotatedString(text.text + suffix)
+                val offsetMap = object : OffsetMapping {
+                    override fun originalToTransformed(offset: Int): Int = offset
+                    override fun transformedToOriginal(offset: Int): Int =
+                        offset.coerceAtMost(text.text.length)
+                }
+                return TransformedText(out, offsetMap)
+            }
+        }
+    }
 
     val maGVState = remember { mutableStateOf("") }
     val tenGVState = remember { mutableStateOf("") }
@@ -248,8 +261,12 @@ fun CreateGiangVienScreen(
                     Text("Email", fontWeight = FontWeight.Bold, color = Color.Black)
                     OutlinedTextField(
                         value = emailState.value,
-                        onValueChange = { emailState.value = it },
+                        onValueChange = { input ->
+                            emailState.value = input.substringBefore('@')
+                        },
                         placeholder = { Text("Nhập email") },
+                        visualTransformation = suffixTransformation,
+                        singleLine = true,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 12.dp),
@@ -279,64 +296,56 @@ fun CreateGiangVienScreen(
 
                     if (maGVState.value.isBlank() || tenGVState.value.isBlank() ||
                         ngaySinhDb.value.isBlank() || gioiTinhState.value.isBlank() ||
-                        emailState.value.isBlank() || matKhauState.value.isBlank()
+                        emailState.value.isBlank()
                     ) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Vui lòng nhập đầy đủ thông tin!",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
+                        Toast.makeText(
+                            context,
+                            "Vui lòng nhập đầy đủ thông tin!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else if (birthDate == null) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Ngày sinh không hợp lệ! (Định dạng yyyy-MM-dd)",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
+                        Toast.makeText(
+                            context,
+                            "Ngày sinh không hợp lệ! (Định dạng yyyy-MM-dd)",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
                     } else if (today.year - birthDate.year < 22) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Giảng viên phải đủ 22 tuổi trở lên!",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
-                    } else if (!isValidEmail(emailState.value)) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Email phải có đuôi @caothang.edu.vn!",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
-                    } else if (!isValidPassword(matKhauState.value)) {
-                        coroutineScope.launch {
-                            snackbarData.value = CustomSnackbarData(
-                                message = "Mật khẩu phải từ 8 ký tự, gồm chữ hoa, chữ thường và ký tự đặc biệt!",
-                                type = SnackbarType.ERROR
-                            )
-                            snackbarHostState.showSnackbar("Thông báo")
-                        }
+                        Toast.makeText(
+                            context,
+                            "Giảng viên phải đủ 22 tuổi trở lên!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else if (!isValidEmail(emailState.value + suffix)) {
+                        Toast.makeText(
+                            context,
+                            "Email phải có đuôi @caothang.edu.vn",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         val daTonTai = danhSachGiangVien.any { it.MaGV == maGVState.value }
+                        val emailDaTonTai =
+                            danhSachGiangVien.any { it.Email == emailState.value + suffix }
                         if (daTonTai) {
-                            coroutineScope.launch {
-                                snackbarData.value = CustomSnackbarData(
-                                    message = "Mã giảng viên đã tồn tại!", type = SnackbarType.ERROR
-                                )
-                                snackbarHostState.showSnackbar("Thông báo")
-                            }
+                            Toast.makeText(
+                                context,
+                                "Mã giảng viên đã tồn tại!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else if (emailDaTonTai) {
+                            Toast.makeText(
+                                context,
+                                "Email đã tồn tại!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } else {
                             val giangVienMoi = GiangVien(
                                 MaGV = maGVState.value,
                                 TenGiangVien = tenGVState.value,
                                 NgaySinh = ngaySinhDb.value,
                                 GioiTinh = gioiTinhState.value,
-                                Email = emailState.value,
-                                MatKhau = maGVState.value,
+                                Email = emailState.value + suffix,
+                                MatKhau = hashPasswordMD5(maGVState.value),
                                 MaLoaiTaiKhoan = 2,
                                 TrangThai = 1
                             )
@@ -347,8 +356,13 @@ fun CreateGiangVienScreen(
                                 "Thêm giảng viên thành công!",
                                 Toast.LENGTH_SHORT
                             ).show()
-
-                            navController.navigate(NavRoute.QUANLYGIANGVIEN.route + "?startIndex={0}")
+                            navController.navigate(NavRoute.QUANLYGIANGVIEN.route + "?startIndex=0") {
+                                popUpTo(NavRoute.ADDGIANGVIEN.route) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                            giangVienViewModel.getAllGiangVien()
                         }
                     }
                 },

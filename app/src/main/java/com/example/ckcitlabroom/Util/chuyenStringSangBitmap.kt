@@ -11,7 +11,6 @@ import java.io.File
 import java.io.FileOutputStream
 
 
-
 fun base64ToBitmap(base64Str: String): Bitmap {
     val decodedBytes = Base64.decode(base64Str, Base64.DEFAULT)
     return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
@@ -112,7 +111,12 @@ fun createPdfWithQRCodeBase64(
                 pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
                 page = pdfDocument.startPage(pageInfo)
                 canvas = page.canvas
-                canvas.drawText("QR máy phòng: $tenphong", (pageWidth / 2).toFloat(), padding.toFloat(), titlePaint)
+                canvas.drawText(
+                    "QR máy: $tenphong",
+                    (pageWidth / 2).toFloat(),
+                    padding.toFloat(),
+                    titlePaint
+                )
                 currentY = padding + 40
             }
 
@@ -123,7 +127,8 @@ fun createPdfWithQRCodeBase64(
 
     pdfDocument.finishPage(page)
 
-    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val downloadsDir =
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
     val file = File(downloadsDir, fileName)
     pdfDocument.writeTo(FileOutputStream(file))
     pdfDocument.close()

@@ -154,6 +154,8 @@ sealed class NavRoute(val route: String) {
 
     //Thông báo
     object ListThongBaoSinhVien : NavRoute("listthongbaosinhvien_screen")
+
+    object Nointernet : NavRoute("nointernet_screen")
 }
 
 @Composable
@@ -206,6 +208,7 @@ fun NavgationGraph(
                 namHocViewModel,
                 tuanViewModel,
                 mayTinhViewModel,
+                phieuMuonMayViewModel
             )
         }
 
@@ -214,7 +217,7 @@ fun NavgationGraph(
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) {
-            QuanLyScreen(navController, giangVienViewModel, sinhVienViewModel)
+            QuanLyScreen(navController, giangVienViewModel, sinhVienViewModel, mayTinhViewModel)
         }
 
         composable(
@@ -339,7 +342,7 @@ fun NavgationGraph(
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
-            EditMayTinhScreen(mamay, mayTinhViewModel, phongMayViewModel)
+            EditMayTinhScreen(navController, mamay, mayTinhViewModel, phongMayViewModel)
         }
 
         composable(

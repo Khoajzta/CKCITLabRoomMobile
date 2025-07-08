@@ -166,7 +166,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "Số lượng máy", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "Số lượng máy(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -195,7 +195,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "Ngày Nhập",
+                        text = "Ngày Nhập(*)",
                         color = Color.Black,
                         fontWeight = FontWeight.Bold
                     )
@@ -228,7 +228,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "Nhà cung cấp", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "Nhà cung cấp(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -267,7 +267,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "Main", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "Main(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -291,7 +291,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "CPU", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "CPU(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -315,7 +315,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "RAM", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "RAM(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -339,7 +339,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "VGA", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "VGA(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -363,7 +363,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "Màn Hình", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "Màn Hình(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -387,7 +387,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "Bàn Phím", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "Bàn Phím(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -411,7 +411,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "Chuột", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "Chuột(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -435,7 +435,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "HDD", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "HDD(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -459,7 +459,7 @@ fun CreateDonNhapScreen(
 
                 item {
                     Text(
-                        text = "SSD", color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "SSD(*)", color = Color.Black, fontWeight = FontWeight.Bold
                     )
 
                     OutlinedTextField(
@@ -576,8 +576,8 @@ fun CreateDonNhapScreen(
                                 isSuccess.value = false
                                 dialogMessage.value = "Lỗi khi gửi đơn nhập. Vui lòng thử lại!"
                             } finally {
-                                loadingState.value = false   // ← chỉ tắt khi đã có dialogMessage
-                                openDialog.value = true      // mở dialog thông báo
+                                loadingState.value = false
+                                openDialog.value = true
                             }
                         }
                     }
@@ -608,10 +608,12 @@ fun CreateDonNhapScreen(
                             onClick = {
                                 openDialog.value = false
                                 if (isSuccess.value) {
-                                    navController.navigate(
-                                        NavRoute.CHITIETDONNHAP.route +
-                                                "?madonnhap=${maDonNhapNew.value}"
-                                    )
+                                    navController.navigate(NavRoute.CHITIETDONNHAP.route + "?madonnhap=${maDonNhapNew.value}") {
+                                        popUpTo(NavRoute.ADDDONNHAP.route) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
                                     isSuccess.value = false
                                 }
                             },

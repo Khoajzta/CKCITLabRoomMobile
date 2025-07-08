@@ -1,5 +1,7 @@
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 
@@ -7,6 +9,8 @@ data class NamHocResponse(
     val message: String? = null,
     val namhoc: List<NamHoc>? = null
 )
+
+data class DeleteNamHocRequest(val MaNam: String)
 
 
 interface NamHocAPIService {
@@ -23,4 +27,13 @@ interface NamHocAPIService {
 
     @GET("NamHoc/read.php")
     suspend fun getAllNamHoc(): NamHocResponse
+
+    @HTTP(
+        method = "DELETE",
+        path = "NamHoc/delete.php",
+        hasBody = true
+    )
+    suspend fun deleteNamHoc(
+        @Body req: DeleteNamHocRequest
+    ): Response<DeleteResponse>
 }

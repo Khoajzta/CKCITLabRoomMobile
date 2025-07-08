@@ -1,4 +1,5 @@
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -6,9 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,21 +45,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditMayTinhScreen(
+    navController: NavHostController,
     maMay: String,
     mayTinhViewModel: MayTinhViewModel = viewModel(),
     phongMayViewModel: PhongMayViewModel
 ) {
+    var context = LocalContext.current
     var maytinh = mayTinhViewModel.maytinh
 
     val danhSachPhongMay = phongMayViewModel.danhSachAllPhongMay
@@ -133,13 +142,22 @@ fun EditMayTinhScreen(
         mayTinhViewModel.getMayTinhByPhong(selectdMaPhong)
     }
 
-    Log.d("danhsachmaytinh", danhsachmaytinhtheophong.toString())
+    val density = LocalDensity.current
+    val ime = WindowInsets.ime
+
+    val imeBottomPx by remember {             // recomposition khi ime thay đổi
+        derivedStateOf { ime.getBottom(density) }
+    }
+
+    val rawBottomDp = with(density) { (imeBottomPx * 0.7f).toDp() }
+    val targetBottomDp = rawBottomDp.coerceAtMost(300.dp)
 
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
+            .padding(bottom = targetBottomDp)
             .height(640.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
@@ -528,7 +546,7 @@ fun EditMayTinhScreen(
 
             Button(
                 onClick = {
-                    /* ─── 1. Chuẩn hoá vị trí người dùng nhập ─── */
+                    /*  Chuẩn hoá vị trí người dùng nhập */
                     val viTriFormatted = viTriState.value.trim()
                         .let { it.toIntOrNull()?.let { "%02d".format(it) } ?: it }
 
@@ -545,25 +563,24 @@ fun EditMayTinhScreen(
 
                     val viTriDaThayDoi = viTriFormatted != maytinh.ViTri
 
-                    /* ─── 2. Nếu vị trí thay đổi → xoá vị trí máy khác trùng ─── */
+                    /* Nếu vị trí thay đổi → xoá vị trí máy khác trùng */
                     if (viTriDaThayDoi) {
                         danhsachmaytinhtheophong        // (đã lọc theo phòng sẵn)
                             .filter { it.ViTri == viTriFormatted && it.MaMay != maytinh.MaMay }
                             .forEach { m ->
                                 val cleared = m.copy(
                                     ViTri = "",
-                                    TenMay = m.TenMay.substringBefore(".")   // bỏ đuôi .xx nếu có
+                                    TenMay = m.TenMay.substringBefore(".")
                                 )
                                 mayTinhViewModel.updateMayTinh(cleared)
                             }
                     }
 
-                    /* ─── 3. Tính lại tên máy cho máy đang chỉnh ─── */
                     val tenMayMoi = if (viTriDaThayDoi)
                         "${tenMayState.value.substringBefore(".")}.$viTriFormatted"
                     else tenMayState.value
 
-                    /* ─── 4. Tạo bản ghi mới & lưu ─── */
+
                     val mayTinhMoi = maytinh.copy(
                         TenMay = tenMayMoi,
                         ViTri = viTriFormatted,
@@ -580,15 +597,8 @@ fun EditMayTinhScreen(
                     )
 
                     mayTinhViewModel.updateMayTinh(mayTinhMoi)
-
-                    /* ─── 5. Thông báo thành công ─── */
-                    coroutineScope.launch {
-                        snackbarData.value = CustomSnackbarData(
-                            message = "Cập nhật máy tính thành công!",
-                            type = SnackbarType.SUCCESS
-                        )
-                        snackbarHostState.showSnackbar("Thông báo")
-                    }
+                    Toast.makeText(context, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),

@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 
 @Composable
 fun DoiMatKhauSvScreen(
@@ -41,6 +43,7 @@ fun DoiMatKhauSvScreen(
     navController: NavHostController
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     var emailState by remember { mutableStateOf("") }
     var matkhaucuState by remember { mutableStateOf("") }
@@ -183,12 +186,12 @@ fun DoiMatKhauSvScreen(
             Button(
                 onClick = {
                     val email = emailState.trim()
-                    val oldPass = matkhaucuState
-                    val newPass = matkhaumoiState
-                    val confirmPass = matkhaumoi2State
+                    val oldPassNhap = hashPasswordMD5(matkhaucuState)
+                    val newPassNhap = hashPasswordMD5(matkhaumoiState)
+                    val confirmPass = hashPasswordMD5(matkhaumoi2State)
 
                     when {
-                        email.isEmpty() || oldPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty() -> {
+                        emailState.isEmpty() || matkhaucuState.isEmpty() || matkhaumoiState.isEmpty() || matkhaumoi2State.isEmpty() -> {
                             Toast.makeText(
                                 context,
                                 "Vui lòng nhập đầy đủ thông tin",
@@ -201,21 +204,25 @@ fun DoiMatKhauSvScreen(
                                 .show()
                         }
 
-                        sinhvien.Email != email -> {
+                        email != sinhvien.Email -> {
                             Toast.makeText(context, "Email không đúng", Toast.LENGTH_SHORT).show()
                         }
 
-                        sinhvien.MatKhau != oldPass -> {
+                        oldPassNhap != sinhvien.MatKhau -> {
                             Toast.makeText(context, "Mật khẩu cũ không đúng", Toast.LENGTH_SHORT)
                                 .show()
                         }
 
-                        newPass != confirmPass -> {
-                            Toast.makeText(context, "Mật khẩu mới không khớp", Toast.LENGTH_SHORT)
+                        confirmPass != newPassNhap -> {
+                            Toast.makeText(
+                                context,
+                                "Xác nhận mật khẩu mới không khớp",
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
                         }
 
-                        !newPass.matches(Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*()_+=-]).{8,}$")) -> {
+                        !matkhaumoi2State.matches(Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*()_+=-]).{8,}$")) -> {
                             Toast.makeText(
                                 context,
                                 "Mật khẩu mới phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường và ký tự đặc biệt",
@@ -223,15 +230,33 @@ fun DoiMatKhauSvScreen(
                             ).show()
                         }
 
+                        hashPasswordMD5(matkhaumoi2State) == sinhvien.MatKhau -> {
+                            Toast.makeText(
+                                context,
+                                "Mật khẩu mới không được trùng với mật khẩu cũ",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
                         else -> {
-                            val updatedSV = sinhvien.copy(MatKhau = newPass)
-                            sinhVienViewModel.updateSinhVien(updatedSV)
-                            Toast.makeText(context, "Đổi mật khẩu thành công", Toast.LENGTH_SHORT)
-                                .show()
-                            sinhVienViewModel.logout()
-                            navController.navigate(NavRoute.LOGINSINHVIEN.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    inclusive = true
+                            coroutineScope.launch {
+                                val updatedSV =
+                                    sinhvien.copy(MatKhau = hashPasswordMD5(matkhaumoi2State))
+                                sinhVienViewModel.updateSinhVien(updatedSV)
+                                Toast.makeText(
+                                    context,
+                                    "Đổi mật khẩu thành công, vui lòng đăng nhập lại",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                sinhVienViewModel.setSV(null)
+                                sinhVienViewModel.resetLoginResult()
+                                sinhVienViewModel.logout()
+
+                                navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        inclusive = true
+                                    }
                                 }
                             }
                         }

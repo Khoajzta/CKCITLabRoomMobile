@@ -1,4 +1,3 @@
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,15 +15,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,8 +43,8 @@ import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.models.CaHoc
 import com.example.ckcitlabroom.models.LopHoc
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
-import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
+import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -81,30 +80,29 @@ fun EditLichHocScreen(
 
     /** Dropdown state */
     var selectedGiangVien by remember { mutableStateOf<GiangVien?>(null) }
-    var selectedPhong     by remember { mutableStateOf<PhongMay?>(null) }
-    var selectedTuanTu    by remember { mutableStateOf<Tuan?>(null) }
-    var selectedTuanDen   by remember { mutableStateOf<Tuan?>(null) }
-    var selectedMonHoc    by remember { mutableStateOf<MonHoc?>(null) }
-    var selectedThu       by remember { mutableStateOf<String?>(null) }
-    var selectedLop       by remember { mutableStateOf<LopHoc?>(null) }
-    var selectedCaHoc     by remember { mutableStateOf<CaHoc?>(null) }
-    var ghiChu            by remember { mutableStateOf("") }
+    var selectedPhong by remember { mutableStateOf<PhongMay?>(null) }
+    var selectedTuanTu by remember { mutableStateOf<Tuan?>(null) }
+    var selectedTuanDen by remember { mutableStateOf<Tuan?>(null) }
+    var selectedMonHoc by remember { mutableStateOf<MonHoc?>(null) }
+    var selectedThu by remember { mutableStateOf<String?>(null) }
+    var selectedLop by remember { mutableStateOf<LopHoc?>(null) }
+    var selectedCaHoc by remember { mutableStateOf<CaHoc?>(null) }
+    var ghiChu by remember { mutableStateOf("") }
 
     /** Danh sách dữ liệu */
     val danhSachGiangVien = giangvienViewModel.danhSachAllGiangVien
-    val danhSachPhong     = phongMayViewModel.danhSachAllPhongMay
-    val danhSachNamHoc    = namHocViewModel.danhSachAllNamHoc
-    val danhSachTuan      = tuanViewModel.danhSachAllTuan
-    val danhSachMonHoc    = monHocViewModel.danhSachAllMonHoc.filter { it.TrangThai == 1 }
-    val danhSachLopHoc    = lopHocViewModel.danhSachAllLopHoc.filter { it.TrangThai == 1 }
-    val danhSachCaHoc     = caHocViewModel.danhSachAllCaHoc.filter { it.TrangThai == 1 }
+    val danhSachPhong = phongMayViewModel.danhSachAllPhongMay
+    val danhSachNamHoc = namHocViewModel.danhSachAllNamHoc
+    val danhSachTuan = tuanViewModel.danhSachAllTuan
+    val danhSachMonHoc = monHocViewModel.danhSachAllMonHoc.filter { it.TrangThai == 1 }
+    val danhSachLopHoc = lopHocViewModel.danhSachAllLopHoc.filter { it.TrangThai == 1 }
     val danhSachAllLichHoc = lichhocViewModel.danhSachLichHoc.filter { it.TrangThai == 1 }
 
     val danhSachTokenSinhVienTheoLop by rememberUpdatedState(sinhVienViewModel.danhSachToken)
     val danhSachAllSinhVien = sinhVienViewModel.danhSachAllSinhVien
     var danhSachSinhVienTheoLop = danhSachAllSinhVien.filter { it.MaLop == lichhoc?.MaLopHoc }
 
-    /** Thứ – Offset */
+    // Thứ – Offset 
     val danhSachThu = listOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật")
     val thuToOffset = mapOf(
         "Thứ 2" to 0, "Thứ 3" to 1, "Thứ 4" to 2,
@@ -112,8 +110,59 @@ fun EditLichHocScreen(
         "Chủ Nhật" to 6
     )
 
+    // Filter ca học đơn giản: chỉ lấy những ca còn hoạt động
+    val danhSachCaHoc = caHocViewModel.danhSachAllCaHoc.filter { it.TrangThai == 1 }
+
+    // Filter lớp học chưa có ca học trong thứ và tuần được chọn (bao gồm lớp hiện tại)
+    val danhsachlopchualichday = remember(
+        selectedThu, selectedTuanTu, selectedTuanDen, selectedCaHoc,
+        danhSachLopHoc, danhSachAllLichHoc, danhSachTuan, lichhoc
+    ) {
+        if (selectedThu != null && selectedTuanTu != null && selectedTuanDen != null && selectedCaHoc != null) {
+            // Tính toán tất cả các ngày dạy dựa trên tuần từ - tuần đến
+            val thuOffset = thuToOffset[selectedThu] ?: 0
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+            val tuanBatDauIndex = danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanTu?.MaTuan }
+            val tuanKetThucIndex =
+                danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanDen?.MaTuan }
+
+            val ngayDayList = mutableListOf<String>()
+
+            if (tuanBatDauIndex != -1 && tuanKetThucIndex != -1 && tuanBatDauIndex <= tuanKetThucIndex) {
+                for (i in tuanBatDauIndex..tuanKetThucIndex) {
+                    val tuan = danhSachTuan[i]
+                    try {
+                        val ngayDay = LocalDate.parse(tuan.NgayBatDau, formatter)
+                            .plusDays(thuOffset.toLong())
+                            .format(formatter)
+                        ngayDayList.add(ngayDay)
+                    } catch (e: Exception) {
+                        // Bỏ qua ngày không hợp lệ
+                    }
+                }
+            }
+
+            // Lọc ra những lớp đã có lịch học trong ca và các ngày cụ thể này
+            // Loại trừ lịch học hiện tại đang được edit
+            val usedLopHoc = danhSachAllLichHoc.filter { lichHoc ->
+                lichHoc.MaCaHoc == selectedCaHoc?.MaCaHoc &&
+                        lichHoc.NgayDay in ngayDayList &&
+                        lichHoc.MaLichHoc != lichhoc?.MaLichHoc // Loại trừ lịch hiện tại
+            }.map { it.MaLopHoc }.toSet()
+
+            // Chỉ hiển thị những lớp chưa có lịch học
+            danhSachLopHoc.filter { lopHoc ->
+                lopHoc.MaLopHoc !in usedLopHoc
+            }
+        } else {
+            danhSachLopHoc
+        }
+    }
+
     /** Selected năm học mặc định */
-    val selectedNamHoc = remember(danhSachNamHoc) { danhSachNamHoc.firstOrNull { it.TrangThai == 1 } }
+    val selectedNamHoc =
+        remember(danhSachNamHoc) { danhSachNamHoc.firstOrNull { it.TrangThai == 1 } }
     val danhSachTuanTheoNam = remember(selectedNamHoc, danhSachTuan) {
         danhSachTuan.filter { it.MaNam == selectedNamHoc?.MaNam }
     }
@@ -132,19 +181,21 @@ fun EditLichHocScreen(
     }
 
     /* ────── KHI LỊCH ĐƯỢC TRẢ VỀ, GÁN VÀO DROPDOWN ────── */
-    LaunchedEffect(lichhocViewModel.lichhoc, danhSachGiangVien, danhSachPhong,
-        danhSachLopHoc, danhSachMonHoc, danhSachCaHoc, danhSachTuanTheoNam) {
+    LaunchedEffect(
+        lichhocViewModel.lichhoc, danhSachGiangVien, danhSachPhong,
+        danhSachLopHoc, danhSachMonHoc, danhSachCaHoc, danhSachTuanTheoNam
+    ) {
         lichhocViewModel.lichhoc?.let { data ->
             lichhoc = data
             originalMaLopHoc = data.MaLopHoc
-            selectedGiangVien = danhSachGiangVien.find { it.MaGV  == data.MaGV  }
-            selectedPhong     = danhSachPhong    .find { it.MaPhong == data.MaPhong }
-            selectedLop       = danhSachLopHoc   .find { it.MaLopHoc == data.MaLopHoc }
-            selectedMonHoc    = danhSachMonHoc   .find { it.MaMonHoc == data.MaMonHoc }
-            selectedCaHoc     = danhSachCaHoc    .find { it.MaCaHoc == data.MaCaHoc }
-            selectedTuanTu    = danhSachTuanTheoNam.find { it.MaTuan == data.MaTuan }
-            selectedTuanDen   = selectedTuanTu
-            selectedThu       = danhSachThu.find { it == data.Thu }
+            selectedGiangVien = danhSachGiangVien.find { it.MaGV == data.MaGV }
+            selectedPhong = danhSachPhong.find { it.MaPhong == data.MaPhong }
+            selectedLop = danhSachLopHoc.find { it.MaLopHoc == data.MaLopHoc }
+            selectedMonHoc = danhSachMonHoc.find { it.MaMonHoc == data.MaMonHoc }
+            selectedCaHoc = danhSachCaHoc.find { it.MaCaHoc == data.MaCaHoc }
+            selectedTuanTu = danhSachTuanTheoNam.find { it.MaTuan == data.MaTuan }
+            selectedTuanDen = selectedTuanTu
+            selectedThu = danhSachThu.find { it == data.Thu }
 
             /** Lấy token SV lớp gốc */
             sinhVienViewModel.getTokensByMaLop(data.MaLopHoc)
@@ -182,7 +233,9 @@ fun EditLichHocScreen(
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .fillMaxWidth(),
                 thickness = 2.dp,
                 color = Color(0xFF1B8DDE)
             )
@@ -220,18 +273,6 @@ fun EditLichHocScreen(
                     )
                 }
 
-                /* Lớp */
-                item {
-                    Text("Lớp", fontWeight = FontWeight.Bold)
-                    CustomDropdownSelector(
-                        label = "Lớp",
-                        items = danhSachLopHoc,
-                        selectedItem = selectedLop,
-                        itemLabel = { it.TenLopHoc },
-                        onItemSelected = { selectedLop = it },
-                        enabled = choPhepChinhSua
-                    )
-                }
 
                 /* Tuần */
                 item {
@@ -284,6 +325,19 @@ fun EditLichHocScreen(
                     )
                 }
 
+                /* Lớp */
+                item {
+                    Text("Lớp", fontWeight = FontWeight.Bold)
+                    CustomDropdownSelector(
+                        label = "Lớp",
+                        items = danhsachlopchualichday,
+                        selectedItem = selectedLop,
+                        itemLabel = { it.TenLopHoc },
+                        onItemSelected = { selectedLop = it },
+                        enabled = choPhepChinhSua
+                    )
+                }
+
                 /* Môn */
                 item {
                     Text("Môn", fontWeight = FontWeight.Bold)
@@ -325,16 +379,21 @@ fun EditLichHocScreen(
                 onClick = {
                     /* 1. Kiểm tra đã chọn đủ */
                     if (selectedGiangVien == null || selectedPhong == null ||
-                        selectedLop == null     || selectedTuanTu == null ||
-                        selectedThu == null     || selectedCaHoc == null ||
-                        selectedMonHoc == null  || selectedNamHoc == null
+                        selectedLop == null || selectedTuanTu == null ||
+                        selectedThu == null || selectedCaHoc == null ||
+                        selectedMonHoc == null || selectedNamHoc == null
                     ) {
-                        Toast.makeText(context, "Vui lòng chọn đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Vui lòng chọn đầy đủ thông tin",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         return@Button
                     }
 
-                    if(ghiChu == ""){
-                        Toast.makeText(context, "Vui lòng nhập thông báo", Toast.LENGTH_SHORT).show()
+                    if (ghiChu == "") {
+                        Toast.makeText(context, "Vui lòng nhập thông báo", Toast.LENGTH_SHORT)
+                            .show()
                         return@Button
                     }
 
@@ -346,47 +405,65 @@ fun EditLichHocScreen(
                             .plusDays(thuOffset.toLong())
                             .format(formatter)
                     }.getOrElse {
-                        Toast.makeText(context, "Không tính được ngày dạy", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Không tính được ngày dạy", Toast.LENGTH_SHORT)
+                            .show()
                         return@Button
                     }
 
                     /* 3. Thông tin ca */
                     val caStart = LocalTime.parse(selectedCaHoc!!.GioBatDau)
-                    val caEnd   = LocalTime.parse(selectedCaHoc!!.GioKetThuc)
+                    val caEnd = LocalTime.parse(selectedCaHoc!!.GioKetThuc)
                     val ngayDate = LocalDate.parse(ngayDayStr, formatter)
                     val gioKetThuc = LocalDateTime.of(ngayDate, caEnd)
 
                     /* 4. Lọc lịch khác (trừ chính mình) */
-                    val lichKhac = danhSachAllLichHoc.filter { it.MaLichHoc != malichhoc.toIntOrNull() }
+                    val lichKhac =
+                        danhSachAllLichHoc.filter { it.MaLichHoc != malichhoc.toIntOrNull() }
 
                     /* 5. Các kiểm tra */
                     // 5.1 – Quá khứ
                     if (gioKetThuc.isBefore(LocalDateTime.now())) {
-                        conflictMessage = "Không thể đặt lịch quá khứ (${formatNgay(ngayDayStr)} ${selectedCaHoc!!.TenCa})."
+                        conflictMessage =
+                            "Không thể đặt lịch quá khứ (${formatNgay(ngayDayStr)} ${selectedCaHoc!!.TenCa})."
                         showDialog = true; return@Button
                     }
 
                     // 5.2 – Trùng phòng + ca
-                    if (lichKhac.any { it.NgayDay == ngayDayStr &&
-                                it.MaPhong == selectedPhong!!.MaPhong &&
-                                it.MaCaHoc == selectedCaHoc!!.MaCaHoc }) {
-                        conflictMessage = "Phòng ${selectedPhong!!.TenPhong} đã có lịch ${selectedCaHoc!!.TenCa} ngày ${formatNgay(ngayDayStr)}."
+                    if (lichKhac.any {
+                            it.NgayDay == ngayDayStr &&
+                                    it.MaPhong == selectedPhong!!.MaPhong &&
+                                    it.MaCaHoc == selectedCaHoc!!.MaCaHoc
+                        }) {
+                        conflictMessage =
+                            "Phòng ${selectedPhong!!.TenPhong} đã có lịch ${selectedCaHoc!!.TenCa} ngày ${
+                                formatNgay(ngayDayStr)
+                            }."
                         showDialog = true; return@Button
                     }
 
                     // 5.3 – Trùng lớp + ca
-                    if (lichKhac.any { it.NgayDay == ngayDayStr &&
-                                it.MaLopHoc == selectedLop!!.MaLopHoc &&
-                                it.MaCaHoc == selectedCaHoc!!.MaCaHoc }) {
-                        conflictMessage = "Lớp ${selectedLop!!.TenLopHoc} đã có lịch ${selectedCaHoc!!.TenCa} ngày ${formatNgay(ngayDayStr)}."
+                    if (lichKhac.any {
+                            it.NgayDay == ngayDayStr &&
+                                    it.MaLopHoc == selectedLop!!.MaLopHoc &&
+                                    it.MaCaHoc == selectedCaHoc!!.MaCaHoc
+                        }) {
+                        conflictMessage =
+                            "Lớp ${selectedLop!!.TenLopHoc} đã có lịch ${selectedCaHoc!!.TenCa} ngày ${
+                                formatNgay(ngayDayStr)
+                            }."
                         showDialog = true; return@Button
                     }
 
                     // 5.4 – Trùng giảng viên + ca
-                    if (lichKhac.any { it.NgayDay == ngayDayStr &&
-                                it.MaGV == selectedGiangVien!!.MaGV &&
-                                it.MaCaHoc == selectedCaHoc!!.MaCaHoc }) {
-                        conflictMessage = "Giảng viên ${selectedGiangVien!!.TenGiangVien} đã có lịch ${selectedCaHoc!!.TenCa} ngày ${formatNgay(ngayDayStr)}."
+                    if (lichKhac.any {
+                            it.NgayDay == ngayDayStr &&
+                                    it.MaGV == selectedGiangVien!!.MaGV &&
+                                    it.MaCaHoc == selectedCaHoc!!.MaCaHoc
+                        }) {
+                        conflictMessage =
+                            "Giảng viên ${selectedGiangVien!!.TenGiangVien} đã có lịch ${selectedCaHoc!!.TenCa} ngày ${
+                                formatNgay(ngayDayStr)
+                            }."
                         showDialog = true; return@Button
                     }
 
@@ -394,28 +471,32 @@ fun EditLichHocScreen(
                     val overlapTrongPhong = lichKhac
                         .filter { it.NgayDay == ngayDayStr && it.MaPhong == selectedPhong!!.MaPhong }
                         .any { old ->
-                            val oldCa = danhSachCaHoc.firstOrNull { it.MaCaHoc == old.MaCaHoc } ?: return@any false
+                            val oldCa = danhSachCaHoc.firstOrNull { it.MaCaHoc == old.MaCaHoc }
+                                ?: return@any false
                             val oldStart = LocalTime.parse(oldCa.GioBatDau)
-                            val oldEnd   = LocalTime.parse(oldCa.GioKetThuc)
+                            val oldEnd = LocalTime.parse(oldCa.GioKetThuc)
                             !(caEnd.isBefore(oldStart) || oldEnd.isBefore(caStart))
                         }
                     if (overlapTrongPhong) {
-                        conflictMessage = "Khung giờ chồng lấn trong phòng ${selectedPhong!!.TenPhong} ngày ${formatNgay(ngayDayStr)}."
+                        conflictMessage =
+                            "Khung giờ chồng lấn trong phòng ${selectedPhong!!.TenPhong} ngày ${
+                                formatNgay(ngayDayStr)
+                            }."
                         showDialog = true; return@Button
                     }
 
                     /* 6. Cập nhật */
                     val newLichHoc = LichHoc(
                         MaLichHoc = malichhoc.toIntOrNull() ?: 0,
-                        MaGV      = selectedGiangVien!!.MaGV,
-                        MaPhong   = selectedPhong!!.MaPhong,
-                        NgayDay   = ngayDayStr,
-                        MaLopHoc  = selectedLop!!.MaLopHoc,
-                        MaCaHoc   = selectedCaHoc!!.MaCaHoc!!,
-                        MaMonHoc  = selectedMonHoc!!.MaMonHoc,
-                        Thu       = selectedThu!!,
-                        MaTuan    = selectedTuanTu!!.MaTuan,
-                        GhiChu    = ghiChu,
+                        MaGV = selectedGiangVien!!.MaGV,
+                        MaPhong = selectedPhong!!.MaPhong,
+                        NgayDay = ngayDayStr,
+                        MaLopHoc = selectedLop!!.MaLopHoc,
+                        MaCaHoc = selectedCaHoc!!.MaCaHoc!!,
+                        MaMonHoc = selectedMonHoc!!.MaMonHoc,
+                        Thu = selectedThu!!,
+                        MaTuan = selectedTuanTu!!.MaTuan,
+                        GhiChu = ghiChu,
                         TrangThai = lichhoc?.TrangThai ?: 0
                     )
 
@@ -423,14 +504,19 @@ fun EditLichHocScreen(
                     lichhocViewModel.updateLichHoc(newLichHoc)
 
                     /* Gửi thông báo */
-                    val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    val now = LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     val title = "Thông báo lịch học"
                     val body =
                         "Lịch học môn ${selectedMonHoc!!.TenMonHoc} của lớp ${selectedLop!!.TenLopHoc}\nThông báo: $ghiChu."
 
                     // SV cùng lớp
                     val svTokens = danhSachTokenSinhVienTheoLop.distinct()
-                    if (svTokens.isNotEmpty()) notificationViewModel.sendNotificationToTokens(svTokens, title, body)
+                    if (svTokens.isNotEmpty()) notificationViewModel.sendNotificationToTokens(
+                        svTokens,
+                        title,
+                        body
+                    )
 
                     danhSachSinhVienTheoLop.forEach { sv ->
                         notificationViewModel.createThongBao(
@@ -466,7 +552,8 @@ fun EditLichHocScreen(
                         )
                     }
 
-                    Toast.makeText(context, "Cập nhật lịch học thành công", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Cập nhật lịch học thành công", Toast.LENGTH_SHORT)
+                        .show()
                     navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -479,6 +566,7 @@ fun EditLichHocScreen(
             /* ────── HỘP THOẠI LỖI ────── */
             if (showDialog) {
                 AlertDialog(
+                    containerColor = Color.White,
                     onDismissRequest = { showDialog = false },
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -496,7 +584,13 @@ fun EditLichHocScreen(
                             )
                         }
                     },
-                    text = { Text(conflictMessage, fontWeight = FontWeight.Bold) },
+                    text = {
+                        Text(
+                            conflictMessage,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                    },
                     confirmButton = {
                         TextButton(
                             onClick = { showDialog = false },
@@ -504,22 +598,17 @@ fun EditLichHocScreen(
                                 .padding(8.dp)
                                 .background(Color(0xFFD32F2F), RoundedCornerShape(8.dp))
                         ) {
-                            Text("Đóng", color = Color.White, modifier = Modifier.padding(horizontal = 12.dp))
+                            Text(
+                                "Đóng",
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 12.dp)
+                            )
                         }
                     },
                     shape = RoundedCornerShape(16.dp),
-                    containerColor = Color.White,
                     tonalElevation = 8.dp
                 )
             }
         }
     }
 }
-
-
-
-
-
-
-
-

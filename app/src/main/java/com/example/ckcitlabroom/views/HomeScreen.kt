@@ -68,14 +68,17 @@ fun HomeScreen(
     navController: NavHostController,
     namHocViewModel: NamHocViewModel,
     tuanViewModel: TuanViewModel,
-    mayTinhViewModel: MayTinhViewModel
+    mayTinhViewModel: MayTinhViewModel,
+    phieuMuonMayViewModel: PhieuMuonMayViewModel
 ) {
     BackHandler {}
 
     var danhsachAllMayTnh = mayTinhViewModel.danhSachAllMayTinh2.collectAsState()
+    var danhsachAllPhieuMuonMay = phieuMuonMayViewModel.danhSachAllPhieuMuonMay
     LaunchedEffect(Unit) {
         namHocViewModel.getAllNamHoc()
         tuanViewModel.getAllTuan()
+        phieuMuonMayViewModel.getAllPhieuMuonMay()
     }
 
     val sinhvien = sinhVienViewModel.sinhvienSet
@@ -97,6 +100,7 @@ fun HomeScreen(
             lichhocviewmodel.stopPolling()
             lichhocviewmodel.stopPollingSV()
             mayTinhViewModel.stopPollingAllMayTinh()
+            phieuMuonMayViewModel.stopPollingPhieuMuonMay()
         }
     }
 
@@ -423,6 +427,11 @@ fun HomeScreen(
                 var tongMayTinhDangHoatDong =
                     danhsachAllMayTnh.value.filter { it.TrangThai == 1 }.size
                 var tongMayTinhHong = danhsachAllMayTnh.value.filter { it.TrangThai == 0 }.size
+                val tongMayDangMuon = danhsachAllPhieuMuonMay
+                    .filter { it.TrangThai == 1 }
+                    .sumOf { it.SoLuong }
+
+
 
                 Text(
                     text = "Thông tin nhanh",
@@ -432,13 +441,21 @@ fun HomeScreen(
                     modifier = Modifier.padding(start = 15.dp, top = 12.dp)
                 )
 
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(vertical = 6.dp, horizontal = 12.dp)
+                        .fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = Color.White,
+                )
+
                 Spacer(modifier = Modifier.height(20.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     StatCard(
-                        title = "Tổng máy tính",
+                        title = "Tổng số máy tính",
                         value = tongMayTinh,
                         accentColor = Color(0xFF1B8DDE),
                         modifier = Modifier.weight(1f),
@@ -449,7 +466,7 @@ fun HomeScreen(
                     StatCard(
                         title = "Đang hoạt động",
                         value = tongMayTinhDangHoatDong,
-                        accentColor = Color(0xff119638),
+                        accentColor = Color(0xff0fad3e),
                         modifier = Modifier.weight(1f),
                         onClick = {
 
@@ -462,12 +479,21 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     StatCard(
-                        title = "Máy cần sửa chữa",
+                        title = "Cần sửa chữa",
                         value = tongMayTinhHong,
-                        accentColor = Color(0xffc11010),
+                        accentColor = Color(0xffdf1919),
                         modifier = Modifier.weight(1f),
                         onClick = {
                             navController.navigate(NavRoute.QUANLYPHIEUSUACHUA.route + "?startIndex=0")
+                        }
+                    )
+                    StatCard(
+                        title = "Đang cho mượn",
+                        value = tongMayDangMuon,
+                        accentColor = Color(0xffefa439),
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route + "?startIndex=1")
                         }
                     )
                 }
@@ -487,7 +513,7 @@ fun StatCard(
 ) {
     Card(
         modifier = modifier
-            .height(150.dp)
+            .height(130.dp)
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(4.dp),
@@ -497,7 +523,7 @@ fun StatCard(
         }
     ) {
 
-        Box {             /* lớp tô màu viền trái */
+        Box {
             Box(
                 modifier = Modifier
                     .width(6.dp)

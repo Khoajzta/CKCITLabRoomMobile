@@ -1,3 +1,4 @@
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,14 +28,21 @@ import com.composables.icons.lucide.MoveRight
 import com.composables.icons.lucide.School
 import com.composables.icons.lucide.User
 import com.composables.icons.lucide.Users
+import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 
 
 @Composable
 fun QuanLyScreen(
     navController: NavHostController,
     giangVienViewModel: GiangVienViewModel,
-    sinhVienViewModel: SinhVienViewModel
+    sinhVienViewModel: SinhVienViewModel,
+    mayTinhViewModel: MayTinhViewModel
 ) {
+    BackHandler {
+
+    }
+
+    LaunchedEffect(Unit) { mayTinhViewModel.clearDanhSachMayTinhDuocChon() }
     val giangVien = giangVienViewModel.giangvienSet
     val sinhvien = sinhVienViewModel.sinhvienSet
 

@@ -111,8 +111,6 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
 
-
-
     fun getGiangVienByMaGV(magv: String) {
         viewModelScope.launch(Dispatchers.IO) {
             isLoading = true
@@ -209,7 +207,8 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
                 }
                 giangVienUpdateTrangThaiResult = response.message
             } catch (e: Exception) {
-                giangVienUpdateTrangThaiResult = "Lỗi khi cập nhật trạng thái giảng viên: ${e.message}"
+                giangVienUpdateTrangThaiResult =
+                    "Lỗi khi cập nhật trạng thái giảng viên: ${e.message}"
                 Log.e("GiangVienViewModel", "Lỗi khi cập nhật trạng thái giảng viên: ${e.message}")
             } finally {
                 isLoading = false
@@ -222,12 +221,17 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
             isLoading = true
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ITLabRoomRetrofitClient.giangVienAPIService.updateLoaiTaiKhoanGiangVien(giangVien)
+                    ITLabRoomRetrofitClient.giangVienAPIService.updateLoaiTaiKhoanGiangVien(
+                        giangVien
+                    )
                 }
                 giangvienUpdateResult = response.message
             } catch (e: Exception) {
                 giangvienUpdateResult = "Lỗi khi cập nhật loại tài khoản giảng viên: ${e.message}"
-                Log.e("GiangVienViewModel", "Lỗi khi cập nhật loại tài khoản giảng viên: ${e.message}")
+                Log.e(
+                    "GiangVienViewModel",
+                    "Lỗi khi cập nhật loại tài khoản giảng viên: ${e.message}"
+                )
             } finally {
                 isLoading = false
             }
@@ -275,7 +279,10 @@ class GiangVienViewModel(application: Application) : AndroidViewModel(applicatio
                     Log.d("GiangVienViewModel", "Lấy token admin thành công: ${response.tokens}")
                 } else {
                     danhSachTokenAdmin = emptyList()
-                    Log.w("GiangVienViewModel", "Không có token admin hoặc lỗi API: ${response.status}")
+                    Log.w(
+                        "GiangVienViewModel",
+                        "Không có token admin hoặc lỗi API: ${response.status}"
+                    )
                 }
             } catch (e: Exception) {
                 errorMessage = "Lỗi khi lấy token admin: ${e.message}"

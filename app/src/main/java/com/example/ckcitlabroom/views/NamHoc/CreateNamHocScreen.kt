@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -14,7 +13,6 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,9 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,7 +29,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -59,15 +52,11 @@ fun CreateNamHocScreen(
     LaunchedEffect(Unit) {
         namHocViewModel.getAllNamHoc()
     }
+
     val maNam = remember { mutableStateOf("") }
     val tenNam = remember { mutableStateOf("") }
     val ngayBatDau = remember { mutableStateOf("") }
     val ngayKetThuc = remember { mutableStateOf("") }
-
-    var danhsachnamhoc = namHocViewModel.danhSachAllNamHoc
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
-    val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
@@ -76,6 +65,8 @@ fun CreateNamHocScreen(
     var showDatePickerEnd by remember { mutableStateOf(false) }
 
     var showConfirmDialog by remember { mutableStateOf(false) }
+
+    var danhsachnamhoc = namHocViewModel.danhSachAllNamHoc
 
 
     Card(
@@ -94,7 +85,7 @@ fun CreateNamHocScreen(
 
             Text("Mã Năm Học", fontWeight = FontWeight.Bold)
             OutlinedTextField(
-                value = maNam.value,
+                value = maNam.value.toUpperCase(),
                 onValueChange = { maNam.value = it },
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
@@ -188,40 +179,6 @@ fun CreateNamHocScreen(
                 shape = RoundedCornerShape(12.dp),
             )
 
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.padding(16.dp)
-            ) { data ->
-                snackbarData.value?.let { customData ->
-                    Snackbar(
-                        containerColor = if (customData.type == SnackbarType.SUCCESS) Color(
-                            0xFF1B8DDE
-                        ) else Color(0xFFD32F2F),
-                        contentColor = Color.White,
-                        shape = RoundedCornerShape(12.dp),
-                        action = {
-                            TextButton(onClick = {
-                                snackbarData.value = null
-                            }) {
-                                Text("Đóng", color = Color.White)
-                            }
-                        }
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = if (customData.type == SnackbarType.SUCCESS) Icons.Default.Info else Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = if (customData.type == SnackbarType.SUCCESS) Color.Cyan else Color.Yellow,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = customData.message)
-                        }
-                    }
-                }
-            }
-
-
             Button(
                 onClick = {
                     if (maNam.value.isBlank() || tenNam.value.isBlank() || ngayBatDau.value.isBlank() || ngayKetThuc.value.isBlank()) {
@@ -232,13 +189,25 @@ fun CreateNamHocScreen(
                         ).show()
                         return@Button
                     }
-                    showConfirmDialog = true // Hiện dialog xác nhận
+
+                    val isMaNamTrung = danhsachnamhoc.any {
+                        it.MaNam.equals(
+                            maNam.value.trim(),
+                            ignoreCase = true
+                        )
+                    }
+
+                    if (isMaNamTrung) {
+                        Toast.makeText(context, "Mã năm học đã tồn tại!", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    showConfirmDialog = true
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF1B8DDE))
             ) {
-                Text("Tạo Năm Học", color = Color.White)
+                Text("Thêm Năm Học", color = Color.White)
             }
         }
 
@@ -285,14 +254,11 @@ fun CreateNamHocScreen(
                     TextButton(
                         onClick = {
                             if (maNam.value.isBlank() || tenNam.value.isBlank() || ngayBatDau.value.isBlank() || ngayKetThuc.value.isBlank()) {
-                                coroutineScope.launch {
-                                    snackbarData.value = CustomSnackbarData(
-                                        "Vui lòng nhập đầy đủ thông tin!",
-                                        SnackbarType.ERROR
-                                    )
-                                    snackbarHostState.showSnackbar(snackbarData.value!!.message)
-                                    snackbarData.value = null
-                                }
+                                Toast.makeText(
+                                    context,
+                                    "Vui lòng nhập đầy đủ thông tin!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 return@TextButton
                             }
 
@@ -300,7 +266,7 @@ fun CreateNamHocScreen(
 
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                             val namHoc = NamHoc(
-                                MaNam = maNam.value,
+                                MaNam = maNam.value.toUpperCase(),
                                 TenNam = tenNam.value,
                                 NgayBatDau = ngayBatDau.value.format(formatter),
                                 NgayKetThuc = ngayKetThuc.value.format(formatter),

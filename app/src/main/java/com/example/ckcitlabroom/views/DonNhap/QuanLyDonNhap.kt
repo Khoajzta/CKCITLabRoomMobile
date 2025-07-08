@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.ChiTietDonNhapyViewModel
 import com.example.ckcitlabroom.viewmodels.DonNhapViewModel
@@ -37,10 +36,13 @@ fun QuanLyDonNhap(
     mayTinhViewModel: MayTinhViewModel
 ) {
     BackHandler {
-        navController.navigate(NavRoute.QUANLY.route) {
-            popUpTo(navController.graph.findStartDestination().id) {
+        navController.navigate(
+            NavRoute.QUANLY.route
+        ) {
+            popUpTo(navController.graph.startDestinationId) {
                 inclusive = true
             }
+            launchSingleTop = true
         }
     }
     val danhSachDonNhap = donNhapyViewModel.danhSachDonNhap

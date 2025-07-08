@@ -62,6 +62,12 @@ fun ListSinhVienDangHoc(
 
     var sinhVienDangHoc =
         danhsachsinhvien.filter { it.MaLop == selectedLop?.MaLopHoc && it.TrangThai == 1 }
+            ?.sortedBy { sv ->
+                sv.TenSinhVien.trim()
+                    .split("\\s+".toRegex())
+                    .last()
+                    .lowercase()
+            } ?: emptyList()
 
     var expanded by remember { mutableStateOf(false) }
 

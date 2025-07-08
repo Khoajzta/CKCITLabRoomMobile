@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,16 +45,6 @@ fun StartupCheckScreen(
     var isConnected by remember { mutableStateOf(isInternetAvailable(context)) }
     var isNavigated by remember { mutableStateOf(false) }
 
-    // Theo dõi mạng
-    NetworkStatusHandler(
-        onAvailable = {
-            isConnected = true
-        },
-        onLost = {
-            isConnected = false
-            Toast.makeText(context, "Mất kết nối Internet", Toast.LENGTH_LONG).show()
-        }
-    )
 
     val sinhVienPreferences = remember(context) { SinhVienPreferences(context) }
     val giangVienPreferences = remember(context) { GiangVienPreferences(context) }
@@ -70,7 +57,10 @@ fun StartupCheckScreen(
     val scale by infiniteTransition.animateFloat(
         initialValue = 0.8f,
         targetValue = 1.05f,
-        animationSpec = infiniteRepeatable(tween(1000, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        animationSpec = infiniteRepeatable(
+            tween(1000, easing = FastOutSlowInEasing),
+            RepeatMode.Reverse
+        ),
         label = "scale"
     )
     val alpha by infiniteTransition.animateFloat(
@@ -88,8 +78,6 @@ fun StartupCheckScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (!isConnected) NoInternetBanner()
-
             Spacer(modifier = Modifier.height(100.dp))
             Image(
                 painter = painterResource(R.drawable.logo),
@@ -117,7 +105,8 @@ fun StartupCheckScreen(
 
         when {
             loginGiangVienState.maGiangVien != null -> {
-                val gv = giangVienViewModel.getGiangVienByMaGOrEmailNow(loginGiangVienState.maGiangVien!!)
+                val gv =
+                    giangVienViewModel.getGiangVienByMaGOrEmailNow(loginGiangVienState.maGiangVien!!)
                 if (gv != null && gv.Token == loginGiangVienState.token) {
                     giangVienViewModel.setGV(gv)
                     isNavigated = true
@@ -125,18 +114,25 @@ fun StartupCheckScreen(
                         popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
                     }
                 } else {
-                    Toast.makeText(context, "Tài khoản đã đăng nhập trên thiết bị khác", Toast.LENGTH_SHORT).show()
                     giangVienPreferences.logout()
+                    giangVienViewModel.logout()
+                    giangVienPreferences.clearLogin()
+                    giangVienViewModel.setGV(null)
+                    Toast.makeText(
+                        context,
+                        "Tài khoản đã đăng nhập trên thiết bị khác",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     isNavigated = true
                     navController.navigate(NavRoute.LOGINSINHVIEN.route) {
                         popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
                     }
-
                 }
             }
 
             loginSinhVienState.maSinhVien != null -> {
-                val sv = sinhVienViewModel.getSinhVienByMaGOrEmailNow(loginSinhVienState.maSinhVien!!)
+                val sv =
+                    sinhVienViewModel.getSinhVienByMaGOrEmailNow(loginSinhVienState.maSinhVien!!)
                 if (sv != null && sv.Token == loginSinhVienState.token) {
                     sinhVienViewModel.setSV(sv)
                     isNavigated = true
@@ -144,8 +140,15 @@ fun StartupCheckScreen(
                         popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }
                     }
                 } else {
-                    Toast.makeText(context, "Tài khoản đã đăng nhập trên thiết bị khác", Toast.LENGTH_SHORT).show()
                     sinhVienPreferences.logout()
+                    sinhVienPreferences.clearLogin()
+                    sinhVienViewModel.logout()
+                    sinhVienViewModel.setSV(null)
+                    Toast.makeText(
+                        context,
+                        "Tài khoản đã đăng nhập trên thiết bị khác",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     isNavigated = true
                     navController.navigate(NavRoute.LOGINSINHVIEN.route) {
                         popUpTo(NavRoute.STARTSCREEN.route) { inclusive = true }

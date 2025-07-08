@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 @Composable
@@ -37,7 +35,15 @@ fun ListGiangVienCongTac(
     }
 
     // 👉 Lọc trước: chỉ lấy giảng viên có TrangThai == 1
-    val giangVienHoatDong = danhSachGiangVien?.filter { it.TrangThai == 1 } ?: emptyList()
+    val giangVienHoatDong = danhSachGiangVien
+        ?.filter { it.TrangThai == 1 }
+        ?.sortedBy { gv ->
+            gv.TenGiangVien.trim()
+                .split("\\s+".toRegex())
+                .last()
+                .lowercase()
+        } ?: emptyList()
+
 
     Column(
         modifier = Modifier

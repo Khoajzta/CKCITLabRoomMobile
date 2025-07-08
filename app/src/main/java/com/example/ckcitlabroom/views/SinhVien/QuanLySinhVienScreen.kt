@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import kotlinx.coroutines.launch
@@ -39,11 +38,7 @@ fun QuanLySinhVien(
     startIndex: Int = 0
 ) {
     BackHandler {
-        navController.navigate(NavRoute.QUANLY.route) {
-            popUpTo(navController.graph.findStartDestination().id) {
-                inclusive = true
-            }
-        }
+        navController.popBackStack()
     }
 
     val pageCount = 2

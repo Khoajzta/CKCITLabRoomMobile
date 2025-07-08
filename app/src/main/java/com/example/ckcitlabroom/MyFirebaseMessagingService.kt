@@ -1,6 +1,5 @@
 package com.example.ckcitlabroom
 
-import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -16,74 +14,60 @@ import java.util.Random
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
-    override fun onNewToken(token: String) {
-        Log.d("FCM", "New Token: $token")
+    companion object {
+        const val DEEPLINK_URI = "caothang://listthongbaosinhvien_screen"
     }
 
-    override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d("FCM", "From: ${remoteMessage.from}")
-        Log.d("FCM", "Data: ${remoteMessage.data}")
-
-        if (remoteMessage.notification == null || isAppInForeground()) {
-            val title =
-                remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: "Thông báo"
-            val body = remoteMessage.data["body"] ?: remoteMessage.notification?.body
+    override fun onMessageReceived(message: RemoteMessage) {
+        val title = message.data["title"]
+            ?: message.notification?.title
+            ?: "Thông báo"
+        val body = message.data["body"]
+            ?: message.notification?.body
             ?: "Bạn có thông báo mới"
-            showNotification(title, body)
-        }
+
+        // LUÔN hiển thị notification, bất kể app foreground/background
+        showNotification(title, body)
     }
 
-    private fun showNotification(title: String, message: String) {
+    private fun showNotification(title: String, body: String) {
         val channelId = "default_channel"
-        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
+        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId, "Thông báo chung",
-                NotificationManager.IMPORTANCE_HIGH
+            nm.createNotificationChannel(
+                NotificationChannel(
+                    channelId, "Thông báo chung",
+                    NotificationManager.IMPORTANCE_HIGH
+                )
             )
-            manager.createNotificationChannel(channel)
         }
 
-        val deepLinkUri = Uri.parse("caothang://listthongbaosinhvien_screen")
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            Intent(this, MainActivity::class.java).apply {
-                action = Intent.ACTION_VIEW
-                data = deepLinkUri
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            },
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(DEEPLINK_URI)
+        ).apply {
+            setPackage(packageName)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val pi = PendingIntent.getActivity(
+            this, 0, deepLinkIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val builder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_logo)
             .setContentTitle(title)
-            .setContentText(message)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(pi)
 
-        manager.notify(Random().nextInt(), builder.build())
-    }
-
-
-    private fun isAppInForeground(): Boolean {
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val appProcesses = activityManager.runningAppProcesses ?: return false
-        val packageName = packageName
-        for (appProcess in appProcesses) {
-            if (
-                appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
-                appProcess.processName == packageName
-            ) {
-                return true
-            }
-        }
-        return false
+        nm.notify(Random().nextInt(), builder.build())
     }
 }
+
+
 
 
 

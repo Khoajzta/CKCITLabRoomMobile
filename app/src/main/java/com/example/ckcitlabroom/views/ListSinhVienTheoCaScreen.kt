@@ -1,15 +1,12 @@
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,12 +44,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.composables.icons.lucide.Delete
 import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.MapPin
-import com.composables.icons.lucide.Trash
-import com.composables.icons.lucide.Trash2
 import com.example.ckcitlabroom.viewmodels.ChiTietSuDungMayViewModel
 import kotlinx.coroutines.delay
 
@@ -103,7 +96,11 @@ fun ListSinhVienTheoCa(
         if (pendingDelete && selectedChiTiet != null) {
             delay(300)
             chiTietSuDungMayViewModel.deleteChiTietSuDungMay(selectedChiTiet!!.MaChiTietSuDung) { success, message ->
-                Toast.makeText(context, if (success) "Xóa thành công" else message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    if (success) "Xóa thành công" else message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             pendingDelete = false
             selectedChiTiet = null
@@ -158,7 +155,10 @@ fun ListSinhVienTheoCa(
                 items(listchitiettheolich, key = { it.MaChiTietSuDung }) { chitiet ->
                     val visible = visibleMap[chitiet.MaChiTietSuDung] ?: true
                     var offsetX by remember { mutableStateOf(0f) }
-                    val animatedOffsetX by animateDpAsState(targetValue = offsetX.dp, label = "offset animation")
+                    val animatedOffsetX by animateDpAsState(
+                        targetValue = offsetX.dp,
+                        label = "offset animation"
+                    )
                     val maxOffset = with(LocalDensity.current) { -60.dp.toPx() }
 
                     AnimatedVisibility(
@@ -208,7 +208,8 @@ fun ListSinhVienTheoCa(
                                             },
                                             onHorizontalDrag = { change, dragAmount ->
                                                 change.consume()
-                                                val newOffset = (offsetX + dragAmount).coerceIn(maxOffset, 0f)
+                                                val newOffset =
+                                                    (offsetX + dragAmount).coerceIn(maxOffset, 0f)
                                                 offsetX = newOffset
                                             }
                                         )
@@ -234,11 +235,23 @@ fun ListSinhVienTheoCa(
                                         color = Color(0xFFDDDDDD),
                                     )
 
-                                    InfoRow(icon = Lucide.Hash, label = "MSSV", value = chitiet.MaSV)
+                                    InfoRow(
+                                        icon = Lucide.Hash,
+                                        label = "MSSV",
+                                        value = chitiet.MaSV
+                                    )
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    InfoRow(icon = Lucide.Hash, label = "Mã Máy", value = chitiet.MaMay)
+                                    InfoRow(
+                                        icon = Lucide.Hash,
+                                        label = "Mã Máy",
+                                        value = chitiet.MaMay
+                                    )
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    InfoRow(icon = Lucide.MapPin, label = "Vị Trí Máy", value = chitiet.ViTri.toString())
+                                    InfoRow(
+                                        icon = Lucide.MapPin,
+                                        label = "Vị Trí Máy",
+                                        value = chitiet.ViTri.toString()
+                                    )
                                 }
                             }
                         }
@@ -266,7 +279,7 @@ fun ListSinhVienTheoCa(
                     )
                 },
                 text = {
-                    Text("Bạn có chắc chắn muốn xóa sinh viên này khỏi danh sách?")
+                    Text("Bạn có chắc chắn muốn xóa sinh viên này khỏi danh sách điểm danh?")
                 },
                 confirmButton = {
                     TextButton(

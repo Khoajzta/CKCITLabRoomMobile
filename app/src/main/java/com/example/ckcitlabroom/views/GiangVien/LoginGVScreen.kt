@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
@@ -111,7 +110,7 @@ fun LoginGVScreen(
                         onPasswordChange = { passwordState.value = it },
                         onLoginClick = {
                             val email = emailState.value.trim()
-                            val password = passwordState.value.trim()
+                            val password = hashPasswordMD5(passwordState.value.trim())
 
                             if (email.isEmpty() || password.isEmpty()) {
                                 Toast.makeText(
@@ -131,7 +130,6 @@ fun LoginGVScreen(
                         },
                     )
                     TextButton(
-                        modifier = Modifier.padding(bottom = 20.dp),
                         onClick = { navController.navigate(NavRoute.LOGINSINHVIEN.route) },
                         colors = ButtonDefaults.textButtonColors(
                             containerColor = Color.Transparent,

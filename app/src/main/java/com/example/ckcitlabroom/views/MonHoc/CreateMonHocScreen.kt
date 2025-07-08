@@ -67,7 +67,7 @@ fun CreateMonHocScreen(
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                placeholder = { Text("Nhập thông tin") },
+                placeholder = { Text("Nhập mã môn học") },
                 shape = RoundedCornerShape(12.dp),
             )
 
@@ -86,7 +86,7 @@ fun CreateMonHocScreen(
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                placeholder = { Text("Nhập thông tin") },
+                placeholder = { Text("Nhập tên môn học") },
                 shape = RoundedCornerShape(12.dp),
             )
 

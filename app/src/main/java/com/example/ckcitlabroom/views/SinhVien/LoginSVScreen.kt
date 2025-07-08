@@ -29,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -77,8 +76,6 @@ fun LoginSVScreen(
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarData = remember { mutableStateOf<CustomSnackbarData?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current.applicationContext
@@ -140,7 +137,7 @@ fun LoginSVScreen(
                         onPasswordChange = { passwordState.value = it },
                         onLoginClick = {
                             val email = emailState.value.trim()
-                            val password = passwordState.value.trim()
+                            val password = hashPasswordMD5(passwordState.value.trim())
 
                             if (email.isEmpty() || password.isEmpty()) {
                                 Toast.makeText(
@@ -161,7 +158,6 @@ fun LoginSVScreen(
                     )
 
                     TextButton(
-                        modifier = Modifier.padding(bottom = 20.dp),
                         onClick = { navController.navigate(NavRoute.LOGINGIANGVIEN.route) },
                         colors = ButtonDefaults.textButtonColors(
                             containerColor = Color.Transparent,
@@ -231,7 +227,7 @@ fun LoginForm(
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier.padding(24.dp),
+        modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {

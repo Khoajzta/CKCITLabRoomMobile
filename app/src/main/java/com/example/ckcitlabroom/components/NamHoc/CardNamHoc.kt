@@ -1,5 +1,11 @@
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,13 +18,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Update
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,24 +36,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.BookOpen
 import com.composables.icons.lucide.CircleAlert
 import com.composables.icons.lucide.CircleCheck
 import com.composables.icons.lucide.Clock
 import com.composables.icons.lucide.Lucide
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.sp
 
 
 @Composable
@@ -54,11 +55,34 @@ fun CardNamHoc(
     namHocViewModel: NamHocViewModel,
 ) {
     var showUpdateButton by remember { mutableStateOf(false) }
+    var showDialogDelete by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var danhsachnamhoc = namHocViewModel.danhSachAllNamHoc
 
     LaunchedEffect(Unit) {
         namHocViewModel.getAllNamHoc()
+    }
+
+    if (showDialogDelete) {
+        AlertDialog(
+            containerColor = Color.White,
+            onDismissRequest = { showDialogDelete = false },
+            title = { Text("Xác nhận xóa", color = Color.Black) },
+            text = { Text("Bạn có chắc chắn muốn xóa năm học này?", color = Color.Black) },
+            confirmButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    onClick = {
+                        namHocViewModel.deleteNamHoc(namHoc.MaNam)
+                        namHocViewModel.getAllNamHoc()
+                        showDialogDelete = false
+                        Toast.makeText(context, "Xóa thành công", Toast.LENGTH_SHORT).show()
+                    }
+                ) {
+                    Text("Xóa", color = Color.White)
+                }
+            }
+        )
     }
 
     Card(
@@ -204,6 +228,27 @@ fun CardNamHoc(
                                 Spacer(Modifier.width(8.dp))
                                 Text(
                                     "Bắt Đầu Năm Học",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            Button(
+                                onClick = {
+                                    showDialogDelete = true
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xffdf1919
+                                    )
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Update, null, tint = Color.White)
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Xóa năm học",
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold
                                 )

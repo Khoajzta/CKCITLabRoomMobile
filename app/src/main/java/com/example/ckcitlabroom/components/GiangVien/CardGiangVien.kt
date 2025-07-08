@@ -12,24 +12,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.composables.icons.lucide.Calendar
 import com.composables.icons.lucide.CircleAlert
@@ -74,7 +78,7 @@ fun CardGiangVien(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "GV: ${giangVien.TenGiangVien}",
+                    text = "${giangVien.TenGiangVien}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     color = Color(0xFF1B8DDE)
@@ -87,7 +91,12 @@ fun CardGiangVien(
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(statusIcon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
+                    Icon(
+                        statusIcon,
+                        contentDescription = null,
+                        tint = color,
+                        modifier = Modifier.size(20.dp)
+                    )
                     Spacer(Modifier.width(4.dp))
                     Text(statusText, color = color, fontWeight = FontWeight.SemiBold)
                 }
@@ -99,7 +108,11 @@ fun CardGiangVien(
 
             InfoRow(icon = Lucide.Hash, label = "Mã GV", value = giangVien.MaGV)
             Spacer(modifier = Modifier.height(8.dp))
-            InfoRow(icon = Lucide.Calendar, label = "Ngày sinh", value = formatNgay(giangVien.NgaySinh))
+            InfoRow(
+                icon = Lucide.Calendar,
+                label = "Ngày sinh",
+                value = formatNgay(giangVien.NgaySinh)
+            )
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Lucide.Users, label = "Giới tính", value = giangVien.GioiTinh)
             Spacer(modifier = Modifier.height(8.dp))
@@ -108,14 +121,19 @@ fun CardGiangVien(
             AnimatedVisibility(visible = expanded) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
-                    if(giangVien.MaGV != giangvienhientai!!.MaGV){
+                    if (giangVien.MaGV != giangvienhientai!!.MaGV) {
                         Button(
                             onClick = { showDialog = true },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
                         ) {
-                            Icon(Lucide.Repeat, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                            Icon(
+                                Lucide.Repeat,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
+                            )
                             Spacer(Modifier.width(8.dp))
                             Text("Cập Nhật Trạng Thái", color = Color.White)
                         }
@@ -134,9 +152,11 @@ fun CardGiangVien(
 
                     Button(
                         onClick = {
-                            var giangviennew = giangVien.copy(MatKhau = giangVien.MaGV)
+                            var giangviennew =
+                                giangVien.copy(MatKhau = hashPasswordMD5(giangVien.MaGV))
                             giangVienViewModel.updateGiangVien(giangviennew)
-                            Toast.makeText(context, "Reset mật khẩu thành công", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Reset mật khẩu thành công", Toast.LENGTH_SHORT)
+                                .show()
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xff1B8DDE)),
@@ -152,8 +172,14 @@ fun CardGiangVien(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Cập nhật trạng thái", fontWeight = FontWeight.Bold, color = Color.Black) },
-            text = { Text("Giảng viên: ${giangVien.TenGiangVien}",color = Color.Black) },
+            title = {
+                Text(
+                    "Cập nhật trạng thái",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            },
+            text = { Text("Giảng viên: ${giangVien.TenGiangVien}", color = Color.Black) },
             confirmButton = {
                 val newTrangThai = if (giangVien.TrangThai == 0) 1 else 0
                 val label = if (newTrangThai == 1) "Công tác lại" else "Ngừng công tác"
@@ -180,7 +206,12 @@ fun CardGiangVien(
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },
             title = { Text("Xác nhận xóa") },
-            text = { Text("Bạn có chắc chắn muốn xóa giảng viên này không?", fontWeight = FontWeight.Bold) },
+            text = {
+                Text(
+                    "Bạn có chắc chắn muốn xóa giảng viên này không?",
+                    fontWeight = FontWeight.Bold
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
                     giangVienViewModel.deleteGiangVien(giangVien.MaGV)

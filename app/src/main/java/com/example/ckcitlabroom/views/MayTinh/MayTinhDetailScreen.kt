@@ -145,14 +145,14 @@ fun MayTinhDetailScreen(
 
     LaunchedEffect(Unit) {
         sinhvien?.let {
-            lichhocViewModel.getLichHocByMaLopHoc(it.MaLop)
+            lichhocViewModel.getAllLichHoc()
             cahocViewModel.getAllCaHoc()
         }
         chitietsudungmayViewModel.getAllChiTietSuDungMay()
     }
 
     val danhSachCaHoc = cahocViewModel.danhSachAllCaHoc
-    val danhSachLichHoc = lichhocViewModel.danhSachLichHoctheomalop
+    val danhSachLichHoc = lichhocViewModel.danhSachLichHoc
 
     // Lấy giờ hiện tại
     val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
@@ -826,6 +826,7 @@ fun MayTinhDetailScreen(
 
                             Toast.makeText(context, "Điểm danh thành công", Toast.LENGTH_SHORT)
                                 .show()
+                            navController.popBackStack()
                         },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))

@@ -1,4 +1,3 @@
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -169,7 +168,7 @@ fun ChiTietLichHocScreen(
                                 text = thu,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 18.sp,
-                                color = Color.Black,
+                                color = Color.White,
                                 modifier = Modifier.padding(horizontal = 8.dp)
                             )
 
@@ -202,8 +201,13 @@ fun ChiTietLichHocScreen(
 
                             if (lichTrongThu.size > 1) {
                                 Row(
-                                    modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                    modifier = Modifier
+                                        .padding(top = 8.dp)
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        8.dp,
+                                        Alignment.CenterHorizontally
+                                    ),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     repeat(lichTrongThu.size) { index ->
@@ -212,7 +216,10 @@ fun ChiTietLichHocScreen(
                                         // 👇 Size & color có animation
                                         val dotSize by animateDpAsState(
                                             targetValue = if (selected) 13.dp else 8.dp,
-                                            animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+                                            animationSpec = tween(
+                                                durationMillis = 300,
+                                                easing = FastOutSlowInEasing
+                                            )
                                         )
 
                                         val dotColor by animateColorAsState(
@@ -230,7 +237,11 @@ fun ChiTietLichHocScreen(
                                                     interactionSource = remember { MutableInteractionSource() },
                                                     indication = null
                                                 ) {
-                                                    scope.launch { listState.animateScrollToItem(index) }
+                                                    scope.launch {
+                                                        listState.animateScrollToItem(
+                                                            index
+                                                        )
+                                                    }
                                                 }
                                         )
                                     }

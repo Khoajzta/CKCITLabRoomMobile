@@ -12,22 +12,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,8 +47,8 @@ import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.models.CaHoc
 import com.example.ckcitlabroom.models.LopHoc
 import com.example.ckcitlabroom.viewmodels.CaHocViewModel
-import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
+import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -97,15 +97,15 @@ fun CreateLichHocScreen(
 
     // Dữ liệu nguồn
     val danhSachGiangVien = giangvienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }
-    val danhSachPhong = phongMayViewModel.danhSachAllPhongMay.filter { it.TrangThai == 1 && it.LoaiPhong == 1 }
+    val danhSachPhong =
+        phongMayViewModel.danhSachAllPhongMay.filter { it.TrangThai == 1 && it.LoaiPhong == 1 }
     val danhSachNamHoc = namHocViewModel.danhSachAllNamHoc.filter { it.TrangThai == 1 }
     val danhSachTuan = tuanViewModel.danhSachAllTuan
     val danhSachMonHoc = monHocViewModel.danhSachAllMonHoc.filter { it.TrangThai == 1 }
     val danhsachlophoc = lopHocViewModel.danhSachAllLopHoc.filter { it.TrangThai == 1 }
-    val danhsachcahoc = caHocViewModel.danhSachAllCaHoc.filter { it.TrangThai == 1 }
     val danhsachAllLichHoc = lichhocViewModel.danhSachLichHoc.filter { it.TrangThai == 1 }
 
-    val danhSachThu  = listOf(
+    val danhSachThu = listOf(
         "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"
     )
 
@@ -125,6 +125,98 @@ fun CreateLichHocScreen(
 
     val danhSachTuanTheoNam = remember(selectedNamHoc, danhSachTuan) {
         danhSachTuan.filter { it.MaNam == selectedNamHoc?.MaNam }
+    }
+
+    // Filter ca học dựa trên phòng, thứ và các ngày cụ thể sẽ dạy
+    val danhsachcahoc = remember(
+        selectedPhong, selectedThu, selectedTuanTu, selectedTuanDen,
+        caHocViewModel.danhSachAllCaHoc, danhsachAllLichHoc, danhSachTuan
+    ) {
+        val allCaHoc = caHocViewModel.danhSachAllCaHoc.filter { it.TrangThai == 1 }
+
+        if (selectedPhong != null && selectedThu != null && selectedTuanTu != null && selectedTuanDen != null) {
+            // Tính toán tất cả các ngày dạy dựa trên tuần từ - tuần đến
+            val thuOffset = thuToOffset[selectedThu] ?: 0
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+            val tuanBatDauIndex = danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanTu?.MaTuan }
+            val tuanKetThucIndex =
+                danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanDen?.MaTuan }
+
+            val ngayDayList = mutableListOf<String>()
+
+            if (tuanBatDauIndex != -1 && tuanKetThucIndex != -1 && tuanBatDauIndex <= tuanKetThucIndex) {
+                for (i in tuanBatDauIndex..tuanKetThucIndex) {
+                    val tuan = danhSachTuan[i]
+                    try {
+                        val ngayDay = LocalDate.parse(tuan.NgayBatDau, formatter)
+                            .plusDays(thuOffset.toLong())
+                            .format(formatter)
+                        ngayDayList.add(ngayDay)
+                    } catch (e: Exception) {
+                        // Bỏ qua ngày không hợp lệ
+                    }
+                }
+            }
+
+            // Lọc ra những ca đã có lịch dạy trong phòng vào các ngày cụ thể này
+            val usedCaHoc = danhsachAllLichHoc.filter { lichHoc ->
+                lichHoc.MaPhong == selectedPhong?.MaPhong &&
+                        lichHoc.NgayDay in ngayDayList
+            }.map { it.MaCaHoc }.toSet()
+
+            // Chỉ hiển thị những ca chưa được sử dụng
+            allCaHoc.filter { caHoc ->
+                caHoc.MaCaHoc !in usedCaHoc
+            }
+        } else {
+            allCaHoc
+        }
+    }
+
+    // Filter lớp học chưa có ca học trong thứ và tuần được chọn
+    val danhsachlopchualichday = remember(
+        selectedThu, selectedTuanTu, selectedTuanDen, selectedCaHoc,
+        danhsachlophoc, danhsachAllLichHoc, danhSachTuan
+    ) {
+        if (selectedThu != null && selectedTuanTu != null && selectedTuanDen != null && selectedCaHoc != null) {
+            // Tính toán tất cả các ngày dạy dựa trên tuần từ - tuần đến
+            val thuOffset = thuToOffset[selectedThu] ?: 0
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+            val tuanBatDauIndex = danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanTu?.MaTuan }
+            val tuanKetThucIndex =
+                danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanDen?.MaTuan }
+
+            val ngayDayList = mutableListOf<String>()
+
+            if (tuanBatDauIndex != -1 && tuanKetThucIndex != -1 && tuanBatDauIndex <= tuanKetThucIndex) {
+                for (i in tuanBatDauIndex..tuanKetThucIndex) {
+                    val tuan = danhSachTuan[i]
+                    try {
+                        val ngayDay = LocalDate.parse(tuan.NgayBatDau, formatter)
+                            .plusDays(thuOffset.toLong())
+                            .format(formatter)
+                        ngayDayList.add(ngayDay)
+                    } catch (e: Exception) {
+                        // Bỏ qua ngày không hợp lệ
+                    }
+                }
+            }
+
+            // Lọc ra những lớp đã có lịch học trong ca và các ngày cụ thể này
+            val usedLopHoc = danhsachAllLichHoc.filter { lichHoc ->
+                lichHoc.MaCaHoc == selectedCaHoc?.MaCaHoc &&
+                        lichHoc.NgayDay in ngayDayList
+            }.map { it.MaLopHoc }.toSet()
+
+            // Chỉ hiển thị những lớp chưa có lịch học
+            danhsachlophoc.filter { lopHoc ->
+                lopHoc.MaLopHoc !in usedLopHoc
+            }
+        } else {
+            danhsachlophoc
+        }
     }
 
     Card(
@@ -152,7 +244,9 @@ fun CreateLichHocScreen(
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .fillMaxWidth(),
                 thickness = 2.dp,
                 color = Color(0xFF1B8DDE),
             )
@@ -184,16 +278,7 @@ fun CreateLichHocScreen(
                     )
                 }
 
-                item {
-                    Text("Lớp", fontWeight = FontWeight.Bold, color = Color.Black)
-                    CustomDropdownSelector(
-                        label = "Lớp",
-                        items = danhsachlophoc,
-                        selectedItem = selectedLop,
-                        itemLabel = { it.TenLopHoc },
-                        onItemSelected = { selectedLop = it }
-                    )
-                }
+
 
                 item {
                     Text("Tuần Bắt Đầu", fontWeight = FontWeight.Bold, color = Color.Black)
@@ -242,6 +327,17 @@ fun CreateLichHocScreen(
                 }
 
                 item {
+                    Text("Lớp", fontWeight = FontWeight.Bold, color = Color.Black)
+                    CustomDropdownSelector(
+                        label = "Lớp",
+                        items = danhsachlopchualichday,
+                        selectedItem = selectedLop,
+                        itemLabel = { it.TenLopHoc },
+                        onItemSelected = { selectedLop = it }
+                    )
+                }
+
+                item {
                     Text("Môn", fontWeight = FontWeight.Bold, color = Color.Black)
                     CustomDropdownSelector(
                         label = "Môn học",
@@ -263,8 +359,10 @@ fun CreateLichHocScreen(
                         val thuOffset = thuToOffset[selectedThu] ?: 0
                         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-                        val tuanBatDauIndex = danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanTu!!.MaTuan }
-                        val tuanKetThucIndex = danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanDen!!.MaTuan }
+                        val tuanBatDauIndex =
+                            danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanTu?.MaTuan }
+                        val tuanKetThucIndex =
+                            danhSachTuan.indexOfFirst { it.MaTuan == selectedTuanDen?.MaTuan }
 
                         if (tuanBatDauIndex != -1 && tuanKetThucIndex != -1 && tuanBatDauIndex <= tuanKetThucIndex) {
                             val lichHocList = mutableListOf<LichHoc>()
@@ -272,7 +370,8 @@ fun CreateLichHocScreen(
                             for (i in tuanBatDauIndex..tuanKetThucIndex) {
                                 val tuan = danhSachTuan[i]
                                 val ngayDay = try {
-                                    LocalDate.parse(tuan.NgayBatDau, formatter).plusDays(thuOffset.toLong())
+                                    LocalDate.parse(tuan.NgayBatDau, formatter)
+                                        .plusDays(thuOffset.toLong())
                                         .format(formatter)
                                 } catch (e: Exception) {
                                     null
@@ -288,12 +387,20 @@ fun CreateLichHocScreen(
 
                                     // 🔹 Kết hợp ngày và giờ để tạo LocalDateTime
                                     val ngayDayDate = LocalDate.parse(ngayDay, formatter)
-                                    val ngayDayGioKetThuc = gioKetThuc?.let { LocalDateTime.of(ngayDayDate, it) }
+                                    val ngayDayGioKetThuc =
+                                        gioKetThuc?.let { LocalDateTime.of(ngayDayDate, it) }
 
                                     // 🔹 So sánh với giờ hiện tại
-                                    if (ngayDayGioKetThuc != null && ngayDayGioKetThuc.isBefore(LocalDateTime.now())) {
+                                    if (ngayDayGioKetThuc != null && ngayDayGioKetThuc.isBefore(
+                                            LocalDateTime.now()
+                                        )
+                                    ) {
                                         conflictMessage =
-                                            "Không thể thêm lịch:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, ${selectedCaHoc?.TenCa} đã kết thúc."
+                                            "Không thể thêm lịch:\nTuần ${tuan.TenTuan}\nNgày ${
+                                                formatNgay(
+                                                    ngayDay
+                                                )
+                                            }, ${selectedCaHoc?.TenCa} đã kết thúc."
                                         showDialog = true
                                         return@Button
                                     }
@@ -301,21 +408,25 @@ fun CreateLichHocScreen(
                                     // 🔹 Kiểm tra trùng phòng
                                     val isTrungCaTrongPhong = danhsachAllLichHoc.any {
                                         it.NgayDay == ngayDay &&
-                                                it.MaPhong == selectedPhong!!.MaPhong &&
-                                                it.MaCaHoc == selectedCaHoc!!.MaCaHoc
+                                                it.MaPhong == selectedPhong?.MaPhong &&
+                                                it.MaCaHoc == selectedCaHoc?.MaCaHoc
                                     }
 
                                     if (isTrungCaTrongPhong) {
                                         conflictMessage =
-                                            "Trùng lịch phòng:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, phòng ${selectedPhong?.TenPhong}, ${selectedCaHoc?.TenCa} đã có lịch dạy!"
+                                            "Trùng lịch phòng:\nTuần ${tuan.TenTuan}\nNgày ${
+                                                formatNgay(
+                                                    ngayDay
+                                                )
+                                            }, phòng ${selectedPhong?.TenPhong}, ${selectedCaHoc?.TenCa} đã có lịch dạy!"
                                         showDialog = true
                                         return@Button
                                     }
                                     //kiểm tra trùng ca của lớp
                                     val isTrungCaCuaLop = danhsachAllLichHoc.any {
                                         it.NgayDay == ngayDay &&
-                                                it.MaLopHoc == selectedLop!!.MaLopHoc &&
-                                                it.MaCaHoc == selectedCaHoc!!.MaCaHoc           // so khớp cả ca
+                                                it.MaLopHoc == selectedLop?.MaLopHoc &&
+                                                it.MaCaHoc == selectedCaHoc?.MaCaHoc           // so khớp cả ca
                                     }
 
                                     if (isTrungCaCuaLop) {
@@ -330,13 +441,17 @@ fun CreateLichHocScreen(
                                     // 🔹 Kiểm tra trùng ca của giảng viên
                                     val isTrungCaCuaGV = danhsachAllLichHoc.any {
                                         it.NgayDay == ngayDay &&
-                                                it.MaGV == selectedGiangVien!!.MaGV &&
-                                                it.MaCaHoc == selectedCaHoc!!.MaCaHoc
+                                                it.MaGV == selectedGiangVien?.MaGV &&
+                                                it.MaCaHoc == selectedCaHoc?.MaCaHoc
                                     }
 
                                     if (isTrungCaCuaGV) {
                                         conflictMessage =
-                                            "Trùng lịch giảng viên:\nTuần ${tuan.TenTuan}\nNgày ${formatNgay(ngayDay)}, giảng viên ${selectedGiangVien?.TenGiangVien} đã có lịch dạy ${selectedCaHoc?.TenCa}!"
+                                            "Trùng lịch giảng viên:\nTuần ${tuan.TenTuan}\nNgày ${
+                                                formatNgay(
+                                                    ngayDay
+                                                )
+                                            }, giảng viên ${selectedGiangVien?.TenGiangVien} đã có lịch dạy ${selectedCaHoc?.TenCa}!"
                                         showDialog = true
                                         return@Button
                                     }
@@ -348,7 +463,7 @@ fun CreateLichHocScreen(
                                         MaPhong = selectedPhong!!.MaPhong,
                                         MaLopHoc = selectedLop!!.MaLopHoc,
                                         MaMonHoc = selectedMonHoc!!.MaMonHoc,
-                                        MaCaHoc = selectedCaHoc!!.MaCaHoc ?: 0,
+                                        MaCaHoc = selectedCaHoc?.MaCaHoc ?: 0,
                                         MaTuan = tuan.MaTuan.toInt(),
                                         Thu = selectedThu!!,
                                         NgayDay = ngayDay,
@@ -362,13 +477,25 @@ fun CreateLichHocScreen(
 
                             lichhocViewModel.createListLichHoc(lichHocList)
 
-                            Toast.makeText(context, "Đã tạo ${lichHocList.size} lịch học", Toast.LENGTH_SHORT).show()
-                            navController.navigate(NavRoute.QUANLYLICHHOC.route+ "?startIndex=0")
+                            Toast.makeText(
+                                context,
+                                "Đã tạo ${lichHocList.size} lịch học",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            navController.navigate(NavRoute.QUANLYLICHHOC.route + "?startIndex=0")
                         } else {
-                            Toast.makeText(context, "Tuần bắt đầu/kết thúc không hợp lệ", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Tuần bắt đầu/kết thúc không hợp lệ",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     } else {
-                        Toast.makeText(context, "Vui lòng chọn đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Vui lòng chọn đầy đủ thông tin",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
