@@ -90,7 +90,13 @@ fun EditLichHocScreen(
     var ghiChu by remember { mutableStateOf("") }
 
     /** Danh sách dữ liệu */
-    val danhSachGiangVien = giangvienViewModel.danhSachAllGiangVien
+    val danhSachGiangVien =
+        giangvienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }?.sortedBy { gv ->
+            gv.TenGiangVien.trim()
+                .split("\\s+".toRegex())
+                .last()
+                .lowercase()
+        } ?: emptyList()
     val danhSachPhong = phongMayViewModel.danhSachAllPhongMay
     val danhSachNamHoc = namHocViewModel.danhSachAllNamHoc
     val danhSachTuan = tuanViewModel.danhSachAllTuan

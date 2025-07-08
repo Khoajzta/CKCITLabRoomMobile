@@ -96,7 +96,13 @@ fun CreateLichHocScreen(
     var ghiChu by remember { mutableStateOf("") }
 
     // Dữ liệu nguồn
-    val danhSachGiangVien = giangvienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }
+    val danhSachGiangVien =
+        giangvienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }?.sortedBy { gv ->
+            gv.TenGiangVien.trim()
+                .split("\\s+".toRegex())
+                .last()
+                .lowercase()
+        } ?: emptyList()
     val danhSachPhong =
         phongMayViewModel.danhSachAllPhongMay.filter { it.TrangThai == 1 && it.LoaiPhong == 1 }
     val danhSachNamHoc = namHocViewModel.danhSachAllNamHoc.filter { it.TrangThai == 1 }
