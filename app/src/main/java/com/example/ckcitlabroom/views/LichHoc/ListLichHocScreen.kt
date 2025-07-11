@@ -1,4 +1,3 @@
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -46,7 +44,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -81,8 +78,15 @@ fun ListLichHocScreen(
 
     // Danh sách từ ViewModel
     val danhsachnamhoc = namHocViewModel.danhSachAllNamHoc.firstOrNull { it.TrangThai == 1 }
-    val danhsachtuantheonam = tuanViewModel.danhSachAllTuan.filter { it.MaNam == danhsachnamhoc?.MaNam }
-    val danhsachgiangvien = giangVienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }
+    val danhsachtuantheonam =
+        tuanViewModel.danhSachAllTuan.filter { it.MaNam == danhsachnamhoc?.MaNam }
+    val danhsachgiangvien =
+        giangVienViewModel.danhSachAllGiangVien.filter { it.TrangThai == 1 }?.sortedBy { gv ->
+            gv.TenGiangVien.trim()
+                .split("\\s+".toRegex())
+                .last()
+                .lowercase()
+        } ?: emptyList()
 
     // Selected states
     var selectedTuan by remember { mutableStateOf<Tuan?>(null) }
@@ -137,7 +141,7 @@ fun ListLichHocScreen(
 
         danhsachlichdayAdminTheoTuan = if (maGV != null) {
             danhsachlichdayGV.filter {
-                it.MaTuan == maTuan  && it.MaGV == maGV
+                it.MaTuan == maTuan && it.MaGV == maGV
             }
         } else emptyList()
     }
@@ -162,14 +166,17 @@ fun ListLichHocScreen(
                     // Admin đang xem lịch của GV được chọn
                     "Lịch dạy tuần $tenTuan"
                 }
+
                 giangVien != null -> {
                     // Giảng viên thường
                     "Lịch dạy tuần $tenTuan"
                 }
+
                 sinhVien != null -> {
                     // Sinh viên
                     "Lịch học tuần $tenTuan lớp ${sinhVien.MaLop}"
                 }
+
                 else -> ""
             }
 
@@ -267,13 +274,16 @@ fun ListLichHocScreen(
 
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
+                        .fillMaxSize()
+                        .clip(shape = RoundedCornerShape(12.dp))
                 ) {
                     if (grouped.isEmpty()) {
                         item {
                             Text(
                                 text = "Giảng viên ${selectedGV?.TenGiangVien ?: "?"} không có lịch dạy trong tuần",
-                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -290,7 +300,11 @@ fun ListLichHocScreen(
                                     Column {
                                         Text(
                                             text = thu,
-                                            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
+                                            modifier = Modifier.padding(
+                                                start = 16.dp,
+                                                top = 12.dp,
+                                                bottom = 4.dp
+                                            ),
                                             fontWeight = FontWeight.SemiBold,
                                             fontSize = 18.sp
                                         )
@@ -305,7 +319,11 @@ fun ListLichHocScreen(
                                             flingBehavior = rememberSnapFlingBehavior(listState)
                                         ) {
                                             items(lichTrongThu) { lichhoc ->
-                                                CardLichHoc(lichhoc, giangVien = giangVien, navController = navController)
+                                                CardLichHoc(
+                                                    lichhoc,
+                                                    giangVien = giangVien,
+                                                    navController = navController
+                                                )
                                                 Spacer(modifier = Modifier.width(12.dp))
                                             }
                                         }
@@ -322,8 +340,13 @@ fun ListLichHocScreen(
 
                                         if (lichTrongThu.size > 1) {
                                             Row(
-                                                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                                modifier = Modifier
+                                                    .padding(top = 8.dp)
+                                                    .fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(
+                                                    8.dp,
+                                                    Alignment.CenterHorizontally
+                                                ),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 repeat(lichTrongThu.size) { index ->
@@ -332,7 +355,10 @@ fun ListLichHocScreen(
                                                     // 👇 Size & color có animation
                                                     val dotSize by animateDpAsState(
                                                         targetValue = if (selected) 13.dp else 8.dp,
-                                                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+                                                        animationSpec = tween(
+                                                            durationMillis = 200,
+                                                            easing = FastOutSlowInEasing
+                                                        )
                                                     )
 
                                                     val dotColor by animateColorAsState(
@@ -350,7 +376,11 @@ fun ListLichHocScreen(
                                                                 interactionSource = remember { MutableInteractionSource() },
                                                                 indication = null
                                                             ) {
-                                                                scope.launch { listState.animateScrollToItem(index) }
+                                                                scope.launch {
+                                                                    listState.animateScrollToItem(
+                                                                        index
+                                                                    )
+                                                                }
                                                             }
                                                     )
                                                 }
@@ -372,13 +402,16 @@ fun ListLichHocScreen(
 
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
+                        .fillMaxSize()
+                        .clip(shape = RoundedCornerShape(12.dp))
                 ) {
                     if (grouped.isEmpty()) {
                         item {
                             Text(
                                 text = "Không có lịch dạy trong tuần",
-                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -395,7 +428,11 @@ fun ListLichHocScreen(
                                     Column {
                                         Text(
                                             text = thu,
-                                            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
+                                            modifier = Modifier.padding(
+                                                start = 16.dp,
+                                                top = 12.dp,
+                                                bottom = 4.dp
+                                            ),
                                             fontWeight = FontWeight.SemiBold,
                                             fontSize = 18.sp
                                         )
@@ -409,7 +446,11 @@ fun ListLichHocScreen(
                                             flingBehavior = rememberSnapFlingBehavior(listState)
                                         ) {
                                             items(lichTrongThu) { lichhoc ->
-                                                CardLichHoc(lichhoc, giangVien = giangVien, navController = navController)
+                                                CardLichHoc(
+                                                    lichhoc,
+                                                    giangVien = giangVien,
+                                                    navController = navController
+                                                )
                                                 Spacer(modifier = Modifier.width(12.dp))
                                             }
                                         }
@@ -426,8 +467,13 @@ fun ListLichHocScreen(
 
                                         if (lichTrongThu.size > 1) {
                                             Row(
-                                                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                                modifier = Modifier
+                                                    .padding(top = 8.dp)
+                                                    .fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(
+                                                    8.dp,
+                                                    Alignment.CenterHorizontally
+                                                ),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 repeat(lichTrongThu.size) { index ->
@@ -436,7 +482,10 @@ fun ListLichHocScreen(
                                                     // 👇 Size & color có animation
                                                     val dotSize by animateDpAsState(
                                                         targetValue = if (selected) 13.dp else 8.dp,
-                                                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+                                                        animationSpec = tween(
+                                                            durationMillis = 200,
+                                                            easing = FastOutSlowInEasing
+                                                        )
                                                     )
 
                                                     val dotColor by animateColorAsState(
@@ -454,7 +503,11 @@ fun ListLichHocScreen(
                                                                 interactionSource = remember { MutableInteractionSource() },
                                                                 indication = null
                                                             ) {
-                                                                scope.launch { listState.animateScrollToItem(index) }
+                                                                scope.launch {
+                                                                    listState.animateScrollToItem(
+                                                                        index
+                                                                    )
+                                                                }
                                                             }
                                                     )
                                                 }
@@ -476,13 +529,16 @@ fun ListLichHocScreen(
 
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize().clip(shape = RoundedCornerShape(12.dp))
+                        .fillMaxSize()
+                        .clip(shape = RoundedCornerShape(12.dp))
                 ) {
                     if (grouped.isEmpty()) {
                         item {
                             Text(
                                 text = "Không có lịch học trong tuần",
-                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -499,7 +555,11 @@ fun ListLichHocScreen(
                                     Column {
                                         Text(
                                             text = thu,
-                                            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
+                                            modifier = Modifier.padding(
+                                                start = 16.dp,
+                                                top = 12.dp,
+                                                bottom = 4.dp
+                                            ),
                                             fontWeight = FontWeight.SemiBold,
                                             fontSize = 18.sp
                                         )
@@ -513,7 +573,11 @@ fun ListLichHocScreen(
                                             flingBehavior = rememberSnapFlingBehavior(listState)
                                         ) {
                                             items(lichTrongThu) { lichhoc ->
-                                                CardLichHoc(lichhoc, sinhvien = sinhVien, navController = navController)
+                                                CardLichHoc(
+                                                    lichhoc,
+                                                    sinhvien = sinhVien,
+                                                    navController = navController
+                                                )
                                                 Spacer(modifier = Modifier.width(12.dp))
                                             }
                                         }
@@ -530,8 +594,13 @@ fun ListLichHocScreen(
 
                                         if (lichTrongThu.size > 1) {
                                             Row(
-                                                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                                modifier = Modifier
+                                                    .padding(top = 8.dp)
+                                                    .fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(
+                                                    8.dp,
+                                                    Alignment.CenterHorizontally
+                                                ),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 repeat(lichTrongThu.size) { index ->
@@ -540,7 +609,10 @@ fun ListLichHocScreen(
                                                     // 👇 Size & color có animation
                                                     val dotSize by animateDpAsState(
                                                         targetValue = if (selected) 13.dp else 8.dp,
-                                                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+                                                        animationSpec = tween(
+                                                            durationMillis = 200,
+                                                            easing = FastOutSlowInEasing
+                                                        )
                                                     )
 
                                                     val dotColor by animateColorAsState(
@@ -558,7 +630,11 @@ fun ListLichHocScreen(
                                                                 interactionSource = remember { MutableInteractionSource() },
                                                                 indication = null
                                                             ) {
-                                                                scope.launch { listState.animateScrollToItem(index) }
+                                                                scope.launch {
+                                                                    listState.animateScrollToItem(
+                                                                        index
+                                                                    )
+                                                                }
                                                             }
                                                     )
                                                 }

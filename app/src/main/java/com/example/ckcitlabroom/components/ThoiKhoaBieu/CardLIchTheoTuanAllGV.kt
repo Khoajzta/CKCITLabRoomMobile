@@ -94,6 +94,7 @@ fun CardThoiKhoaBieuTheoTuan(
                         textAlign = TextAlign.Center
                     )
 
+
                     listOf(
                         item.Thu2, item.Thu3, item.Thu4,
                         item.Thu5, item.Thu6, item.Thu7, item.ChuNhat
