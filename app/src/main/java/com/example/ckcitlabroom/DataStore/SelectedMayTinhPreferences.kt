@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -34,6 +35,36 @@ class SelectedMayTinhPerPhieuPreferences(private val context: Context) {
             if (id in curr) curr - id else curr + id
         )
     }
+
+    suspend fun getAllMayTinhIds(): Set<String> {
+        val prefs = context.dataStore.data.first() // lấy snapshot Preferences hiện tại
+        val allIds = mutableSetOf<String>()
+
+        prefs.asMap().forEach { (key, value) ->
+            // kiểm tra nếu key bắt đầu bằng "ids_" thì đó là một phiếu
+            if (key.name.startsWith("ids_")) {
+                val ids = (value as? String).decodeSet()
+                allIds.addAll(ids)
+            }
+        }
+
+        return allIds
+    }
+
+    suspend fun getAllMayTinhIdsExcept(phieuId: String): Set<String> {
+        val prefs = context.dataStore.data.first()
+        val allIds = mutableSetOf<String>()
+
+        prefs.asMap().forEach { (key, value) ->
+            if (key.name.startsWith("ids_") && key.name != "ids_$phieuId") {
+                val ids = (value as? String).decodeSet()
+                allIds.addAll(ids)
+            }
+        }
+
+        return allIds
+    }
+
 
     suspend fun clear(phieuId: String) = context.dataStore.edit { it.remove(key(phieuId)) }
 }

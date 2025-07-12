@@ -1,4 +1,3 @@
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -34,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -87,23 +87,29 @@ fun ChuyenMayPhieuMuonScreen(
 
     var danhsachallmaytinh = mayTinhViewModel.danhSachAllMayTinh
 
+    
+    LaunchedEffect(maphieumuon) {
+        maphieumuon.let { mayTinhViewModel.loadMayTinhDangChonOPhieuKhac(it) }
+    }
+
+    val mayDangChonOPhieuKhac by mayTinhViewModel.mayDangDuocChonOPhieuKhac.observeAsState(emptySet())
+
     val danhSachMayTheoPhong by remember(
         selectedPhong,
-        mayTinhViewModel.danhSachAllMayTinhtheophong
+        mayTinhViewModel.danhSachAllMayTinhtheophong,
+        mayDangChonOPhieuKhac
     ) {
         derivedStateOf {
             val maPhong = selectedPhong?.MaPhong
             mayTinhViewModel.danhSachAllMayTinhtheophong
-                .filter { it.TrangThai == 1 && it.MaPhong == maPhong }   // lọc phòng
+                .filter { it.TrangThai == 1 && it.MaPhong == maPhong }
+                .filterNot { it.MaMay in mayDangChonOPhieuKhac }  // lọc bỏ máy đã chọn
                 .sortedBy { may ->
                     Regex("""\d+""").find(may.TenMay)?.value?.toIntOrNull() ?: 0
                 }
         }
     }
 
-
-    Log.d("danhsachAllmaytinh", danhsachallmaytinh.toString())
-    Log.d("selectedIds", selectedIds.toString())
 
     LaunchedEffect(Unit) {
         phongMayViewModel.getAllPhongMay()

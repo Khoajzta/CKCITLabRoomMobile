@@ -1,5 +1,9 @@
+import android.content.Intent
 import android.icu.util.Calendar
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,11 +46,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,7 +99,24 @@ fun CreateGiangVienScreen(
 
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
     val calendar = remember { Calendar.getInstance() }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    // Launcher for picking Excel file
+    val excelLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val data: Intent? = result.data
+        val fileUri: Uri? = data?.data
+        if (fileUri != null) {
+            coroutineScope.launch {
+                parseExcelFileAndImport(context, fileUri, giangVienViewModel)
+            }
+        }
+
+    }
 
     if (showDatePicker) {
         val datePickerDialog = android.app.DatePickerDialog(
@@ -371,6 +393,28 @@ fun CreateGiangVienScreen(
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {
                 Text("Thêm giảng viên", color = Color.White, fontWeight = FontWeight.Bold)
+            }
+            // Nút thêm từ file Excel bên dưới
+            Button(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                        type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        putExtra(
+                            Intent.EXTRA_MIME_TYPES, arrayOf(
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                "application/vnd.ms-excel"
+                            )
+                        )
+                    }
+                    excelLauncher.launch(intent)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+            ) {
+                Text("Thêm từ file Excel", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }

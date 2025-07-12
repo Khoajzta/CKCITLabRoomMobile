@@ -1,3 +1,4 @@
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
@@ -16,9 +17,14 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -54,6 +60,7 @@ fun QuanLyPhieuMuonMayScreen(
     )
     val scope = rememberCoroutineScope()
 
+    var context = LocalContext.current
 
     /* ---------- Tiêu đề tab ---------- */
     val tabTitles = listOf(
@@ -62,12 +69,27 @@ fun QuanLyPhieuMuonMayScreen(
         "Phiếu Đã Trả",
     )
 
-    /* ---------- Giao diện ---------- */
+    LaunchedEffect(Unit) {
+        mayTinhViewModel.getAllMayTinh2()
+        mayTinhViewModel.loadAllMayTinhIds()
+    }
+
+    val danhsachAllMayTnh = mayTinhViewModel.danhSachAllMayTinh2.collectAsState()
+
+    val daanhsachallmaydachon by mayTinhViewModel.allMayTinhIds.observeAsState(emptySet())
+
+    
     Scaffold(
         containerColor = Color.Transparent,
         floatingActionButton = {
             FloatingActionButtonCustom(
-                onClick = { navController.navigate(NavRoute.ADDPHIEUMUONMAY.route) }
+                onClick = {
+                    if (danhsachAllMayTnh.value.size - daanhsachallmaydachon.size == 0) {
+                        Toast.makeText(context, "Hết máy để cho mượn", Toast.LENGTH_SHORT).show()
+                    } else {
+                        navController.navigate(NavRoute.ADDPHIEUMUONMAY.route)
+                    }
+                }
             )
         }
     ) { padding ->

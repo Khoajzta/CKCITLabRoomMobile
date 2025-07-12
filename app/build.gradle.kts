@@ -1,12 +1,3 @@
-import org.gradle.kotlin.dsl.release
-import org.gradle.internal.impldep.com.amazonaws.util.IOUtils
-import org.gradle.internal.impldep.org.eclipse.jgit.lib.InflaterCache
-import org.apache.commons.logging.LogFactory
-import io.grpc.internal.SharedResourceHolder
-import io.netty.util.ReferenceCountUtil
-import io.netty.util.ReferenceCountUtil.release
-
-
 plugins {
     id("com.android.application")
     alias(libs.plugins.kotlin.android)
@@ -126,10 +117,11 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging-ktx")
 
 
-    implementation ("com.google.accompanist:accompanist-navigation-animation:0.34.0")
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
 
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
 
 
     // Google Maps & Other Libs
@@ -140,7 +132,6 @@ dependencies {
     // Compose BOM again (if needed globally)
     val composeBom = platform("androidx.compose:compose-bom:2024.09.00")
     implementation(composeBom)
-
 
 
     // Testing

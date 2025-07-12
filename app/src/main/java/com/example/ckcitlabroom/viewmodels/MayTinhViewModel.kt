@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ckcitlabroom.api.Constants.ITLabRoomRetrofitClient
 import com.itlabroom.datastore.SelectedMayTinhPerPhieuPreferences
@@ -302,6 +304,24 @@ class MayTinhViewModel(application: Application) : AndroidViewModel(application)
 
     fun clearMayTinhOfPhieu(maPhieu: String) =
         viewModelScope.launch { prefs.clear(maPhieu) }
+
+    private val _allMayTinhIds = MutableLiveData<Set<String>>()
+    val allMayTinhIds: LiveData<Set<String>> get() = _allMayTinhIds
+
+    // Gọi hàm lấy tất cả máy tính
+    fun loadAllMayTinhIds() = viewModelScope.launch {
+        val allIds = prefs.getAllMayTinhIds()
+        _allMayTinhIds.value = allIds
+    }
+
+    private val _mayDangDuocChonOPhieuKhac = MutableLiveData<Set<String>>()
+    val mayDangDuocChonOPhieuKhac: LiveData<Set<String>> get() = _mayDangDuocChonOPhieuKhac
+
+    fun loadMayTinhDangChonOPhieuKhac(currentPhieuId: String) = viewModelScope.launch {
+        val ids = prefs.getAllMayTinhIdsExcept(currentPhieuId)
+        _mayDangDuocChonOPhieuKhac.value = ids
+    }
+
 }
 
 

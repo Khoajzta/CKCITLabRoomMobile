@@ -3,8 +3,12 @@ package com.example.ckcitlabroom.views.SinhVien
 import NavRoute
 import SinhVien
 import SinhVienViewModel
+import android.content.Intent
 import android.icu.util.Calendar
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +50,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import hashPasswordMD5
+import kotlinx.coroutines.launch
+import parseExcelFileAndImportSinhVien
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -85,9 +92,23 @@ fun CreateSinhVienScreen(
         }
     }
 
+    val coroutineScope = rememberCoroutineScope()
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val calendar = remember { Calendar.getInstance() }
+
+    val excelLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val data: Intent? = result.data
+        val fileUri: Uri? = data?.data
+        if (fileUri != null) {
+            coroutineScope.launch {
+                parseExcelFileAndImportSinhVien(context, fileUri, sinhVienViewModel)
+            }
+        }
+
+    }
 
     if (showDatePicker) {
         val datePickerDialog = android.app.DatePickerDialog(
@@ -348,6 +369,28 @@ fun CreateSinhVienScreen(
                 colors = ButtonDefaults.buttonColors(Color(0XFF1B8DDE))
             ) {
                 Text("Thêm sinh viên", color = Color.White, fontWeight = FontWeight.Bold)
+            }
+
+            Button(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                        type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        putExtra(
+                            Intent.EXTRA_MIME_TYPES, arrayOf(
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                "application/vnd.ms-excel"
+                            )
+                        )
+                    }
+                    excelLauncher.launch(intent)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+            ) {
+                Text("Thêm từ file Excel", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -83,6 +84,12 @@ fun ChiTietDonNhapChuyenMuonScreen(
         }
     }
 
+    LaunchedEffect(maphieumuon) {
+        maphieumuon.let { mayTinhViewModel.loadMayTinhDangChonOPhieuKhac(it) }
+    }
+
+    val mayDangChonOPhieuKhac by mayTinhViewModel.mayDangDuocChonOPhieuKhac.observeAsState(emptySet())
+
     val danhSachMayTinhTrongKhoTheoDon = remember(danhSachMayTinhTheoDon) {
         danhSachMayTinhTheoDon.filter {
             it.MaPhong.equals(
@@ -90,6 +97,7 @@ fun ChiTietDonNhapChuyenMuonScreen(
                 ignoreCase = true
             ) && it.TrangThai == 1
         }
+            .filterNot { it.MaMay in mayDangChonOPhieuKhac }
     }
 
     val selectedIds by mayTinhViewModel
