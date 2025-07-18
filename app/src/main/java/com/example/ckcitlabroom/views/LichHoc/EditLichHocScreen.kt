@@ -253,107 +253,125 @@ fun EditLichHocScreen(
                     .fillMaxWidth()
             ) {
 
-                /* Giảng viên */
                 item {
-                    Text("Giảng Viên", fontWeight = FontWeight.Bold)
-                    CustomDropdownSelector(
-                        label = "Giảng viên",
-                        items = danhSachGiangVien,
-                        selectedItem = selectedGiangVien,
-                        itemLabel = { it.TenGiangVien },
-                        onItemSelected = { selectedGiangVien = it },
-                        enabled = choPhepChinhSua
+                    androidx.compose.material.Text(
+                        "Tuần Bắt Đầu",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
                     )
-                }
-
-                /* Phòng */
-                item {
-                    Text("Phòng Dạy", fontWeight = FontWeight.Bold)
-                    CustomDropdownSelector(
-                        label = "Phòng",
-                        items = danhSachPhong,
-                        selectedItem = selectedPhong,
-                        itemLabel = { it.TenPhong },
-                        onItemSelected = { selectedPhong = it },
-                        enabled = choPhepChinhSua
-                    )
-                }
-
-
-                /* Tuần */
-                item {
-                    Text("Tuần Bắt Đầu", fontWeight = FontWeight.Bold)
                     CustomDropdownSelector(
                         label = "Từ tuần",
-                        items = danhSachTuanTheoNam,
+                        items = danhSachTuanTheoNam.filter { it.MaNam == selectedNamHoc?.MaNam },
                         selectedItem = selectedTuanTu,
                         itemLabel = { it.TenTuan },
-                        onItemSelected = { selectedTuanTu = it },
-                        enabled = choPhepChinhSua
+                        onItemSelected = { selectedTuanTu = it }
                     )
                 }
 
                 item {
-                    Text("Tuần Kết Thúc", fontWeight = FontWeight.Bold)
+                    androidx.compose.material.Text(
+                        "Tuần Kết Thúc",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
                     CustomDropdownSelector(
                         label = "Đến tuần",
-                        items = danhSachTuanTheoNam,
+                        items = danhSachTuanTheoNam.filter { it.MaNam == selectedNamHoc?.MaNam },
                         selectedItem = selectedTuanDen,
                         itemLabel = { it.TenTuan },
-                        onItemSelected = { selectedTuanDen = it },
-                        enabled = choPhepChinhSua
+                        onItemSelected = { selectedTuanDen = it }
                     )
                 }
 
-                /* Thứ */
                 item {
-                    Text("Thứ", fontWeight = FontWeight.Bold)
+                    androidx.compose.material.Text(
+                        "Thứ",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+
                     CustomDropdownSelector(
                         label = "Thứ",
                         items = danhSachThu,
                         selectedItem = selectedThu,
                         itemLabel = { it },
-                        onItemSelected = { selectedThu = it },
-                        enabled = choPhepChinhSua
+                        onItemSelected = { selectedThu = it }
                     )
                 }
 
-                /* Ca học */
                 item {
-                    Text("Ca Học", fontWeight = FontWeight.Bold)
+                    androidx.compose.material.Text(
+                        "Phòng Dạy",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    CustomDropdownSelector(
+                        label = "Phòng",
+                        items = danhSachPhong,
+                        selectedItem = selectedPhong,
+                        itemLabel = { it.TenPhong },
+                        onItemSelected = { selectedPhong = it }
+                    )
+                }
+
+                item {
+                    androidx.compose.material.Text(
+                        "Giảng Viên",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    CustomDropdownSelector(
+                        label = "Giảng viên",
+                        items = danhSachGiangVien,
+                        selectedItem = selectedGiangVien,
+                        itemLabel = { it.TenGiangVien },
+                        onItemSelected = { selectedGiangVien = it }
+                    )
+                }
+
+                item {
+                    androidx.compose.material.Text(
+                        "Ca Học",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+
                     CustomDropdownSelector(
                         label = "Ca Học",
                         items = danhSachCaHoc,
                         selectedItem = selectedCaHoc,
                         itemLabel = { it.TenCa },
-                        onItemSelected = { selectedCaHoc = it },
-                        enabled = choPhepChinhSua
+                        onItemSelected = { selectedCaHoc = it }
                     )
                 }
 
-                /* Lớp */
                 item {
-                    Text("Lớp", fontWeight = FontWeight.Bold)
+                    androidx.compose.material.Text(
+                        "Lớp",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
                     CustomDropdownSelector(
                         label = "Lớp",
                         items = danhsachlopchualichday,
                         selectedItem = selectedLop,
                         itemLabel = { it.TenLopHoc },
-                        onItemSelected = { selectedLop = it },
-                        enabled = choPhepChinhSua
+                        onItemSelected = { selectedLop = it }
                     )
                 }
 
-                /* Môn */
                 item {
-                    Text("Môn", fontWeight = FontWeight.Bold)
+                    androidx.compose.material.Text(
+                        "Môn",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
                     CustomDropdownSelector(
                         label = "Môn học",
                         items = danhSachMonHoc,
                         selectedItem = selectedMonHoc,
                         itemLabel = { it.TenMonHoc },
-                        onItemSelected = { selectedMonHoc = it },
-                        enabled = choPhepChinhSua
+                        onItemSelected = { selectedMonHoc = it }
                     )
                 }
 
@@ -473,6 +491,26 @@ fun EditLichHocScreen(
                         showDialog = true; return@Button
                     }
 
+                    // 5.4b – Chồng giờ giảng viên
+                    val overlapGiangVien = lichKhac
+                        .filter { it.NgayDay == ngayDayStr && it.MaGV == selectedGiangVien!!.MaGV }
+                        .any { old ->
+                            val oldCa = danhSachCaHoc.firstOrNull { it.MaCaHoc == old.MaCaHoc }
+                                ?: return@any false
+                            val oldStart = LocalTime.parse(oldCa.GioBatDau)
+                            val oldEnd = LocalTime.parse(oldCa.GioKetThuc)
+                            !(caEnd.isBefore(oldStart) || oldEnd.isBefore(caStart))
+                        }
+                    if (overlapGiangVien) {
+                        conflictMessage =
+                            "Khung giờ trùng với lịch khác của giảng viên ${selectedGiangVien!!.TenGiangVien} ngày ${
+                                formatNgay(
+                                    ngayDayStr
+                                )
+                            }."
+                        showDialog = true; return@Button
+                    }
+
                     // 5.5 – Chồng giờ trong phòng
                     val overlapTrongPhong = lichKhac
                         .filter { it.NgayDay == ngayDayStr && it.MaPhong == selectedPhong!!.MaPhong }
@@ -485,7 +523,7 @@ fun EditLichHocScreen(
                         }
                     if (overlapTrongPhong) {
                         conflictMessage =
-                            "Khung giờ chồng lấn trong phòng ${selectedPhong!!.TenPhong} ngày ${
+                            "Trùng ca trong phòng ${selectedPhong!!.TenPhong} ngày ${
                                 formatNgay(ngayDayStr)
                             }."
                         showDialog = true; return@Button

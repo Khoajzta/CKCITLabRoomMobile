@@ -45,7 +45,8 @@ fun RequestCameraPermission(onGranted: () -> Unit) {
         if (isGranted) {
             onGranted()
         } else {
-            Toast.makeText(context, "Bạn cần cấp quyền Camera để quét QR", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Bạn cần cấp quyền Camera để quét QR", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -54,6 +55,7 @@ fun RequestCameraPermission(onGranted: () -> Unit) {
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
                 onGranted()
             }
+
             else -> {
                 permissionLauncher.launch(Manifest.permission.CAMERA)
             }
@@ -67,6 +69,8 @@ fun RequestCameraPermission(onGranted: () -> Unit) {
 fun QRCodeScannerScreen(
     onResult: (String) -> Unit,
 ) {
+
+
     var hasPermission by remember { mutableStateOf(false) }
 
     // Xin quyền camera
@@ -104,7 +108,10 @@ fun QRCodeScannerScreen(
                         imageAnalyzer.setAnalyzer(ContextCompat.getMainExecutor(it)) { imageProxy ->
                             val mediaImage = imageProxy.image
                             if (mediaImage != null && !scanned.value) {
-                                val inputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                                val inputImage = InputImage.fromMediaImage(
+                                    mediaImage,
+                                    imageProxy.imageInfo.rotationDegrees
+                                )
                                 scanner.process(inputImage)
                                     .addOnSuccessListener { barcodes ->
                                         for (barcode in barcodes) {

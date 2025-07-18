@@ -30,6 +30,9 @@ import com.example.ckcitlabroom.viewmodels.LopHocViewModel
 import com.example.ckcitlabroom.viewmodels.MayTinhViewModel
 import com.example.ckcitlabroom.views.SinhVien.CreateSinhVienScreen
 import com.example.ckcitlabroom.views.SinhVien.EditSinhVienScreen
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 sealed class NavRoute(val route: String) {
     object HOME : NavRoute("home_screen")
@@ -346,15 +349,18 @@ fun NavgationGraph(
         }
 
         composable(
-            NavRoute.MAYTINHDETAIL.route + "?mamay={mamay}",
+            NavRoute.MAYTINHDETAIL.route + "?mamay={mamay}&malichhoc={malichhoc}",
             arguments = listOf(
-                navArgument("mamay") { type = NavType.StringType; nullable = true }
+                navArgument("mamay") { type = NavType.StringType; nullable = true },
+                navArgument("malichhoc") { type = NavType.StringType; nullable = true }
             ),
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
             val mamay = navBackStackEntry.arguments?.getString("mamay") ?: ""
+            val malichhoc = navBackStackEntry.arguments?.getString("malichhoc") ?: ""
             MayTinhDetailScreen(
+                malichhoc,
                 mamay,
                 phongMayViewModel,
                 giangVienViewModel,
@@ -845,9 +851,14 @@ fun NavgationGraph(
             val danhSachMay by mayTinhViewModel.danhSachAllMayTinh2.collectAsState(emptyList())
             var isDataLoaded by remember { mutableStateOf(false) }
 
+
+
+
             LaunchedEffect(Unit) {
                 if (!isDataLoaded) {
                     mayTinhViewModel.getAllMayTinh2()
+                    lichHocViewModel.getAllLichHoc()
+                    caHocViewModel.getAllCaHoc()
                     isDataLoaded = true
                 }
             }
@@ -868,8 +879,52 @@ fun NavgationGraph(
                 else -> {
                     QRCodeScannerScreen { qrCodeValue ->
                         val tonTai = danhSachMay.any { it.MaMay == qrCodeValue }
+
                         if (tonTai) {
-                            navController.navigate(NavRoute.MAYTINHDETAIL.route + "?mamay=$qrCodeValue")
+                            val mayTinh = danhSachMay.firstOrNull { it.MaMay == qrCodeValue }
+
+                            if (mayTinh != null) {
+                                val maPhong = mayTinh.MaPhong
+
+                                val danhSachCaHoc = caHocViewModel.danhSachAllCaHoc
+
+                                val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+                                val gioHienTai = LocalTime.now().format(formatter)
+
+                                val caHienTai = danhSachCaHoc.firstOrNull {
+                                    it.GioBatDau <= gioHienTai && it.GioKetThuc >= gioHienTai
+                                }
+
+                                val ngayHienTai = LocalDate.now()
+                                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                                val danhSachLichHoc = lichHocViewModel.danhSachLichHoc
+
+                                // Giả lập giá trị mặc định nếu không có ca học hoặc lịch học
+                                var maLichHoc: String? = null
+
+                                if (caHienTai != null) {
+                                    val lichHocHienTai = danhSachLichHoc.firstOrNull {
+                                        it.MaPhong == maPhong &&
+                                                it.MaCaHoc == caHienTai.MaCaHoc &&
+                                                it.NgayDay == ngayHienTai
+                                    }
+
+                                    maLichHoc = lichHocHienTai?.MaLichHoc.toString()
+                                }
+
+                                // Điều hướng sang màn chi tiết, truyền malichhoc = null nếu không tìm thấy
+                                navController.navigate(
+                                    NavRoute.MAYTINHDETAIL.route + "?mamay=$qrCodeValue&malichhoc=$maLichHoc"
+                                )
+
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Không tìm thấy thông tin máy",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
                         } else {
                             Toast.makeText(context, "Mã QR không hợp lệ", Toast.LENGTH_SHORT).show()
                         }
@@ -1431,8 +1486,9 @@ fun NavgationGraph(
         }
 
         composable(
-            NavRoute.LISTSVSUDUNGMAYTHEOCA.route + "?maCa={maCa}&maTuan={maTuan}&maphong={maphong}&ngaySuDung={ngaySuDung}",
+            NavRoute.LISTSVSUDUNGMAYTHEOCA.route + "?malichhoc={maLichHoc}&maCa={maCa}&maTuan={maTuan}&maphong={maphong}&ngaySuDung={ngaySuDung}",
             arguments = listOf(
+                navArgument("maLichHoc") { type = NavType.StringType; nullable = true },
                 navArgument("maCa") { type = NavType.StringType; nullable = true },
                 navArgument("maTuan") { type = NavType.StringType; nullable = true },
                 navArgument("maphong") { type = NavType.StringType; nullable = true },
@@ -1441,12 +1497,22 @@ fun NavgationGraph(
             enterTransition = defaultEnterTransition(AnimatedContentTransitionScope.SlideDirection.Start),
             exitTransition = defaultExitTransition(AnimatedContentTransitionScope.SlideDirection.End)
         ) { navBackStackEntry ->
+            val maLichHoc = navBackStackEntry.arguments?.getString("maLichHoc") ?: ""
             val maCa = navBackStackEntry.arguments?.getString("maCa") ?: ""
             val maTuan = navBackStackEntry.arguments?.getString("maTuan") ?: ""
             val maphong = navBackStackEntry.arguments?.getString("maphong") ?: ""
             val ngaySuDung = navBackStackEntry.arguments?.getString("ngaySuDung") ?: ""
 
-            ListSinhVienTheoCa(maCa, maTuan, maphong, ngaySuDung, chiTietSuDungMayViewModel)
+            ListSinhVienTheoCa(
+                maLichHoc,
+                maCa,
+                maTuan,
+                maphong,
+                ngaySuDung,
+                chiTietSuDungMayViewModel,
+                sinhVienViewModel,
+                lichHocViewModel
+            )
         }
 
         composable(

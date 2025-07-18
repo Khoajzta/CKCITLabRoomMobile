@@ -42,6 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.R
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun CardSinhVienInfo(
@@ -50,6 +53,7 @@ fun CardSinhVienInfo(
     sinhVienViewModel: SinhVienViewModel
 ) {
     val context = LocalContext.current
+
     val sinhVienPreferences = remember { SinhVienPreferences(context) }
     val loginState by sinhVienPreferences.loginStateFlow.collectAsState(initial = LoginSinhVienState())
 
@@ -60,31 +64,56 @@ fun CardSinhVienInfo(
             containerColor = Color.White,
             onDismissRequest = { showLogoutConfirmDialog = false },
             confirmButton = {
-                TextButton(onClick = {
-                    showLogoutConfirmDialog = false
+                TextButton(
+                    onClick = {
+                        showLogoutConfirmDialog = false
 
-                    // Thực hiện đăng xuất
-                    val sinhvienNew = sinhvien.copy(Token = "")
-                    sinhVienViewModel.updateSinhVien(sinhvienNew)
+                        // Xóa token FCM trên server
+                        val sinhvienNew = sinhvien.copy(Token = "")
+                        sinhVienViewModel.updateSinhVien(sinhvienNew)
 
-                    sinhVienViewModel.setSV(null)
-                    sinhVienViewModel.resetLoginResult()
-                    sinhVienViewModel.logout()
+                        // Đăng xuất Firebase
+                        FirebaseAuth.getInstance().signOut()
 
-                    navController.navigate(NavRoute.LOGINSINHVIEN.route) {
-                        popUpTo(NavRoute.HOME.route) { inclusive = true }
+                        // Sign out GoogleSignInClient (nếu cần)
+                        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken("833001661760-qrmhtiovh0s953a12n6u8hqmni8j7k52.apps.googleusercontent.com")
+                            .requestEmail()
+                            .build()
+                        val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                        googleSignInClient.signOut()
+
+                        // Clear session app
+                        sinhVienViewModel.setSV(null)
+                        sinhVienViewModel.resetLoginResult()
+                        sinhVienViewModel.logout()
+
+                        // Navigate về màn login
+                        navController.navigate(NavRoute.LOGINSINHVIEN.route) {
+                            popUpTo(0) { inclusive = true } // Clear luôn backstack về gốc
+                        }
                     }
-                }) {
-                    Text("Đăng xuất", fontWeight = FontWeight.Bold,color = Color.Red)
+                ) {
+                    Text(
+                        "Đăng xuất",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
                 }
+
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutConfirmDialog = false }) {
-                    Text("Hủy",color = Color.Black)
+                    Text("Hủy", color = Color.Black)
                 }
             },
             title = { Text("Xác nhận đăng xuất", color = Color.Red) },
-            text = { Text("Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?", color = Color.Black) },
+            text = {
+                Text(
+                    "Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?",
+                    color = Color.Black
+                )
+            },
             shape = RoundedCornerShape(16.dp)
         )
     }

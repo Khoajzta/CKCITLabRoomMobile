@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -245,7 +246,7 @@ fun CardNamHoc(
                                 ),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                Icon(Icons.Default.Update, null, tint = Color.White)
+                                Icon(Icons.Default.Delete, null, tint = Color.White)
                                 Spacer(Modifier.width(8.dp))
                                 Text(
                                     "Xóa năm học",

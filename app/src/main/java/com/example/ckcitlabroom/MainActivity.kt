@@ -115,8 +115,8 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
 
-
     private lateinit var navController: NavHostController
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -126,6 +126,7 @@ class MainActivity : ComponentActivity() {
             CKCITLabRoomTheme {
                 navController = rememberNavController()
 
+                // Xử lý deep link
                 fun handleIntentDeepLink(intent: Intent?) {
                     navController.handleDeepLink(intent)
                 }
@@ -133,14 +134,17 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     handleIntentDeepLink(intent)
 
+                    // Lắng nghe intent mới
                     addOnNewIntentListener { newIntent ->
                         setIntent(newIntent)
                         handleIntentDeepLink(newIntent)
                     }
 
+                    // Schedule worker update lịch học
                     scheduleUpdateLichHocWorker(applicationContext)
                 }
 
+                // Màn hình chính
                 MainScreen(navController)
             }
         }
@@ -167,6 +171,8 @@ fun MainScreen(navController: NavHostController) {
         )
     }
 
+
+
     RequestPermissionsOnFirstLaunch()
 
     val lichHocViewModel: LichHocViewModel = viewModel()
@@ -189,10 +195,22 @@ fun MainScreen(navController: NavHostController) {
     val monHocViewModel: MonHocViewModel = viewModel()
     val notificationViewModel: NotificationViewModel = viewModel()
 
+
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val context = LocalContext.current
 
-    Log.d("currentRoute", "currentRoute: $currentRoute")
+    LaunchedEffect(Unit) {
+        val prefs = context.getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
+        val lastActiveTime = prefs.getLong("last_active_time", 0L)
+        val currentTime = System.currentTimeMillis()
+
+        if (currentTime - lastActiveTime > 3600000) {
+            navController.navigate(NavRoute.STARTSCREEN.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+
 
     var gv = giangVienViewModel.giangvienSet
     var sv = sinhVienViewModel.sinhvienSet

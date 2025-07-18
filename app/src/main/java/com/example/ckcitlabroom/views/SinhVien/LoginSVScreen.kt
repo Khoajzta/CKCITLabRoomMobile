@@ -1,5 +1,9 @@
+import android.app.Activity
+import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,12 +11,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -51,34 +58,39 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.R
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginSVScreen(
     navController: NavHostController,
     sinhVienViewModel: SinhVienViewModel
 ) {
-    BackHandler {}
-
-    val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
-    val cardOffset by animateDpAsState(
-        targetValue = if (imeBottom > 0) 20.dp else 120.dp,
+    val context = LocalContext.current.applicationContext
+    val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    val offsetY by animateDpAsState(
+        targetValue = if (imeVisible) (-150).dp else 0.dp,
         label = "CardOffset"
-    )
-    val animatedElevation by animateDpAsState(
-        targetValue = if (imeBottom > 0) 20.dp else 7.dp,
-        label = "CardElevation"
     )
 
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
 
     val coroutineScope = rememberCoroutineScope()
-
-    val context = LocalContext.current.applicationContext
     val userPreferences = remember { SinhVienPreferences(context) }
 
     val loginState by userPreferences.loginStateFlow.collectAsState(initial = LoginSinhVienState())
@@ -92,7 +104,6 @@ fun LoginSVScreen(
         sinhVienViewModel.setSV(null)
     }
 
-    // Tự động load SV khi đã lưu loginState
     LaunchedEffect(loginState) {
         if (loginState.isLoggedIn && loginState.maSinhVien != null && !isAutoLoginChecked.value) {
             isAutoLoginChecked.value = true
@@ -100,7 +111,6 @@ fun LoginSVScreen(
         }
     }
 
-    // Hiển thị màn hình loading nếu đang tự động đăng nhập
     if (loginState.isLoggedIn && !isAutoLoginChecked.value) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -109,21 +119,18 @@ fun LoginSVScreen(
             DotLoading()
         }
     } else {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Transparent),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            contentAlignment = Alignment.Center
         ) {
-            Spacer(modifier = Modifier.height(cardOffset))
-
             Card(
                 modifier = Modifier
                     .width(340.dp)
-                    .height(460.dp),
+                    .offset(y = offsetY),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(animatedElevation),
+                elevation = CardDefaults.cardElevation(12.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
@@ -157,7 +164,13 @@ fun LoginSVScreen(
                         },
                     )
 
+                    GoogleLoginButtonSinhVien(
+                        sinhVienViewModel = sinhVienViewModel,
+                        navController = navController
+                    )
+
                     TextButton(
+                        modifier = Modifier.padding(bottom = 16.dp),
                         onClick = { navController.navigate(NavRoute.LOGINGIANGVIEN.route) },
                         colors = ButtonDefaults.textButtonColors(
                             containerColor = Color.Transparent,
@@ -168,43 +181,39 @@ fun LoginSVScreen(
                         Text("Giảng viên đăng nhập")
                     }
                 }
-
-
             }
+        }
+    }
 
-            // Xử lý kết quả đăng nhập
-            LaunchedEffect(loginResult) {
-                if (loginResult?.result == true) {
-                    sinhVienViewModel.getSinhVienByMaGOrEmail(emailState.value)
-                } else if (loginResult != null) {
-                    Toast.makeText(context, "Email hoặc mật khẩu không đúng", Toast.LENGTH_SHORT)
-                        .show()
-                    sinhVienViewModel.resetLoginResult()
-                }
-            }
+    // Xử lý kết quả đăng nhập
+    LaunchedEffect(loginResult) {
+        if (loginResult?.result == true) {
+            sinhVienViewModel.getSinhVienByMaGOrEmail(emailState.value)
+        } else if (loginResult != null) {
+            Toast.makeText(context, "Email hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show()
+            sinhVienViewModel.resetLoginResult()
+        }
+    }
 
-            // Xử lý thành công login và điều hướng
-            LaunchedEffect(loginResult, sinhvien) {
-                if (!isNavigated.value && loginResult?.result == true && sinhvien != null) {
-                    if (sinhvien.TrangThai == 0) {
-                        Toast.makeText(context, "Tài khoản bị khóa", Toast.LENGTH_SHORT).show()
-                        sinhVienViewModel.resetLoginResult()
-                    } else {
-                        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
-                            val sinhvienWithToken = sinhvien.copy(Token = token)
-                            sinhVienViewModel.setToken(token)
-                            sinhVienViewModel.updateToken(sinhvien.MaSinhVien, token)
+    // Điều hướng sang Home nếu đăng nhập thành công
+    LaunchedEffect(loginResult, sinhvien) {
+        if (!isNavigated.value && loginResult?.result == true && sinhvien != null) {
+            if (sinhvien.TrangThai == 0) {
+                Toast.makeText(context, "Tài khoản bị khóa", Toast.LENGTH_SHORT).show()
+                sinhVienViewModel.resetLoginResult()
+            } else {
+                FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                    val sinhvienWithToken = sinhvien.copy(Token = token)
+                    sinhVienViewModel.setToken(token)
+                    sinhVienViewModel.updateToken(sinhvien.MaSinhVien, token)
 
-                            coroutineScope.launch {
-                                userPreferences.saveLoginForSinhVien(sinhvienWithToken)
-
-                                if (!isNavigated.value) {
-                                    isNavigated.value = true
-                                    sinhVienViewModel.setSV(sinhvienWithToken)
-                                    navController.navigate(NavRoute.HOME.route) {
-                                        popUpTo(0) { inclusive = true }
-                                    }
-                                }
+                    coroutineScope.launch {
+                        userPreferences.saveLoginForSinhVien(sinhvienWithToken)
+                        if (!isNavigated.value) {
+                            isNavigated.value = true
+                            sinhVienViewModel.setSV(sinhvienWithToken)
+                            navController.navigate(NavRoute.HOME.route) {
+                                popUpTo(0) { inclusive = true }
                             }
                         }
                     }
@@ -256,7 +265,7 @@ fun LoginForm(
                 unfocusedBorderColor = Color.White,
                 focusedBorderColor = Color.White,
                 focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
+                unfocusedTextColor = Color.Black,
             )
         )
 
@@ -312,6 +321,161 @@ fun LoginForm(
         }
     }
 }
+
+@Composable
+fun GoogleLoginButtonSinhVien(
+    sinhVienViewModel: SinhVienViewModel,
+    navController: NavHostController
+) {
+    val context = LocalContext.current
+    val activity = context as Activity
+    val auth = FirebaseAuth.getInstance()
+    val lifecycleScope = (context as ComponentActivity).lifecycleScope
+
+    val userPreferences = remember { SinhVienPreferences(context) }
+    val isLoading = remember { mutableStateOf(false) }
+
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken("833001661760-qrmhtiovh0s953a12n6u8hqmni8j7k52.apps.googleusercontent.com")
+        .requestEmail()
+        .build()
+
+    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            Log.d("GoogleSignIn", "Tài khoản Google: ${account.displayName}")
+
+            isLoading.value = true
+
+            lifecycleScope.launch {
+                try {
+                    val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+                    val authResult = auth.signInWithCredential(credential).await()
+
+                    val user = auth.currentUser
+                    val email = user?.email
+
+                    if (email != null && email.endsWith("@caothang.edu.vn")) {
+                        val sinhvien = withContext(Dispatchers.IO) {
+                            sinhVienViewModel.getSinhVienByMaGOrEmailNow(email)
+                        }
+
+                        if (sinhvien != null) {
+                            Log.d("SinhVienLogin", "Sinh viên: $sinhvien")
+
+                            val token = FirebaseMessaging.getInstance().token.await()
+                            val sinhvienWithToken = sinhvien.copy(Token = token)
+
+                            sinhVienViewModel.setToken(token)
+                            sinhVienViewModel.updateToken(sinhvien.MaSinhVien, token)
+
+                            userPreferences.saveLoginForSinhVien(sinhvienWithToken)
+                            sinhVienViewModel.setSV(sinhvienWithToken)
+
+                            isLoading.value = false
+                            delay(300)
+
+                            navController.navigate(NavRoute.HOME.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        } else {
+                            isLoading.value = false
+                            Log.e("SinhVienLogin", "Không tìm thấy sinh viên với email $email")
+                            Toast.makeText(
+                                context,
+                                "Không tìm thấy thông tin sinh viên",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            auth.signOut()
+                        }
+                    } else {
+                        isLoading.value = false
+                        auth.signOut()
+                        Toast.makeText(
+                            context,
+                            "Vui lòng đăng nhập bằng email @caothang.edu.vn",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        googleSignInClient.signOut()
+                    }
+                } catch (e: Exception) {
+                    isLoading.value = false
+                    Log.e("GoogleSignIn", "Lỗi đăng nhập: $e")
+                    Toast.makeText(context, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: Exception) {
+            isLoading.value = false
+            Log.e("GoogleSignIn", "Lỗi lấy tài khoản Google: $e")
+            Toast.makeText(context, "Đăng nhập Google thất bại", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Button(
+        onClick = {
+            isLoading.value = true
+            googleSignInClient.signOut().addOnCompleteListener {
+                launcher.launch(googleSignInClient.signInIntent)
+            }
+        },
+        modifier = Modifier
+            .padding(start = 24.dp, end = 24.dp, top = 12.dp)
+            .height(50.dp)
+            .shadow(6.dp, RoundedCornerShape(12.dp)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White,
+            contentColor = Color.Black
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_google),
+                contentDescription = "Google Logo",
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(end = 8.dp)
+            )
+            Text(
+                text = "Đăng nhập với Google",
+                color = Color(0xFF555555),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+
+    if (isLoading.value) {
+        Dialog(onDismissRequest = { }) {
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .background(Color.White, RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = Color(0xFF1B8DDE),
+                    strokeWidth = 4.dp
+                )
+            }
+        }
+    }
+}
+
+
+
+
+
+
 
 
 

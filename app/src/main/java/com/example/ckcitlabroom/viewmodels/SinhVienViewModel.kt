@@ -41,6 +41,17 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
     var danhSachAllSinhVien by mutableStateOf<List<SinhVien>>(emptyList())
         private set
 
+    var isLoggedIn by mutableStateOf(false)
+        private set
+
+    fun markLoggedIn() {
+        isLoggedIn = true
+    }
+
+    fun markLoggedOut() {
+        isLoggedIn = false
+    }
+
     var sinhvienCreateResult by mutableStateOf("")
     var sinhvienUpdateResult by mutableStateOf("")
     var sinhvienDeleteResult by mutableStateOf("")
@@ -189,7 +200,8 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch(Dispatchers.IO) {
             isLoading = true
             try {
-                val result = ITLabRoomRetrofitClient.sinhvienAPIService.getSinhVienByEmailOrMaSV(key)
+                val result =
+                    ITLabRoomRetrofitClient.sinhvienAPIService.getSinhVienByEmailOrMaSV(key)
                 sinhvien = result
             } catch (e: HttpException) {
                 errorMessage = "Lỗi HTTP: ${e.code()} - ${e.message()}"
@@ -238,7 +250,8 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
                 getSinhVienByMaLop(maLop)
 
             } catch (e: Exception) {
-                sinhVienUpdateTrangThaiResult = "Lỗi khi cập nhật trạng thái sinh viên: ${e.message}"
+                sinhVienUpdateTrangThaiResult =
+                    "Lỗi khi cập nhật trạng thái sinh viên: ${e.message}"
                 Log.e("SinhVienViewModel", "Lỗi khi cập nhật trạng thái sinh viên: ${e.message}")
             } finally {
                 isLoading = false
@@ -294,6 +307,28 @@ class SinhVienViewModel(application: Application) : AndroidViewModel(application
             ITLabRoomRetrofitClient.sinhvienAPIService.getSinhVienByEmailOrMaSV(ma)
         } catch (e: Exception) {
             null
+        }
+    }
+
+    fun getSinhVienByMaGOrEmail(key: String, onResult: (SinhVien?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            isLoading = true
+            try {
+                val result =
+                    ITLabRoomRetrofitClient.sinhvienAPIService.getSinhVienByEmailOrMaSV(key)
+                sinhvien = result
+                withContext(Dispatchers.Main) {
+                    onResult(result)
+                }
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage
+                Log.e("API", "Lỗi", e)
+                withContext(Dispatchers.Main) {
+                    onResult(null)
+                }
+            } finally {
+                isLoading = false
+            }
         }
     }
 }

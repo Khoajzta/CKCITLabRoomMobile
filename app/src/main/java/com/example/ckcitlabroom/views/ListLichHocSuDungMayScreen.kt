@@ -44,7 +44,6 @@ import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import kotlin.collections.sortedBy
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,7 +110,7 @@ fun ListLichHocSuDungMay(
         } ?: emptyList()
     }
 
-    val thuList = listOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật")
+    val thuList = listOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật")
     val lichHocTheoThu = thuList.associateWith { thu ->
         lichHocTheoTuan.filter { it.Thu == thu }
     }
@@ -276,10 +275,11 @@ fun ListLichHocSuDungMay(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(lichTrongThu) { lichhoc ->
-                                CardLichHocListSV(lichhoc,
+                                CardLichHocListSV(
+                                    lichhoc,
                                     click = {
                                         navController.navigate(
-                                            NavRoute.LISTSVSUDUNGMAYTHEOCA.route + "?maCa=${lichhoc.MaCaHoc}&maTuan=${lichhoc.MaTuan}&maphong=${lichhoc.MaPhong}&ngaySuDung=${lichhoc.NgayDay}"
+                                            NavRoute.LISTSVSUDUNGMAYTHEOCA.route + "?malichhoc=${lichhoc.MaLichHoc}&maCa=${lichhoc.MaCaHoc}&maTuan=${lichhoc.MaTuan}&maphong=${lichhoc.MaPhong}&ngaySuDung=${lichhoc.NgayDay}"
                                         )
                                     }
                                 )

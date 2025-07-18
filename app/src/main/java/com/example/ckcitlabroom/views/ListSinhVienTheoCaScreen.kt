@@ -48,23 +48,31 @@ import com.composables.icons.lucide.Hash
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.MapPin
 import com.example.ckcitlabroom.viewmodels.ChiTietSuDungMayViewModel
+import com.example.ckcitlabroom.viewmodels.LichHocViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun ListSinhVienTheoCa(
+    malichhoc: String,
     maCa: String,
     maTuan: String,
     maphong: String,
     ngaySuDung: String,
-    chiTietSuDungMayViewModel: ChiTietSuDungMayViewModel
+    chiTietSuDungMayViewModel: ChiTietSuDungMayViewModel,
+    sinhVienViewModel: SinhVienViewModel,
+    lichHocViewModel: LichHocViewModel
 ) {
     val context = LocalContext.current
     var showConfirmDialog by remember { mutableStateOf(false) }
     var selectedChiTiet by remember { mutableStateOf<ChiTietSuDungMayRP?>(null) }
     var pendingDelete by remember { mutableStateOf(false) }
 
+    var lichhoc = lichHocViewModel.lichhoc
+
+
     LaunchedEffect(Unit) {
         chiTietSuDungMayViewModel.getAllChiTietSuDungMay()
+        lichHocViewModel.getLichHocByMaLich(malichhoc)
     }
 
     DisposableEffect(Unit) {
@@ -74,12 +82,39 @@ fun ListSinhVienTheoCa(
     }
 
     val listAllchitiet = chiTietSuDungMayViewModel.danhSachAllChiTiet
+
     val listchitiettheolich = listAllchitiet.filter {
         it.MaCa == maCa.toInt() &&
                 it.MaPhong == maphong &&
                 it.NgaySuDung == ngaySuDung &&
                 it.MaTuan == maTuan.toInt()
+    }?.sortedBy { sv ->
+        sv.TenSinhVien.trim()
+            .split("\\s+".toRegex())
+            .last()
+            .lowercase()
+    } ?: emptyList()
+
+    var sinhvienChinh = emptyList<ChiTietSuDungMayRP>()
+    var sinhvienHocGhep = emptyList<ChiTietSuDungMayRP>()
+
+    if (lichhoc != null) {
+        sinhvienChinh =
+            listchitiettheolich.filter { it.MaLop == lichhoc.MaLopHoc }?.sortedBy { sv ->
+                sv.TenSinhVien.trim()
+                    .split("\\s+".toRegex())
+                    .last()
+                    .lowercase()
+            } ?: emptyList()
+        sinhvienHocGhep =
+            listchitiettheolich.filter { it.MaLop != lichhoc.MaLopHoc }?.sortedBy { sv ->
+                sv.TenSinhVien.trim()
+                    .split("\\s+".toRegex())
+                    .last()
+                    .lowercase()
+            } ?: emptyList()
     }
+
 
     val visibleMap = remember { mutableStateMapOf<Int, Boolean>() }
 
@@ -152,7 +187,7 @@ fun ListSinhVienTheoCa(
                     }
                 }
             } else {
-                items(listchitiettheolich, key = { it.MaChiTietSuDung }) { chitiet ->
+                items(sinhvienChinh, key = { it.MaChiTietSuDung }) { chitiet ->
                     val visible = visibleMap[chitiet.MaChiTietSuDung] ?: true
                     var offsetX by remember { mutableStateOf(0f) }
                     val animatedOffsetX by animateDpAsState(
@@ -252,6 +287,127 @@ fun ListSinhVienTheoCa(
                                         label = "Vị Trí Máy",
                                         value = chitiet.ViTri.toString()
                                     )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!sinhvienHocGhep.isEmpty()) {
+                    item {
+                        Text(
+                            modifier = Modifier.padding(12.dp),
+                            text = "Sinh viên học ghép",
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White
+                        )
+                    }
+
+                    items(sinhvienHocGhep, key = { it.MaChiTietSuDung }) { chitiet ->
+                        val visible = visibleMap[chitiet.MaChiTietSuDung] ?: true
+                        var offsetX by remember { mutableStateOf(0f) }
+                        val animatedOffsetX by animateDpAsState(
+                            targetValue = offsetX.dp,
+                            label = "offset animation"
+                        )
+                        val maxOffset = with(LocalDensity.current) { -60.dp.toPx() }
+
+                        AnimatedVisibility(
+                            visible = visible,
+                            exit = fadeOut() + slideOutHorizontally(targetOffsetX = { -it })
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp)
+                            ) {
+                                // Nền đỏ phía sau với nút Xóa
+                                Card(
+                                    modifier = Modifier.matchParentSize(),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.Red),
+                                    elevation = CardDefaults.cardElevation(0.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.CenterEnd
+                                    ) {
+                                        IconButton(
+                                            onClick = {
+                                                selectedChiTiet = chitiet
+                                                showConfirmDialog = true
+                                            },
+                                            modifier = Modifier.padding(end = 8.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Xóa",
+                                                tint = Color.White
+                                            )
+                                        }
+                                    }
+                                }
+
+                                // Card nội dung có thể trượt
+                                Card(
+                                    modifier = Modifier
+                                        .offset(x = animatedOffsetX)
+                                        .pointerInput(Unit) {
+                                            detectHorizontalDragGestures(
+                                                onDragEnd = {
+                                                    offsetX = if (offsetX < -30f) -60f else 0f
+                                                },
+                                                onHorizontalDrag = { change, dragAmount ->
+                                                    change.consume()
+                                                    val newOffset =
+                                                        (offsetX + dragAmount).coerceIn(
+                                                            maxOffset,
+                                                            0f
+                                                        )
+                                                    offsetX = newOffset
+                                                }
+                                            )
+                                        }
+                                        .fillMaxWidth(),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                                ) {
+                                    Column(modifier = Modifier.padding(16.dp)) {
+                                        Text(
+                                            text = chitiet.TenSinhVien,
+                                            color = Color(0xFF1B8DDE),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp
+                                        )
+
+                                        HorizontalDivider(
+                                            modifier = Modifier
+                                                .padding(vertical = 8.dp)
+                                                .fillMaxWidth(),
+                                            thickness = 2.dp,
+                                            color = Color(0xFFDDDDDD),
+                                        )
+
+                                        InfoRow(
+                                            icon = Lucide.Hash,
+                                            label = "MSSV",
+                                            value = chitiet.MaSV
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        InfoRow(
+                                            icon = Lucide.Hash,
+                                            label = "Mã Máy",
+                                            value = chitiet.MaMay
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        InfoRow(
+                                            icon = Lucide.MapPin,
+                                            label = "Vị Trí Máy",
+                                            value = chitiet.ViTri.toString()
+                                        )
+                                    }
                                 }
                             }
                         }

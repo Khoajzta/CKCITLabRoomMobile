@@ -493,7 +493,9 @@ fun HomeScreen(
                         accentColor = Color(0xffefa439),
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route + "?startIndex=1")
+                            if (giangVien.MaLoaiTaiKhoan == 1) {
+                                navController.navigate(NavRoute.QUANLYPHIEUMUONMAY.route + "?startIndex=1")
+                            }
                         }
                     )
                 }

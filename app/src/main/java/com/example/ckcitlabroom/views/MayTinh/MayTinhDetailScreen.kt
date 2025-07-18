@@ -1,3 +1,4 @@
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -58,6 +59,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun MayTinhDetailScreen(
+    malichhoc: String?,
     maMay: String,
     phongMayViewModel: PhongMayViewModel,
     giangVienViewModel: GiangVienViewModel,
@@ -67,9 +69,10 @@ fun MayTinhDetailScreen(
     chitietsudungmayViewModel: ChiTietSuDungMayViewModel,
     lichhocViewModel: LichHocViewModel
 ) {
-
     val context = LocalContext.current
     val result = chitietsudungmayViewModel.chitietsudungmayCreateResult
+
+    Log.d("malichhoc", malichhoc.toString())
 
     var donNhapViewModel: DonNhapViewModel = viewModel()
     var chiTietDonNhapyViewModel: ChiTietDonNhapyViewModel = viewModel()
@@ -743,6 +746,9 @@ fun MayTinhDetailScreen(
                             val ngayHomNay = LocalDate.now().toString()
                             val maPhongMay = maytinh?.MaPhong
 
+                            Log.d("MaPhongMay", maPhongMay.toString())
+
+
                             // Kiểm tra thông tin cần thiết
                             if (sinhvien == null) {
                                 Toast.makeText(
@@ -771,62 +777,65 @@ fun MayTinhDetailScreen(
                                 return@Button
                             }
 
-                            // Lấy lịch học có cùng ca và ngày
-                            val lichCungCaVaNgay = danhSachLichHoc.firstOrNull { lichHoc ->
-                                lichHoc.MaCaHoc == caHienTai.MaCaHoc &&
-                                        lichHoc.NgayDay == ngayHomNay
-                            }
-
-                            if (lichCungCaVaNgay == null) {
-                                Toast.makeText(
-                                    context,
-                                    "Không có lịch học trong ${caHienTai.TenCa} ngày hôm nay",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                return@Button
-                            }
-
-                            if (lichCungCaVaNgay.MaPhong != maPhongMay) {
-                                Toast.makeText(
-                                    context,
-                                    "Máy tính không đúng phòng học hiện tại",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                return@Button
-                            }
-
-                            val daDiemDanh =
-                                chitietsudungmayViewModel.danhSachAllChiTiet.any { chiTiet ->
-                                    chiTiet.MaSV == sinhvien.MaSinhVien &&
-                                            chiTiet.MaCa == caHienTai.MaCaHoc &&
-                                            chiTiet.NgaySuDung == ngayHomNay
+                            if (malichhoc != null) {
+                                // Lấy lịch học có cùng ca và ngày
+                                val lichCungCaVaNgay = danhSachLichHoc.firstOrNull { lichHoc ->
+                                    lichHoc.MaCaHoc == caHienTai.MaCaHoc &&
+                                            lichHoc.NgayDay == ngayHomNay && lichHoc.MaLichHoc == malichhoc.toInt()
                                 }
 
-                            if (daDiemDanh) {
-                                Toast.makeText(
-                                    context,
-                                    "Bạn đã điểm danh trước đó rồi",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                return@Button
+
+                                if (lichCungCaVaNgay == null) {
+                                    Toast.makeText(
+                                        context,
+                                        "Không có lịch học trong ${caHienTai.TenCa} ngày hôm nay",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    return@Button
+                                }
+
+                                if (lichCungCaVaNgay.MaPhong != maPhongMay) {
+                                    Toast.makeText(
+                                        context,
+                                        "Máy tính không đúng phòng học hiện tại",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    return@Button
+                                }
+
+                                val daDiemDanh =
+                                    chitietsudungmayViewModel.danhSachAllChiTiet.any { chiTiet ->
+                                        chiTiet.MaSV == sinhvien.MaSinhVien &&
+                                                chiTiet.MaCa == caHienTai.MaCaHoc &&
+                                                chiTiet.NgaySuDung == ngayHomNay
+                                    }
+
+                                if (daDiemDanh) {
+                                    Toast.makeText(
+                                        context,
+                                        "Bạn đã điểm danh trước đó rồi",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    return@Button
+                                }
+//
+//                             ✅ Chưa điểm danh → tiến hành
+                                val chitiet = ChiTietSuDungMay(
+                                    MaChiTietSuDung = 0,
+                                    MaSV = sinhvien.MaSinhVien,
+                                    MaCa = lichCungCaVaNgay.MaCaHoc,
+                                    MaTuan = lichCungCaVaNgay.MaTuan,
+                                    NgaySuDung = lichCungCaVaNgay.NgayDay,
+                                    MaMay = maytinh.MaMay,
+                                    MaPhong = lichCungCaVaNgay.MaPhong
+                                )
+
+                                chitietsudungmayViewModel.createChiTietSuDungMay(chitiet)
+
+                                Toast.makeText(context, "Điểm danh thành công", Toast.LENGTH_SHORT)
+                                    .show()
+                                navController.popBackStack()
                             }
-
-                            // ✅ Chưa điểm danh → tiến hành
-                            val chitiet = ChiTietSuDungMay(
-                                MaChiTietSuDung = 0,
-                                MaSV = sinhvien.MaSinhVien,
-                                MaCa = lichCungCaVaNgay.MaCaHoc,
-                                MaTuan = lichCungCaVaNgay.MaTuan,
-                                NgaySuDung = lichCungCaVaNgay.NgayDay,
-                                MaMay = maytinh.MaMay,
-                                MaPhong = lichCungCaVaNgay.MaPhong
-                            )
-
-                            chitietsudungmayViewModel.createChiTietSuDungMay(chitiet)
-
-                            Toast.makeText(context, "Điểm danh thành công", Toast.LENGTH_SHORT)
-                                .show()
-                            navController.popBackStack()
                         },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))

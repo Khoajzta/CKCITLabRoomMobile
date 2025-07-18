@@ -123,7 +123,9 @@ dependencies {
 
     implementation("org.apache.poi:poi-ooxml:5.2.3")
 
-
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+    
     // Google Maps & Other Libs
     implementation(libs.play.services.maps)
     implementation(libs.common)

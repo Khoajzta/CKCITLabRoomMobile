@@ -108,7 +108,7 @@ fun ChiTietLichHocScreen(
         else -> emptyList()
     }
 
-    val thuList = listOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật")
+    val thuList = listOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật")
     val lichHocTheoThu = thuList.associateWith { thu ->
         lichHocTheoTuan.filter { it.Thu == thu }
     }
@@ -168,7 +168,7 @@ fun ChiTietLichHocScreen(
                                 text = thu,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 18.sp,
-                                color = Color.White,
+                                color = Color.Black,
                                 modifier = Modifier.padding(horizontal = 8.dp)
                             )
 

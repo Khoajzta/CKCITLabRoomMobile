@@ -1,5 +1,7 @@
 package com.example.ckcitlabroom.views.SinhVien
 
+import DialogState
+import ErrorDialog
 import NavRoute
 import SinhVien
 import SinhVienViewModel
@@ -91,12 +93,17 @@ fun CreateSinhVienScreen(
             sinhVienViewModel.stopPollingSinhVien()
         }
     }
-
     val coroutineScope = rememberCoroutineScope()
+
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val calendar = remember { Calendar.getInstance() }
 
+    val dialogState = remember { DialogState() }
+
+    ErrorDialog(dialogState)
+
+// Launcher
     val excelLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -104,11 +111,11 @@ fun CreateSinhVienScreen(
         val fileUri: Uri? = data?.data
         if (fileUri != null) {
             coroutineScope.launch {
-                parseExcelFileAndImportSinhVien(context, fileUri, sinhVienViewModel)
+                parseExcelFileAndImportSinhVien(context, fileUri, sinhVienViewModel, dialogState)
             }
         }
-
     }
+
 
     if (showDatePicker) {
         val datePickerDialog = android.app.DatePickerDialog(

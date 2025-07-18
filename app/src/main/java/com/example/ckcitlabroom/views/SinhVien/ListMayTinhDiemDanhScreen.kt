@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +28,8 @@ fun ListMayTinhDiemDanh(
     val lichhoc = lichHocViewModel.lichhoc
     val danhSachMayTinhTheoPhong = mayTinhViewModel.danhSachAllMayTinhtheophong
     val danhSachDiemDanh = chiTietSuDungMayViewModel.danhSachAllChiTiet
+
+    Log.d("Lich hoc", "Lich hoc: $lichhoc")
 
     // Load dữ liệu
     LaunchedEffect(malichhoc) {
@@ -63,7 +66,7 @@ fun ListMayTinhDiemDanh(
                         CardMayTinhDiemDanh(
                             maytinh = maytinh,
                             click = {
-                                navController.navigate(NavRoute.MAYTINHDETAIL.route + "?mamay=${maytinh.MaMay}")
+                                navController.navigate(NavRoute.MAYTINHDETAIL.route + "?mamay=${maytinh.MaMay}&malichhoc=$malichhoc")
                             }
                         )
                     }

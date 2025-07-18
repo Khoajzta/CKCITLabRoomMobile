@@ -56,11 +56,14 @@ fun DiemDanhScreen(
     val danhSachLichHocHienTai = remember(caHienTai, danhSachLichHoc) {
         if (caHienTai != null) {
             val ngayHomNay = LocalDate.now().toString() // yyyy-MM-dd
-            danhSachLichHoc.filter {
-                it.MaCaHoc == caHienTai.MaCaHoc && it.NgayDay == ngayHomNay
-            }
+            danhSachLichHoc
+                .filter {
+                    it.MaCaHoc == caHienTai.MaCaHoc && it.NgayDay == ngayHomNay
+                }
+                .sortedBy { it.MaPhong }  // sắp xếp theo MaPhong tăng dần
         } else emptyList()
     }
+
 
 
     Column(

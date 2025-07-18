@@ -35,12 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.ckcitlabroom.R
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun CardGiangVienInfo(
@@ -48,6 +52,7 @@ fun CardGiangVienInfo(
     navController: NavHostController,
     giangVienViewModel: GiangVienViewModel
 ) {
+    val context = LocalContext.current
     var showLogoutConfirmDialog by remember { mutableStateOf(false) }
 
     if (showLogoutConfirmDialog) {
@@ -62,6 +67,16 @@ fun CardGiangVienInfo(
                     val giangVienNew = giangVien.copy(Token = "")
                     giangVienViewModel.updateGiangVien(giangVienNew)
 
+                    FirebaseAuth.getInstance().signOut()
+
+                    // Sign out GoogleSignInClient (nếu cần)
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken("833001661760-qrmhtiovh0s953a12n6u8hqmni8j7k52.apps.googleusercontent.com")
+                        .requestEmail()
+                        .build()
+                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                    googleSignInClient.signOut()
+
                     giangVienViewModel.setGV(null)
                     giangVienViewModel.resetLoginResult()
                     giangVienViewModel.logout()
@@ -75,22 +90,29 @@ fun CardGiangVienInfo(
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutConfirmDialog = false }) {
-                    Text("Hủy",color = Color.Black)
+                    Text("Hủy", color = Color.Black)
                 }
             },
             title = { Text("Xác nhận đăng xuất", color = Color.Red) },
-            text = { Text("Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?",color = Color.Black) },
+            text = {
+                Text(
+                    "Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?",
+                    color = Color.Black
+                )
+            },
             shape = RoundedCornerShape(16.dp)
         )
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().shadow(4.dp, RoundedCornerShape(20.dp)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(4.dp, RoundedCornerShape(20.dp)),
         elevation = CardDefaults.cardElevation(4.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
 
-    ) {
+        ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp)

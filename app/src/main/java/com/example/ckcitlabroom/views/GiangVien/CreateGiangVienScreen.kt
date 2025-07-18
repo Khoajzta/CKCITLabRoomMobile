@@ -103,8 +103,10 @@ fun CreateGiangVienScreen(
     val calendar = remember { Calendar.getInstance() }
 
     val coroutineScope = rememberCoroutineScope()
+    val dialogState = remember { DialogState() }
 
-    // Launcher for picking Excel file
+    ErrorDialog(dialogState)
+
     val excelLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -112,11 +114,11 @@ fun CreateGiangVienScreen(
         val fileUri: Uri? = data?.data
         if (fileUri != null) {
             coroutineScope.launch {
-                parseExcelFileAndImport(context, fileUri, giangVienViewModel)
+                parseExcelFileAndImportGiangVien(context, fileUri, giangVienViewModel, dialogState)
             }
         }
-
     }
+
 
     if (showDatePicker) {
         val datePickerDialog = android.app.DatePickerDialog(
